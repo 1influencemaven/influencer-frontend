@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import { ThemeProvider } from "@/providers/theme-provider";
 
-export const metadata: Metadata = {
-  title: "Influencer AI",
-  description: "SaaS para conectar influencers con marcas mediante IA.",
-};
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -12,9 +8,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="h-full antialiased">
+    <html lang="es" suppressHydrationWarning className="h-full antialiased">
       <body className="flex min-h-full flex-col bg-background text-foreground">
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

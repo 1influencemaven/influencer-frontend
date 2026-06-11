@@ -1,0 +1,51 @@
+{
+  "Home": {
+    "badge": "Influencer AI",
+    "title": "Connect brands and influencers on a foundation built to scale.",
+    "description": "Initial frontend with internationalization, persistent themes, and shadcn/ui components ready for product work.",
+    "primaryAction": "Go to dashboard",
+    "secondaryAction": "Sign in"
+  },
+  "Login": {
+    "eyebrow": "Secure access",
+    "title": "Sign in",
+    "description": "Enter to manage campaigns, creators, and AI-assisted recommendations.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@brand.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your password",
+    "submit": "Continue",
+    "helper": "The session will use backend HttpOnly cookies."
+  },
+  "Dashboard": {
+    "eyebrow": "Main panel",
+    "title": "Dashboard",
+    "description": "Initial overview for connecting brands with influencers through AI.",
+    "metricCampaigns": "Active campaigns",
+    "metricCreators": "Suggested creators",
+    "metricMatches": "AI matches",
+    "welcome": "Your workspace is ready to grow by modules."
+  },
+  "Sidebar": {
+    "brand": "Influencer AI",
+    "dashboard": "Dashboard",
+    "campaigns": "Campaigns",
+    "creators": "Influencers",
+    "settings": "Settings"
+  },
+  "Theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Locale": {
+    "label": "Language",
+    "es": "Spanish",
+    "en": "English"
+  },
+  "Common": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  }
+}

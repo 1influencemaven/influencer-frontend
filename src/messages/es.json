@@ -1,0 +1,51 @@
+{
+  "Home": {
+    "badge": "Influencer AI",
+    "title": "Conecta marcas e influencers con una base lista para crecer.",
+    "description": "Frontend inicial con internacionalización, temas persistentes y componentes shadcn/ui preparados para producto.",
+    "primaryAction": "Ir al dashboard",
+    "secondaryAction": "Iniciar sesión"
+  },
+  "Login": {
+    "eyebrow": "Acceso seguro",
+    "title": "Inicia sesión",
+    "description": "Entra para gestionar campañas, creadores y recomendaciones asistidas por IA.",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "tu@marca.com",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Tu contraseña",
+    "submit": "Continuar",
+    "helper": "La sesión usará cookies HttpOnly del backend."
+  },
+  "Dashboard": {
+    "eyebrow": "Panel principal",
+    "title": "Dashboard",
+    "description": "Resumen inicial para conectar marcas con influencers mediante IA.",
+    "metricCampaigns": "Campañas activas",
+    "metricCreators": "Creadores sugeridos",
+    "metricMatches": "Coincidencias IA",
+    "welcome": "Tu espacio de trabajo está listo para crecer por módulos."
+  },
+  "Sidebar": {
+    "brand": "Influencer AI",
+    "dashboard": "Dashboard",
+    "campaigns": "Campañas",
+    "creators": "Influencers",
+    "settings": "Configuración"
+  },
+  "Theme": {
+    "label": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "Locale": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "Inglés"
+  },
+  "Common": {
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
+  }
+}
