@@ -57,7 +57,7 @@ export function LoginForm() {
       await login(values);
       const user = await me();
       setUser(user);
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (error) {
       if (isApiError(error) && error.status === 401) {
         setApiError(t("errors.invalidCredentials"));

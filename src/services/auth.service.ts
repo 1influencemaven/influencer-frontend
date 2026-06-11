@@ -1,3 +1,4 @@
+import { parseAuthUser } from "@/lib/auth/parse-auth-user";
 import apiClient from "@/lib/api/client";
 import type {
   AuthUser,
@@ -36,7 +37,7 @@ export async function me(): Promise<AuthUser> {
     validateStatus: (status) => status >= 200 && status < 300,
   });
 
-  return data;
+  return parseAuthUser(data);
 }
 
 export function getAuthErrorMessage(error: unknown): string {

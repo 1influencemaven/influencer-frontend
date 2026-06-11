@@ -33,13 +33,17 @@
     "metricCampaigns": "Campañas activas",
     "metricCreators": "Creadores sugeridos",
     "metricMatches": "Coincidencias IA",
-    "welcome": "Tu espacio de trabajo está listo para crecer por módulos."
+    "welcome": "Tu espacio de trabajo está listo para crecer por módulos.",
+    "adminEyebrow": "Administración",
+    "adminTitle": "Panel de control global",
+    "adminDescription": "Sección visible solo para administradores: gestión de usuarios, permisos y configuración avanzada."
   },
   "Sidebar": {
     "brand": "Influencer AI",
     "dashboard": "Dashboard",
     "campaigns": "Campañas",
     "creators": "Influencers",
+    "users": "Usuarios",
     "settings": "Configuración"
   },
   "Theme": {

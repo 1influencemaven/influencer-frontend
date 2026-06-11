@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance } from "axios";
 import { cookies, headers } from "next/headers";
 
-import { getApiBaseUrl } from "@/config/env";
+import { getServerApiBaseUrl } from "@/config/env";
 import type { ApiRequestConfig } from "@/lib/api/types";
 import { toApiError } from "@/types/api-error";
 import type { ApiResponse } from "@/types/api-response";
@@ -38,7 +38,7 @@ async function buildForwardHeaders(): Promise<Record<string, string>> {
 
 export async function createServerApiClient(): Promise<AxiosInstance> {
   const instance = axios.create({
-    baseURL: getApiBaseUrl(),
+    baseURL: getServerApiBaseUrl(),
     timeout: REQUEST_TIMEOUT_MS,
     headers: await buildForwardHeaders(),
   });

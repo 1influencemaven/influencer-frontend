@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { AdminInsights } from "@/components/dashboard/admin-insights";
 import { routing, type AppLocale } from "@/i18n/routing";
 
 type DashboardPageProps = {
@@ -45,6 +46,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       <section className="rounded-xl border border-dashed border-border bg-muted/40 p-6">
         <p className="text-sm text-muted-foreground">{t("welcome")}</p>
       </section>
+      <AdminInsights />
     </div>
   );
 }

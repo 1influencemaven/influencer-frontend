@@ -33,13 +33,17 @@
     "metricCampaigns": "Active campaigns",
     "metricCreators": "Suggested creators",
     "metricMatches": "AI matches",
-    "welcome": "Your workspace is ready to grow by modules."
+    "welcome": "Your workspace is ready to grow by modules.",
+    "adminEyebrow": "Administration",
+    "adminTitle": "Global control panel",
+    "adminDescription": "Section visible to administrators only: user management, permissions, and advanced settings."
   },
   "Sidebar": {
     "brand": "Influencer AI",
     "dashboard": "Dashboard",
     "campaigns": "Campaigns",
     "creators": "Influencers",
+    "users": "Users",
     "settings": "Settings"
   },
   "Theme": {

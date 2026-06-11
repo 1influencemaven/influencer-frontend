@@ -21,12 +21,8 @@ export function RequireAuth({ children }: RequireAuthProps) {
     }
   }, [isAuthenticated, isHydrated, router]);
 
-  if (!isHydrated) {
+  if (!isHydrated || !isAuthenticated) {
     return <AuthLoadingScreen />;
-  }
-
-  if (!isAuthenticated) {
-    return null;
   }
 
   return children;
