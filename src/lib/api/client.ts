@@ -63,6 +63,15 @@ apiClient.interceptors.request.use((config) => {
     requestConfig.headers.set("Accept-Language", document.documentElement.lang);
   }
 
+  const isAuthGet =
+    requestConfig.method?.toLowerCase() === "get" &&
+    requestConfig.url?.startsWith("/auth");
+
+  if (isAuthGet) {
+    requestConfig.headers.set("Cache-Control", "no-store");
+    requestConfig.headers.set("Pragma", "no-cache");
+  }
+
   logRequest(requestConfig);
 
   return requestConfig;

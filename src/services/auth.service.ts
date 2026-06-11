@@ -29,7 +29,12 @@ export async function logout(): Promise<LogoutResponse> {
 }
 
 export async function me(): Promise<AuthUser> {
-  const { data } = await apiClient.get<AuthUser>(`${AUTH_BASE_PATH}/me`);
+  const { data } = await apiClient.get<AuthUser>(`${AUTH_BASE_PATH}/me`, {
+    // Avoid 304 Not Modified: axios rejects non-2xx and returns an empty body on 304,
+    // which breaks session hydration after a page reload.
+    params: { _: Date.now() },
+    validateStatus: (status) => status >= 200 && status < 300,
+  });
 
   return data;
 }

@@ -15,7 +15,16 @@
     "passwordLabel": "Password",
     "passwordPlaceholder": "Your password",
     "submit": "Continue",
-    "helper": "The session will use backend HttpOnly cookies."
+    "submitting": "Signing in...",
+    "helper": "The session will use backend HttpOnly cookies.",
+    "errors": {
+      "invalidCredentials": "Invalid credentials. Check your email and password.",
+      "generic": "Could not sign in. Please try again.",
+      "emailRequired": "Email address is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMin": "Password must be at least 8 characters."
+    }
   },
   "Dashboard": {
     "eyebrow": "Main panel",
@@ -43,6 +52,11 @@
     "label": "Language",
     "es": "Spanish",
     "en": "English"
+  },
+  "Private": {
+    "brand": "Influencer AI",
+    "logout": "Sign out",
+    "loggingOut": "Signing out..."
   },
   "Common": {
     "openMenu": "Open menu",
