@@ -62,6 +62,45 @@
     "logout": "Sign out",
     "loggingOut": "Signing out..."
   },
+  "Users": {
+    "eyebrow": "Administration",
+    "title": "Users",
+    "description": "Manage platform access accounts.",
+    "createAction": "New user",
+    "emptyState": "No users listed yet. Create the first one using the button above."
+  },
+  "CreateUser": {
+    "eyebrow": "New user",
+    "title": "Register user",
+    "description": "Create an account with role and access credentials.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Jane Doe",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "user@company.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "roleLabel": "Role",
+    "submit": "Create user",
+    "submitting": "Creating user...",
+    "cancel": "Cancel",
+    "roles": {
+      "USER": "User",
+      "ADMIN": "Administrator"
+    },
+    "errors": {
+      "generic": "Could not create the user. Please try again.",
+      "forbidden": "You do not have permission to create users.",
+      "emailConflict": "A user with this email already exists.",
+      "nameRequired": "Name is required.",
+      "nameMin": "Name must be at least 2 characters.",
+      "nameMax": "Name cannot exceed 100 characters.",
+      "emailRequired": "Email address is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMin": "Password must be at least 8 characters.",
+      "roleRequired": "Select a role."
+    }
+  },
   "Common": {
     "openMenu": "Open menu",
     "closeMenu": "Close menu"

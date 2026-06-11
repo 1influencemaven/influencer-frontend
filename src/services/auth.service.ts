@@ -6,7 +6,7 @@ import type {
   LoginResponse,
   LogoutResponse,
 } from "@/types/auth";
-import { isApiError } from "@/types/api-error";
+import { getApiErrorMessage } from "@/types/api-error";
 
 const AUTH_BASE_PATH = "/auth";
 
@@ -41,15 +41,7 @@ export async function me(): Promise<AuthUser> {
 }
 
 export function getAuthErrorMessage(error: unknown): string {
-  if (isApiError(error)) {
-    return error.message;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return "An unexpected error occurred";
+  return getApiErrorMessage(error);
 }
 
 export const authService = {

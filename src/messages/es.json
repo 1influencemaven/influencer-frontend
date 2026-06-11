@@ -62,6 +62,45 @@
     "logout": "Cerrar sesión",
     "loggingOut": "Cerrando sesión..."
   },
+  "Users": {
+    "eyebrow": "Administración",
+    "title": "Usuarios",
+    "description": "Gestiona las cuentas de acceso a la plataforma.",
+    "createAction": "Nuevo usuario",
+    "emptyState": "Aún no hay usuarios listados. Crea el primero desde el botón superior."
+  },
+  "CreateUser": {
+    "eyebrow": "Nuevo usuario",
+    "title": "Registrar usuario",
+    "description": "Crea una cuenta con rol y credenciales de acceso.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "María García",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "usuario@empresa.com",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Mínimo 8 caracteres",
+    "roleLabel": "Rol",
+    "submit": "Crear usuario",
+    "submitting": "Creando usuario...",
+    "cancel": "Cancelar",
+    "roles": {
+      "USER": "Usuario",
+      "ADMIN": "Administrador"
+    },
+    "errors": {
+      "generic": "No se pudo crear el usuario. Inténtalo de nuevo.",
+      "forbidden": "No tienes permisos para crear usuarios.",
+      "emailConflict": "Ya existe un usuario con ese correo electrónico.",
+      "nameRequired": "El nombre es obligatorio.",
+      "nameMin": "El nombre debe tener al menos 2 caracteres.",
+      "nameMax": "El nombre no puede superar los 100 caracteres.",
+      "emailRequired": "El correo electrónico es obligatorio.",
+      "emailInvalid": "Introduce un correo electrónico válido.",
+      "passwordRequired": "La contraseña es obligatoria.",
+      "passwordMin": "La contraseña debe tener al menos 8 caracteres.",
+      "roleRequired": "Selecciona un rol."
+    }
+  },
   "Common": {
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú"

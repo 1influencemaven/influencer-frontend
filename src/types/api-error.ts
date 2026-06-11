@@ -77,3 +77,18 @@ type AxiosLikeError = {
 function isAxiosLikeError(error: unknown): error is AxiosLikeError {
   return isRecord(error) && error.isAxiosError === true;
 }
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallback = "An unexpected error occurred",
+): string {
+  if (isApiError(error)) {
+    return error.message;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallback;
+}
