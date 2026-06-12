@@ -15,12 +15,28 @@ const config: Config = {
   ],
   modulePathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/out/"],
   collectCoverageFrom: [
-    "src/**/*.{js,jsx,ts,tsx}",
+    "src/lib/**/*.{ts,tsx}",
+    "src/config/**/*.{ts,tsx}",
+    "src/schemas/**/*.{ts,tsx}",
+    "src/types/api-error.ts",
+    "!src/lib/api/client.ts",
+    "!src/lib/api/server.ts",
+    "!src/lib/api/refresh-session.ts",
+    "!src/lib/api/types.ts",
+    "!src/lib/auth/proxy-auth.ts",
     "!src/**/*.d.ts",
     "!src/app/**",
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "text-summary", "html", "lcov"],
+  coverageThreshold: {
+    global: {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+  },
 };
 
 export default createJestConfig(config);

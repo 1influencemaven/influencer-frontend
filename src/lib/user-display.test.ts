@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import { getEmailInitials } from "@/lib/user-display";
 
 describe("getEmailInitials", () => {
@@ -11,5 +15,13 @@ describe("getEmailInitials", () => {
 
   it("supports underscore and hyphen separators", () => {
     expect(getEmailInitials("john_doe-test@example.com")).toBe("JD");
+  });
+
+  it("handles emails without separators", () => {
+    expect(getEmailInitials("ab")).toBe("AB");
+  });
+
+  it("uses the full local part when email has no domain separator", () => {
+    expect(getEmailInitials("localpart")).toBe("LO");
   });
 });
