@@ -18,6 +18,8 @@ const config: Config = {
     "src/lib/**/*.{ts,tsx}",
     "src/config/**/*.{ts,tsx}",
     "src/schemas/**/*.{ts,tsx}",
+    "!src/schemas/schema-test-utils.ts",
+    "!src/schemas/**/*.test.ts",
     "src/types/api-error.ts",
     "!src/lib/api/client.ts",
     "!src/lib/api/server.ts",

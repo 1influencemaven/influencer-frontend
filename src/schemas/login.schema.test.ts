@@ -2,73 +2,133 @@
  * @jest-environment node
  */
 
-import { createLoginSchema } from "@/schemas/login.schema";
+import {
+  createLoginSchema,
+  type LoginFormValues,
+} from "@/schemas/login.schema";
+import {
+  expectFieldError,
+  expectParseFailure,
+  expectParseSuccess,
+  expectRequiredFieldFailure,
+} from "@/schemas/schema-test-utils";
 
 const messages = {
   emailRequired: "Email required",
   emailInvalid: "Email invalid",
   passwordRequired: "Password required",
   passwordMin: "Password min",
+} as const;
+
+const validInput: LoginFormValues = {
+  email: "user@example.com",
+  password: "password123",
 };
 
 describe("createLoginSchema", () => {
   const schema = createLoginSchema(messages);
 
-  it("accepts valid credentials", () => {
-    expect(
-      schema.safeParse({
+  describe("valid cases", () => {
+    it("accepts valid credentials", () => {
+      const result = schema.safeParse(validInput);
+      expectParseSuccess(result);
+      expect(result.data).toEqual(validInput);
+    });
+
+    it("accepts the minimum password length", () => {
+      const result = schema.safeParse({
         email: "user@example.com",
-        password: "password123",
-      }).success,
-    ).toBe(true);
+        password: "12345678",
+      });
+
+      expectParseSuccess(result);
+    });
+
+    it("accepts common email formats", () => {
+      const emails = [
+        "user@example.com",
+        "user.name+tag@sub.example.co.uk",
+      ];
+
+      for (const email of emails) {
+        expectParseSuccess(
+          schema.safeParse({ email, password: "password123" }),
+        );
+      }
+    });
   });
 
-  it("rejects missing email", () => {
-    const result = schema.safeParse({ email: "", password: "password123" });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.flatten().fieldErrors.email).toContain(
+  describe("required fields", () => {
+    it("rejects missing email", () => {
+      expectRequiredFieldFailure(
+        schema.safeParse({ password: "password123" }),
+        "email",
+      );
+    });
+
+    it("rejects empty email", () => {
+      expectFieldError(
+        schema.safeParse({ email: "", password: "password123" }),
+        "email",
         messages.emailRequired,
       );
-    }
-  });
-
-  it("rejects invalid email", () => {
-    const result = schema.safeParse({
-      email: "not-an-email",
-      password: "password123",
     });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.flatten().fieldErrors.email).toContain(
-        messages.emailInvalid,
+
+    it("rejects missing password", () => {
+      expectRequiredFieldFailure(
+        schema.safeParse({ email: "user@example.com" }),
+        "password",
       );
-    }
-  });
-
-  it("rejects short passwords", () => {
-    const result = schema.safeParse({
-      email: "user@example.com",
-      password: "short",
     });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.flatten().fieldErrors.password).toContain(
-        messages.passwordMin,
-      );
-    }
-  });
 
-  it("rejects missing password", () => {
-    const result = schema.safeParse({
-      email: "user@example.com",
-      password: "",
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.flatten().fieldErrors.password).toContain(
+    it("rejects empty password", () => {
+      expectFieldError(
+        schema.safeParse({ email: "user@example.com", password: "" }),
+        "password",
         messages.passwordRequired,
       );
-    }
+    });
+
+    it("rejects completely empty payloads", () => {
+      expectParseFailure(schema.safeParse({}));
+    });
+  });
+
+  describe("invalid formats", () => {
+    it.each([
+      "not-an-email",
+      "user@",
+      "@example.com",
+      "user@.com",
+      "user example.com",
+    ])("rejects invalid email: %s", (email) => {
+      expectFieldError(
+        schema.safeParse({ email, password: "password123" }),
+        "email",
+        messages.emailInvalid,
+      );
+    });
+  });
+
+  describe("min/max limits", () => {
+    it("rejects passwords shorter than 8 characters", () => {
+      expectFieldError(
+        schema.safeParse({
+          email: "user@example.com",
+          password: "1234567",
+        }),
+        "password",
+        messages.passwordMin,
+      );
+    });
+
+    it("accepts passwords with exactly 8 characters", () => {
+      expectParseSuccess(
+        schema.safeParse({
+          email: "user@example.com",
+          password: "12345678",
+        }),
+      );
+    });
   });
 });
