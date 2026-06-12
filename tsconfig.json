@@ -59,6 +59,8 @@
   "include": [
     "next-env.d.ts",
     "next.config.ts",
+    "jest.config.ts",
+    "jest.setup.ts",
     "postcss.config.mjs",
     "eslint.config.mjs",
     "src/**/*.ts",
