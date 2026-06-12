@@ -5,7 +5,12 @@ import axios, {
 } from "axios";
 
 import { getApiBaseUrl, isDevelopment } from "@/config/env";
+import {
+  refreshSession,
+  shouldAttemptRefresh,
+} from "@/lib/api/refresh-session";
 import type { ApiRequestConfig } from "@/lib/api/types";
+import { useAuthStore } from "@/stores/auth.store";
 import { toApiError } from "@/types/api-error";
 
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -47,11 +52,11 @@ function logError(error: AxiosError): void {
     return;
   }
 
-  const method = error.config?.method?.toUpperCase() ?? "GET";
-  const url = `${error.config?.baseURL ?? ""}${error.config?.url ?? ""}`;
-  const status = error.response?.status ?? "NETWORK";
+  // const method = error.config?.method?.toUpperCase() ?? "GET";
+  // const url = `${error.config?.baseURL ?? ""}${error.config?.url ?? ""}`;
+  // const status = error.response?.status ?? "NETWORK";
 
-  console.error(`[api] ✕ ${status} ${method} ${url}`);
+  // console.error(`[api] ✕ ${status} ${method} ${url}`);
 }
 
 apiClient.interceptors.request.use((config) => {
@@ -85,13 +90,26 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     logError(error);
 
-    // Future refresh-token flow (error.config supports ApiRequestConfig._retry):
-    // const originalRequest = error.config as InternalAxiosRequestConfig & ApiRequestConfig;
-    // if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-    //   originalRequest._retry = true;
-    //   await refreshSession();
-    //   return apiClient(originalRequest);
-    // }
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & ApiRequestConfig)
+      | undefined;
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      shouldAttemptRefresh(originalRequest.url)
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        await refreshSession();
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        useAuthStore.getState().clearUser();
+        return Promise.reject(toApiError(refreshError));
+      }
+    }
 
     return Promise.reject(toApiError(error));
   },

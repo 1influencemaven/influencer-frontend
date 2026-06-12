@@ -1,10 +1,12 @@
 import { parseAuthUser } from "@/lib/auth/parse-auth-user";
 import apiClient from "@/lib/api/client";
+import { refreshSession } from "@/lib/api/refresh-session";
 import type {
   AuthUser,
   LoginCredentials,
   LoginResponse,
   LogoutResponse,
+  RefreshResponse,
 } from "@/types/auth";
 import { getApiErrorMessage } from "@/types/api-error";
 
@@ -29,6 +31,10 @@ export async function logout(): Promise<LogoutResponse> {
   return data;
 }
 
+export async function refresh(): Promise<RefreshResponse> {
+  return refreshSession();
+}
+
 export async function me(): Promise<AuthUser> {
   const { data } = await apiClient.get<AuthUser>(`${AUTH_BASE_PATH}/me`, {
     // Avoid 304 Not Modified: axios rejects non-2xx and returns an empty body on 304,
@@ -47,6 +53,7 @@ export function getAuthErrorMessage(error: unknown): string {
 export const authService = {
   login,
   logout,
+  refresh,
   me,
   getAuthErrorMessage,
 };

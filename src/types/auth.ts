@@ -23,3 +23,7 @@ export type LoginResponse = {
 export type LogoutResponse = {
   message: string;
 };
+
+export type RefreshResponse = {
+  user: AuthSessionUser;
+};

@@ -3,21 +3,35 @@
 import { useTranslations } from "next-intl";
 
 import { RoleGate } from "@/components/auth/role-gate";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function AdminInsights() {
   const t = useTranslations("Dashboard");
 
   return (
     <RoleGate roles={["ADMIN"]}>
-      <section className="rounded-xl border border-border bg-card p-6 shadow-xs">
-        <p className="text-sm font-medium text-primary">{t("adminEyebrow")}</p>
-        <h2 className="mt-2 text-lg font-semibold tracking-tight">
-          {t("adminTitle")}
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {t("adminDescription")}
-        </p>
-      </section>
+      <Card className="gap-0 border-border/80 py-0 shadow-xs">
+        <CardHeader className="gap-1 border-b border-border/80 py-5">
+          <p className="text-xs font-semibold tracking-wide text-primary uppercase">
+            {t("adminEyebrow")}
+          </p>
+          <CardTitle className="text-base font-semibold">
+            {t("adminTitle")}
+          </CardTitle>
+          <CardDescription>{t("adminDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent className="py-5">
+          <p className="text-sm text-muted-foreground">
+            {t("adminPlaceholder")}
+          </p>
+        </CardContent>
+      </Card>
     </RoleGate>
   );
 }
