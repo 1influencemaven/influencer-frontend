@@ -16,7 +16,7 @@
     "passwordPlaceholder": "Tu contraseña",
     "submit": "Continuar",
     "submitting": "Iniciando sesión...",
-    "helper": "La sesión usará cookies HttpOnly del backend.",
+    "helper": "¿No tienes cuenta? Contacta con tu administrador.",
     "errors": {
       "invalidCredentials": "Credenciales inválidas. Revisa tu correo y contraseña.",
       "generic": "No se pudo iniciar sesión. Inténtalo de nuevo.",
@@ -78,7 +78,25 @@
     "title": "Usuarios",
     "description": "Gestiona las cuentas de acceso a la plataforma.",
     "createAction": "Nuevo usuario",
-    "emptyState": "Aún no hay usuarios listados. Crea el primero desde el botón superior."
+    "emptyState": "Aún no hay usuarios listados. Crea el primero desde el botón superior.",
+    "loading": "Cargando usuarios...",
+    "loadError": "No se pudieron cargar los usuarios. Inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "deleteError": "No se pudo eliminar el usuario. Inténtalo de nuevo.",
+    "deleteForbidden": "No puedes eliminar tu propia cuenta.",
+    "deleteConfirm": "¿Eliminar este usuario?",
+    "deleteConfirmAction": "Confirmar",
+    "deleteCancel": "Cancelar",
+    "deleting": "Eliminando...",
+    "editAction": "Editar",
+    "deleteAction": "Eliminar",
+    "columns": {
+      "name": "Nombre",
+      "email": "Correo",
+      "role": "Rol",
+      "createdAt": "Creado",
+      "actions": "Acciones"
+    }
   },
   "CreateUser": {
     "eyebrow": "Nuevo usuario",
@@ -108,6 +126,41 @@
       "emailRequired": "El correo electrónico es obligatorio.",
       "emailInvalid": "Introduce un correo electrónico válido.",
       "passwordRequired": "La contraseña es obligatoria.",
+      "passwordMin": "La contraseña debe tener al menos 8 caracteres.",
+      "roleRequired": "Selecciona un rol."
+    }
+  },
+  "EditUser": {
+    "eyebrow": "Editar usuario",
+    "title": "Actualizar usuario",
+    "description": "Modifica los datos de acceso y el rol del usuario.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "María García",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "usuario@empresa.com",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Dejar vacío para no cambiar",
+    "roleLabel": "Rol",
+    "submit": "Guardar cambios",
+    "submitting": "Guardando...",
+    "cancel": "Cancelar",
+    "loading": "Cargando usuario...",
+    "backToList": "Volver al listado",
+    "roles": {
+      "USER": "Usuario",
+      "ADMIN": "Administrador"
+    },
+    "errors": {
+      "generic": "No se pudo actualizar el usuario. Inténtalo de nuevo.",
+      "forbidden": "No tienes permisos para editar usuarios.",
+      "notFound": "El usuario no existe o ya fue eliminado.",
+      "loadFailed": "No se pudo cargar el usuario. Inténtalo de nuevo.",
+      "emailConflict": "Ya existe un usuario con ese correo electrónico.",
+      "nameRequired": "El nombre es obligatorio.",
+      "nameMin": "El nombre debe tener al menos 2 caracteres.",
+      "nameMax": "El nombre no puede superar los 100 caracteres.",
+      "emailRequired": "El correo electrónico es obligatorio.",
+      "emailInvalid": "Introduce un correo electrónico válido.",
       "passwordMin": "La contraseña debe tener al menos 8 caracteres.",
       "roleRequired": "Selecciona un rol."
     }

@@ -16,7 +16,7 @@
     "passwordPlaceholder": "Your password",
     "submit": "Continue",
     "submitting": "Signing in...",
-    "helper": "",
+    "helper": "Don't have an account? Contact your administrator.",
     "errors": {
       "invalidCredentials": "Invalid credentials. Check your email and password.",
       "generic": "Could not sign in. Please try again.",
@@ -78,7 +78,25 @@
     "title": "Users",
     "description": "Manage platform access accounts.",
     "createAction": "New user",
-    "emptyState": "No users listed yet. Create the first one using the button above."
+    "emptyState": "No users listed yet. Create the first one using the button above.",
+    "loading": "Loading users...",
+    "loadError": "Could not load users. Please try again.",
+    "retry": "Retry",
+    "deleteError": "Could not delete the user. Please try again.",
+    "deleteForbidden": "You cannot delete your own account.",
+    "deleteConfirm": "Delete this user?",
+    "deleteConfirmAction": "Confirm",
+    "deleteCancel": "Cancel",
+    "deleting": "Deleting...",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "createdAt": "Created",
+      "actions": "Actions"
+    }
   },
   "CreateUser": {
     "eyebrow": "New user",
@@ -108,6 +126,41 @@
       "emailRequired": "Email address is required.",
       "emailInvalid": "Enter a valid email address.",
       "passwordRequired": "Password is required.",
+      "passwordMin": "Password must be at least 8 characters.",
+      "roleRequired": "Select a role."
+    }
+  },
+  "EditUser": {
+    "eyebrow": "Edit user",
+    "title": "Update user",
+    "description": "Modify access details and role for the user.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Jane Doe",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "user@company.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Leave empty to keep current password",
+    "roleLabel": "Role",
+    "submit": "Save changes",
+    "submitting": "Saving...",
+    "cancel": "Cancel",
+    "loading": "Loading user...",
+    "backToList": "Back to list",
+    "roles": {
+      "USER": "User",
+      "ADMIN": "Administrator"
+    },
+    "errors": {
+      "generic": "Could not update the user. Please try again.",
+      "forbidden": "You do not have permission to edit users.",
+      "notFound": "The user does not exist or was already deleted.",
+      "loadFailed": "Could not load the user. Please try again.",
+      "emailConflict": "A user with this email already exists.",
+      "nameRequired": "Name is required.",
+      "nameMin": "Name must be at least 2 characters.",
+      "nameMax": "Name cannot exceed 100 characters.",
+      "emailRequired": "Email address is required.",
+      "emailInvalid": "Enter a valid email address.",
       "passwordMin": "Password must be at least 8 characters.",
       "roleRequired": "Select a role."
     }

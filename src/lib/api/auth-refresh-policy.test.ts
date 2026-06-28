@@ -13,7 +13,6 @@ describe("shouldAttemptRefresh", () => {
     expect(shouldAttemptRefresh("/auth/refresh")).toBe(false);
     expect(shouldAttemptRefresh("/auth/login")).toBe(false);
     expect(shouldAttemptRefresh("/auth/logout")).toBe(false);
-    expect(shouldAttemptRefresh("/auth/register")).toBe(false);
   });
 
   it("returns true for regular api routes", () => {

@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { RequireRole } from "@/components/auth/require-role";
 import { Button } from "@/components/ui/button";
+import { UsersTable } from "@/components/users/users-table";
 import { Link } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 
@@ -34,9 +35,7 @@ export default async function UsersPage({ params }: UsersPageProps) {
             <Link href="/users/new">{t("createAction")}</Link>
           </Button>
         </div>
-        <section className="rounded-xl border border-dashed border-border bg-muted/40 p-6">
-          <p className="text-sm text-muted-foreground">{t("emptyState")}</p>
-        </section>
+        <UsersTable />
       </div>
     </RequireRole>
   );

@@ -2,7 +2,7 @@ import type { UserRole } from "@/types/auth";
 
 export type User = {
   id: string;
-  name?: string;
+  name: string;
   email: string;
   role: UserRole;
   createdAt?: string;
@@ -16,4 +16,15 @@ export type CreateUserPayload = {
   role: UserRole;
 };
 
+export type UpdateUserPayload = {
+  name?: string;
+  email?: string;
+  password?: string;
+  role?: UserRole;
+};
+
 export type CreateUserResponse = User;
+
+export type DeleteUserResponse = {
+  message: string;
+};

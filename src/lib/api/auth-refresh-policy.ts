@@ -2,7 +2,6 @@ const AUTH_PATHS_WITHOUT_REFRESH = [
   "/auth/refresh",
   "/auth/login",
   "/auth/logout",
-  "/auth/register",
 ] as const;
 
 export function shouldAttemptRefresh(url: string | undefined): boolean {
