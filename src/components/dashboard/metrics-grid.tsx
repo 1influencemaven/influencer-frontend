@@ -7,7 +7,7 @@ type MetricsGridProps = {
 
 export function MetricsGrid({ metrics }: MetricsGridProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
       {metrics.map((metric) => (
         <MetricCard
           key={metric.id}

@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AdminInsights } from "@/components/dashboard/admin-insights";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { MetricsGrid } from "@/components/dashboard/metrics-grid";
+import { DashboardMetricsSection } from "@/components/dashboard/dashboard-metrics-section";
 import { UserSummaryCard } from "@/components/dashboard/user-summary-card";
 import {
   Card,
@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { routing, type AppLocale } from "@/i18n/routing";
-import type { DashboardMetric } from "@/types/dashboard";
 
 type DashboardPageProps = {
   params: Promise<{ locale: AppLocale }>;
@@ -27,33 +26,6 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   setRequestLocale(locale);
 
   const t = await getTranslations("Dashboard");
-
-  const metrics: DashboardMetric[] = [
-    {
-      id: "campaigns",
-      label: t("metricCampaigns"),
-      value: "—",
-      hint: t("metricsPlaceholder"),
-      accent: "sky",
-      isPlaceholder: true,
-    },
-    {
-      id: "creators",
-      label: t("metricCreators"),
-      value: "—",
-      hint: t("metricsPlaceholder"),
-      accent: "purple",
-      isPlaceholder: true,
-    },
-    {
-      id: "matches",
-      label: t("metricMatches"),
-      value: "—",
-      hint: t("metricsPlaceholder"),
-      accent: "teal",
-      isPlaceholder: true,
-    },
-  ];
 
   return (
     <>
@@ -74,7 +46,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
             {t("metricsSectionDescription")}
           </p>
         </div>
-        <MetricsGrid metrics={metrics} />
+        <DashboardMetricsSection />
       </section>
 
       <Card className="gap-0 border-dashed border-border/80 bg-muted/30 py-0 shadow-none">
