@@ -12,6 +12,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import {
   createUpdateInfluencerSchema,
   toUpdateInfluencerPayload,
+  type UpdateInfluencerFormInput,
   type UpdateInfluencerFormValues,
 } from "@/schemas/update-influencer.schema";
 import { getInfluencer, updateInfluencer } from "@/services/influencers.service";
@@ -63,7 +64,7 @@ export function EditInfluencerForm({ influencerId }: EditInfluencerFormProps) {
     [schemaMessages],
   );
 
-  const form = useForm<UpdateInfluencerFormValues>({
+  const form = useForm<UpdateInfluencerFormInput, unknown, UpdateInfluencerFormValues>({
     resolver: zodResolver(updateInfluencerSchema),
     defaultValues: {
       name: "",

@@ -25,13 +25,88 @@ export type CreateInfluencerSchemaMessages = {
 
 const optionalString = z.string().optional().or(z.literal(""));
 
-function toOptionalNumber(value: unknown): number | undefined {
-  if (value === "" || value === undefined || value === null) {
+const optionalNumericInput = z.union([z.string(), z.number()]).optional();
+
+function parseOptionalNumber(value: string | number | undefined): number | undefined {
+  if (value === undefined || value === "") {
     return undefined;
   }
 
-  const parsed = Number(value);
+  const parsed = typeof value === "number" ? value : Number(value);
   return Number.isNaN(parsed) ? undefined : parsed;
+}
+
+function optionalIntField(
+  messages: Pick<CreateInfluencerSchemaMessages, "followersMin" | "followersInt">,
+) {
+  return optionalNumericInput
+    .refine(
+      (value) => {
+        if (value === undefined || value === "") return true;
+        return parseOptionalNumber(value) !== undefined;
+      },
+      messages.followersInt,
+    )
+    .refine(
+      (value) => {
+        if (value === undefined || value === "") return true;
+        const parsed = parseOptionalNumber(value);
+        return parsed !== undefined && Number.isInteger(parsed);
+      },
+      messages.followersInt,
+    )
+    .refine(
+      (value) => {
+        if (value === undefined || value === "") return true;
+        const parsed = parseOptionalNumber(value);
+        return parsed !== undefined && parsed >= 0;
+      },
+      messages.followersMin,
+    )
+    .transform((value) => parseOptionalNumber(value));
+}
+
+function optionalEngagementField(
+  messages: Pick<
+    CreateInfluencerSchemaMessages,
+    "engagementMin" | "engagementMax" | "engagementDecimals"
+  >,
+) {
+  return optionalNumericInput
+    .refine(
+      (value) => {
+        if (value === undefined || value === "") return true;
+        return parseOptionalNumber(value) !== undefined;
+      },
+      messages.engagementDecimals,
+    )
+    .refine(
+      (value) => {
+        if (value === undefined || value === "") return true;
+        const parsed = parseOptionalNumber(value);
+        return parsed !== undefined && parsed >= 0;
+      },
+      messages.engagementMin,
+    )
+    .refine(
+      (value) => {
+        if (value === undefined || value === "") return true;
+        const parsed = parseOptionalNumber(value);
+        return parsed !== undefined && parsed <= 100;
+      },
+      messages.engagementMax,
+    )
+    .refine(
+      (value) => {
+        if (value === undefined || value === "") return true;
+        const parsed = parseOptionalNumber(value);
+        if (parsed === undefined) return true;
+        const decimals = parsed.toString().split(".")[1];
+        return !decimals || decimals.length <= 2;
+      },
+      messages.engagementDecimals,
+    )
+    .transform((value) => parseOptionalNumber(value));
 }
 
 export function createCreateInfluencerSchema(
@@ -71,29 +146,8 @@ export function createCreateInfluencerSchema(
       (value) => !value || value.length <= 100,
       messages.subNicheMax,
     ),
-    followers: z.preprocess(
-      toOptionalNumber,
-      z
-        .number({ invalid_type_error: messages.followersInt })
-        .int(messages.followersInt)
-        .min(0, messages.followersMin)
-        .optional(),
-    ),
-    engagement: z.preprocess(
-      toOptionalNumber,
-      z
-        .number({ invalid_type_error: messages.engagementDecimals })
-        .min(0, messages.engagementMin)
-        .max(100, messages.engagementMax)
-        .refine(
-          (value) => {
-            const decimals = value.toString().split(".")[1];
-            return !decimals || decimals.length <= 2;
-          },
-          messages.engagementDecimals,
-        )
-        .optional(),
-    ),
+    followers: optionalIntField(messages),
+    engagement: optionalEngagementField(messages),
     email: optionalString.refine(
       (value) => !value || z.string().email().safeParse(value).success,
       messages.emailInvalid,
@@ -110,7 +164,11 @@ export function createCreateInfluencerSchema(
   });
 }
 
-export type CreateInfluencerFormValues = z.infer<
+export type CreateInfluencerFormInput = z.input<
+  ReturnType<typeof createCreateInfluencerSchema>
+>;
+
+export type CreateInfluencerFormValues = z.output<
   ReturnType<typeof createCreateInfluencerSchema>
 >;
 
@@ -121,7 +179,7 @@ export function toCreateInfluencerPayload(
     name: values.name.trim(),
   };
 
-  const optionalFields: (keyof CreateInfluencerFormValues)[] = [
+  const optionalFields = [
     "instagram",
     "tiktok",
     "youtube",
@@ -131,7 +189,7 @@ export function toCreateInfluencerPayload(
     "subNiche",
     "email",
     "mediaKitUrl",
-  ];
+  ] as const satisfies ReadonlyArray<keyof CreateInfluencerFormValues>;
 
   for (const field of optionalFields) {
     const value = values[field];

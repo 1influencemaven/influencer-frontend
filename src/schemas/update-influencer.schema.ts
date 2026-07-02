@@ -19,7 +19,11 @@ export function createUpdateInfluencerSchema(
   });
 }
 
-export type UpdateInfluencerFormValues = z.infer<
+export type UpdateInfluencerFormInput = z.input<
+  ReturnType<typeof createUpdateInfluencerSchema>
+>;
+
+export type UpdateInfluencerFormValues = z.output<
   ReturnType<typeof createUpdateInfluencerSchema>
 >;
 

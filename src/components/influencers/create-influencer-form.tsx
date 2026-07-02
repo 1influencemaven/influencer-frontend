@@ -12,6 +12,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import {
   createCreateInfluencerSchema,
   toCreateInfluencerPayload,
+  type CreateInfluencerFormInput,
   type CreateInfluencerFormValues,
 } from "@/schemas/create-influencer.schema";
 import { createInfluencer } from "@/services/influencers.service";
@@ -56,7 +57,7 @@ export function CreateInfluencerForm() {
     [schemaMessages],
   );
 
-  const form = useForm<CreateInfluencerFormValues>({
+  const form = useForm<CreateInfluencerFormInput, unknown, CreateInfluencerFormValues>({
     resolver: zodResolver(createInfluencerSchema),
     defaultValues: {
       name: "",
