@@ -175,7 +175,7 @@
   "Influencers": {
     "eyebrow": "Management",
     "title": "Influencers",
-    "description": "Manage creator profiles, audience metrics, and commercial profiles.",
+    "description": "Manage creator profiles, audience metrics, and ideal brand profiles.",
     "createAction": "New influencer",
     "emptyState": "No influencers match the current filters.",
     "loading": "Loading influencers...",
@@ -190,16 +190,16 @@
     "viewAction": "View",
     "editAction": "Edit",
     "deleteAction": "Delete",
-    "profileStatus": {
-      "PENDING": "Pending",
+    "ibpStatus": {
+      "DRAFT": "Draft",
       "PROCESSING": "Processing",
-      "COMPLETED": "Completed",
+      "ACTIVE": "Active",
       "FAILED": "Failed"
     },
     "filters": {
       "search": "Search",
       "searchPlaceholder": "Name, social handles, or email...",
-      "profileStatus": "Profile status",
+      "ibpStatus": "Ideal profile status",
       "allStatuses": "All statuses",
       "country": "Country",
       "countryPlaceholder": "ES",
@@ -221,7 +221,7 @@
       "niche": "Niche",
       "followers": "Followers",
       "engagement": "Engagement",
-      "profileStatus": "Status",
+      "ibpStatus": "Ideal profile",
       "createdAt": "Created",
       "actions": "Actions"
     }
@@ -296,7 +296,7 @@
   },
   "InfluencerDetail": {
     "eyebrow": "Detail",
-    "description": "Full influencer information and commercial profile.",
+    "description": "Full influencer information and ideal brand profile.",
     "loading": "Loading influencer...",
     "backToList": "Back to list",
     "updatedAt": "Updated on {value}",
@@ -306,17 +306,13 @@
     "deleteConfirmAction": "Confirm",
     "deleteCancel": "Cancel",
     "deleting": "Deleting...",
-    "refresh": "Refresh status",
-    "processingHint": "Commercial profile generation is in progress. Refresh to see the result.",
     "sections": {
       "general": "General information",
       "generalDescription": "Identification and commercial contact details.",
       "social": "Social networks",
       "socialDescription": "Handles and platform presence.",
       "metrics": "Metrics",
-      "metricsDescription": "Creator audience and engagement.",
-      "status": "Status",
-      "statusDescription": "Generated commercial profile status."
+      "metricsDescription": "Creator audience and engagement."
     },
     "fields": {
       "name": "Name",
@@ -332,34 +328,96 @@
       "followers": "Followers",
       "engagement": "Engagement"
     },
-    "generateProfile": {
-      "action": "Generate Commercial Profile",
-      "generating": "Generating...",
-      "success": "Generation queued. The commercial profile will update shortly.",
-      "error": "Could not queue generation. Please try again.",
-      "alreadyProcessing": "Generation is already in progress for this influencer.",
-      "notFound": "The influencer does not exist or was already deleted."
-    },
-    "commercialProfile": {
-      "title": "Commercial profile",
-      "description": "Ideal brands, target departments, and buyer personas.",
-      "idealBrands": "Ideal brands",
-      "brandSize": "Brand size",
-      "departments": "Departments",
-      "buyerPersonas": "Buyer personas",
-      "seniority": "Seniority: {value}",
-      "processingHint": "The commercial profile is being generated. Refresh the page to see the result.",
-      "empty": {
-        "PENDING": "The commercial profile has not been generated yet.",
-        "PROCESSING": "The commercial profile is being generated.",
-        "COMPLETED": "No commercial profile data is available.",
-        "FAILED": "The last generation failed. You can try again."
-      }
-    },
     "errors": {
       "notFound": "The influencer does not exist or was already deleted.",
       "loadFailed": "Could not load the influencer. Please try again.",
       "deleteFailed": "Could not delete the influencer. Please try again."
+    }
+  },
+  "IdealBrandProfile": {
+    "title": "Ideal brand profile",
+    "description": "Structured criteria to identify brands that fit this influencer.",
+    "loading": "Loading ideal profile...",
+    "empty": "No ideal profile yet. AI will create a draft you can review and save.",
+    "processingHint": "AI is generating the ideal profile. This may take a few seconds.",
+    "failedHint": "The last generation failed. You can try again.",
+    "staleDataBanner": "The influencer has new data since the last generation. You can regenerate the ideal profile.",
+    "retry": "Retry",
+    "status": {
+      "none": "No profile",
+      "DRAFT": "Draft",
+      "PROCESSING": "Processing",
+      "ACTIVE": "Active",
+      "FAILED": "Failed"
+    },
+    "generate": {
+      "action": "Generate ideal profile",
+      "generating": "Generating...",
+      "error": "Could not queue generation. Please try again.",
+      "alreadyProcessing": "Generation is already in progress.",
+      "notFound": "The influencer does not exist or was already deleted."
+    },
+    "regenerate": {
+      "action": "Regenerate with AI",
+      "regenerating": "Regenerating...",
+      "confirm": "Regenerate the ideal profile? Current content will be overwritten.",
+      "confirmAction": "Regenerate",
+      "cancel": "Cancel",
+      "error": "Could not regenerate the profile. Please try again.",
+      "alreadyProcessing": "Generation is already in progress."
+    },
+    "form": {
+      "targetSectors": "Target sectors",
+      "excludedSectors": "Excluded sectors",
+      "brandSize": "Brand size",
+      "markets": "Markets",
+      "collaborationTypes": "Collaboration types",
+      "summary": "Summary",
+      "alertSignals": "Alert signals",
+      "desirableCriteria": "Desirable criteria",
+      "arrayHint": "One value per line.",
+      "save": "Save profile",
+      "saving": "Saving...",
+      "errors": {
+        "required": "This field is required.",
+        "generic": "Could not save the profile. Please try again.",
+        "processing": "Cannot save while generation is in progress."
+      }
+    },
+    "errors": {
+      "loadFailed": "Could not load the ideal profile. Please try again."
+    }
+  },
+  "Settings": {
+    "eyebrow": "Preferences",
+    "title": "Settings",
+    "description": "Adjust platform parameters, including the ideal brand profile generation prompt.",
+    "ibpPrompt": {
+      "title": "Ideal brand profile (IBP) prompt",
+      "description": "Business instructions the AI uses when generating the ideal brand profile.",
+      "hint": "The JSON output format and influencer data are appended automatically. Only edit the business instructions.",
+      "instructionsLabel": "Instructions",
+      "loading": "Loading prompt...",
+      "characterCount": "{current} / {max} characters",
+      "usingDefault": "Using default",
+      "customized": "Customized",
+      "readOnlyHint": "Only administrators can edit this prompt.",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Prompt saved successfully.",
+      "reset": "Restore default",
+      "resetting": "Restoring...",
+      "resetConfirm": "Restore the default prompt?",
+      "resetConfirmAction": "Confirm",
+      "resetCancel": "Cancel",
+      "resetSuccess": "Prompt restored to the default value.",
+      "errors": {
+        "loadFailed": "Could not load the prompt. Please try again.",
+        "saveFailed": "Could not save the prompt. Please try again.",
+        "resetFailed": "Could not restore the prompt. Please try again.",
+        "required": "Instructions cannot be empty.",
+        "tooLong": "Instructions cannot exceed 8000 characters."
+      }
     }
   }
 }

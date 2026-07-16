@@ -4,11 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 
 import { listInfluencers } from "@/services/influencers.service";
 import { getApiErrorMessage } from "@/types/api-error";
+import type { IbpStatus } from "@/types/ideal-brand-profile";
 import type {
   InfluencerSortBy,
   InfluencersQueryParams,
   PaginatedInfluencersResponse,
-  ProfileStatus,
   SortOrder,
 } from "@/types/influencer";
 
@@ -17,7 +17,7 @@ export type InfluencersListFilters = {
   country: string;
   language: string;
   niche: string;
-  profileStatus: ProfileStatus | "";
+  ibpStatus: IbpStatus | "";
 };
 
 export type InfluencersListState = {
@@ -33,7 +33,7 @@ const DEFAULT_FILTERS: InfluencersListFilters = {
   country: "",
   language: "",
   niche: "",
-  profileStatus: "",
+  ibpStatus: "",
 };
 
 const DEFAULT_STATE: InfluencersListState = {
@@ -68,8 +68,8 @@ function buildQueryParams(state: InfluencersListState): InfluencersQueryParams {
     params.niche = state.filters.niche.trim();
   }
 
-  if (state.filters.profileStatus) {
-    params.profileStatus = state.filters.profileStatus;
+  if (state.filters.ibpStatus) {
+    params.ibpStatus = state.filters.ibpStatus;
   }
 
   return params;

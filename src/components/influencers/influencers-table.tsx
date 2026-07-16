@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
-import { ProfileStatusBadge } from "@/components/influencers/profile-status-badge";
+import { IbpStatusBadge } from "@/components/influencers/ibp-status-badge";
 import { InfluencersTableFilters } from "@/components/influencers/influencers-table-filters";
 import { InfluencersTablePagination } from "@/components/influencers/influencers-table-pagination";
 import { Button } from "@/components/ui/button";
@@ -208,7 +208,7 @@ export function InfluencersTable() {
                   "px-4",
                 )}
                 <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("columns.profileStatus")}
+                  {t("columns.ibpStatus")}
                 </TableHead>
                 {renderSortableHead(
                   "createdAt",
@@ -255,7 +255,9 @@ export function InfluencersTable() {
                           {formatEngagement(influencer.engagement)}
                         </TableCell>
                         <TableCell className="px-4">
-                          <ProfileStatusBadge status={influencer.profileStatus} />
+                          <IbpStatusBadge
+                            status={influencer.idealBrandProfile?.status ?? null}
+                          />
                         </TableCell>
                         <TableCell className="px-4 text-sm text-muted-foreground">
                           {formatCreatedAt(influencer.createdAt, locale)}

@@ -11,7 +11,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   try {
     const [totalResponse, activeResponse] = await Promise.all([
       listInfluencers({ page: 1, limit: 1 }),
-      listInfluencers({ page: 1, limit: 1, profileStatus: "COMPLETED" }),
+      listInfluencers({ page: 1, limit: 1, ibpStatus: "ACTIVE" }),
     ]);
 
     return {

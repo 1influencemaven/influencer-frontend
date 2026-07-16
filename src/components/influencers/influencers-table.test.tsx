@@ -24,7 +24,7 @@ const influencersMessages = {
   filters: {
     search: "Search",
     searchPlaceholder: "Search...",
-    profileStatus: "Profile status",
+    ibpStatus: "Ideal profile status",
     allStatuses: "All statuses",
     country: "Country",
     countryPlaceholder: "ES",
@@ -41,18 +41,19 @@ const influencersMessages = {
     previous: "Previous",
     next: "Next",
   },
-  profileStatus: {
-    PENDING: "Pending",
+  ibpStatus: {
+    DRAFT: "Draft",
     PROCESSING: "Processing",
-    COMPLETED: "Completed",
+    ACTIVE: "Active",
     FAILED: "Failed",
+    none: "No profile",
   },
   columns: {
     name: "Name",
     niche: "Niche",
     followers: "Followers",
     engagement: "Engagement",
-    profileStatus: "Status",
+    ibpStatus: "Ideal profile",
     createdAt: "Created",
     actions: "Actions",
   },
@@ -80,10 +81,10 @@ const translateInfluencers = (key: string) => {
     ];
   }
 
-  if (key.startsWith("profileStatus.")) {
-    const status = key.replace("profileStatus.", "");
-    return influencersMessages.profileStatus[
-      status as keyof typeof influencersMessages.profileStatus
+  if (key.startsWith("ibpStatus.")) {
+    const status = key.replace("ibpStatus.", "");
+    return influencersMessages.ibpStatus[
+      status as keyof typeof influencersMessages.ibpStatus
     ];
   }
 
@@ -91,7 +92,15 @@ const translateInfluencers = (key: string) => {
 };
 
 jest.mock("next-intl", () => ({
-  useTranslations: () => translateInfluencers,
+  useTranslations: (namespace?: string) => (key: string) => {
+    if (namespace === "IdealBrandProfile.status") {
+      return influencersMessages.ibpStatus[
+        key as keyof typeof influencersMessages.ibpStatus
+      ] ?? key;
+    }
+
+    return translateInfluencers(key);
+  },
   useLocale: () => "en",
 }));
 
@@ -127,8 +136,7 @@ const influencer = {
   engagement: "4.50",
   email: "laura@example.com",
   mediaKitUrl: null,
-  profileStatus: "PENDING" as const,
-  commercialProfile: null,
+  idealBrandProfile: null,
   createdAt: "2026-06-01T10:00:00.000Z",
   updatedAt: "2026-06-01T10:00:00.000Z",
 };

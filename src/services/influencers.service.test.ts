@@ -16,7 +16,6 @@ import apiClient from "@/lib/api/client";
 import {
   createInfluencer,
   deleteInfluencer,
-  generateProfile,
   getInfluencer,
   listInfluencers,
   updateInfluencer,
@@ -39,8 +38,7 @@ const influencer = {
   engagement: "4.50",
   email: "laura@example.com",
   mediaKitUrl: null,
-  profileStatus: "PENDING" as const,
-  commercialProfile: null,
+  idealBrandProfile: null,
   createdAt: "2026-06-28T12:00:00.000Z",
   updatedAt: "2026-06-28T12:00:00.000Z",
 };
@@ -64,14 +62,14 @@ describe("influencers.service", () => {
           page: 1,
           limit: 20,
           search: "laura",
-          profileStatus: "PENDING",
+          ibpStatus: "DRAFT",
           sortBy: "name",
           sortOrder: "asc",
         }),
       ).resolves.toEqual(response);
 
       expect(mockedApiClient.get).toHaveBeenCalledWith(
-        "/influencers?page=1&limit=20&search=laura&profileStatus=PENDING&sortBy=name&sortOrder=asc",
+        "/influencers?page=1&limit=20&search=laura&ibpStatus=DRAFT&sortBy=name&sortOrder=asc",
       );
     });
   });
@@ -120,23 +118,6 @@ describe("influencers.service", () => {
 
       await expect(deleteInfluencer("inf-1")).resolves.toEqual(response);
       expect(mockedApiClient.delete).toHaveBeenCalledWith("/influencers/inf-1");
-    });
-  });
-
-  describe("generateProfile", () => {
-    it("queues commercial profile generation", async () => {
-      const response = {
-        message: "Profile generation job enqueued",
-        influencerId: "inf-1",
-        profileStatus: "PROCESSING" as const,
-      };
-
-      mockedApiClient.post.mockResolvedValue(createAxiosResponse(response));
-
-      await expect(generateProfile("inf-1")).resolves.toEqual(response);
-      expect(mockedApiClient.post).toHaveBeenCalledWith(
-        "/influencers/inf-1/generate-profile",
-      );
     });
   });
 });

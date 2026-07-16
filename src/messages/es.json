@@ -175,7 +175,7 @@
   "Influencers": {
     "eyebrow": "Gestión",
     "title": "Influencers",
-    "description": "Administra perfiles de creadores, métricas de audiencia y perfiles comerciales.",
+    "description": "Administra perfiles de creadores, métricas de audiencia y perfiles ideales de marca.",
     "createAction": "Nuevo influencer",
     "emptyState": "No hay influencers que coincidan con los filtros actuales.",
     "loading": "Cargando influencers...",
@@ -190,16 +190,16 @@
     "viewAction": "Ver",
     "editAction": "Editar",
     "deleteAction": "Eliminar",
-    "profileStatus": {
-      "PENDING": "Pendiente",
+    "ibpStatus": {
+      "DRAFT": "Borrador",
       "PROCESSING": "Procesando",
-      "COMPLETED": "Completado",
+      "ACTIVE": "Activo",
       "FAILED": "Fallido"
     },
     "filters": {
       "search": "Búsqueda",
       "searchPlaceholder": "Nombre, redes o email...",
-      "profileStatus": "Estado del perfil",
+      "ibpStatus": "Estado del perfil ideal",
       "allStatuses": "Todos los estados",
       "country": "País",
       "countryPlaceholder": "ES",
@@ -221,7 +221,7 @@
       "niche": "Nicho",
       "followers": "Seguidores",
       "engagement": "Engagement",
-      "profileStatus": "Estado",
+      "ibpStatus": "Perfil ideal",
       "createdAt": "Creado",
       "actions": "Acciones"
     }
@@ -296,7 +296,7 @@
   },
   "InfluencerDetail": {
     "eyebrow": "Detalle",
-    "description": "Información completa del influencer y su perfil comercial.",
+    "description": "Información completa del influencer y su perfil ideal de marca.",
     "loading": "Cargando influencer...",
     "backToList": "Volver al listado",
     "updatedAt": "Actualizado el {value}",
@@ -306,17 +306,13 @@
     "deleteConfirmAction": "Confirmar",
     "deleteCancel": "Cancelar",
     "deleting": "Eliminando...",
-    "refresh": "Actualizar estado",
-    "processingHint": "La generación del perfil comercial está en curso. Actualiza para ver el resultado.",
     "sections": {
       "general": "Información general",
       "generalDescription": "Datos de identificación y contacto comercial.",
       "social": "Redes sociales",
       "socialDescription": "Handles y presencia en plataformas.",
       "metrics": "Métricas",
-      "metricsDescription": "Audiencia y engagement del creador.",
-      "status": "Estado",
-      "statusDescription": "Estado del perfil comercial generado."
+      "metricsDescription": "Audiencia y engagement del creador."
     },
     "fields": {
       "name": "Nombre",
@@ -332,34 +328,96 @@
       "followers": "Seguidores",
       "engagement": "Engagement"
     },
-    "generateProfile": {
-      "action": "Generar Perfil Comercial",
-      "generating": "Generando...",
-      "success": "Generación encolada. El perfil comercial se actualizará en breve.",
-      "error": "No se pudo encolar la generación. Inténtalo de nuevo.",
-      "alreadyProcessing": "Ya hay una generación en curso para este influencer.",
-      "notFound": "El influencer no existe o ya fue eliminado."
-    },
-    "commercialProfile": {
-      "title": "Perfil comercial",
-      "description": "Marcas ideales, departamentos objetivo y buyer personas.",
-      "idealBrands": "Marcas ideales",
-      "brandSize": "Tamaño de marca",
-      "departments": "Departamentos",
-      "buyerPersonas": "Buyer personas",
-      "seniority": "Seniority: {value}",
-      "processingHint": "El perfil comercial se está generando. Actualiza la página para ver el resultado.",
-      "empty": {
-        "PENDING": "Aún no se ha generado el perfil comercial.",
-        "PROCESSING": "El perfil comercial se está generando.",
-        "COMPLETED": "No hay datos de perfil comercial disponibles.",
-        "FAILED": "La última generación falló. Puedes intentarlo de nuevo."
-      }
-    },
     "errors": {
       "notFound": "El influencer no existe o ya fue eliminado.",
       "loadFailed": "No se pudo cargar el influencer. Inténtalo de nuevo.",
       "deleteFailed": "No se pudo eliminar el influencer. Inténtalo de nuevo."
+    }
+  },
+  "IdealBrandProfile": {
+    "title": "Perfil ideal de marca",
+    "description": "Criterios estructurados para identificar marcas compatibles con este influencer.",
+    "loading": "Cargando perfil ideal...",
+    "empty": "Aún no se ha generado el perfil ideal. La IA creará un borrador que podrás revisar y guardar.",
+    "processingHint": "La IA está generando el perfil ideal. Esto puede tardar unos segundos.",
+    "failedHint": "La última generación falló. Puedes intentarlo de nuevo.",
+    "staleDataBanner": "El influencer tiene datos nuevos desde la última generación. Puedes regenerar el perfil ideal.",
+    "retry": "Reintentar",
+    "status": {
+      "none": "Sin perfil",
+      "DRAFT": "Borrador",
+      "PROCESSING": "Procesando",
+      "ACTIVE": "Activo",
+      "FAILED": "Fallido"
+    },
+    "generate": {
+      "action": "Generar perfil ideal",
+      "generating": "Generando...",
+      "error": "No se pudo encolar la generación. Inténtalo de nuevo.",
+      "alreadyProcessing": "Ya hay una generación en curso.",
+      "notFound": "El influencer no existe o ya fue eliminado."
+    },
+    "regenerate": {
+      "action": "Regenerar con IA",
+      "regenerating": "Regenerando...",
+      "confirm": "¿Regenerar el perfil ideal? Se sobrescribirá el contenido actual.",
+      "confirmAction": "Regenerar",
+      "cancel": "Cancelar",
+      "error": "No se pudo regenerar el perfil. Inténtalo de nuevo.",
+      "alreadyProcessing": "Ya hay una generación en curso."
+    },
+    "form": {
+      "targetSectors": "Sectores objetivo",
+      "excludedSectors": "Sectores excluidos",
+      "brandSize": "Tamaño de marca",
+      "markets": "Mercados",
+      "collaborationTypes": "Tipos de colaboración",
+      "summary": "Resumen",
+      "alertSignals": "Señales de alerta",
+      "desirableCriteria": "Criterios deseables",
+      "arrayHint": "Un valor por línea.",
+      "save": "Guardar perfil",
+      "saving": "Guardando...",
+      "errors": {
+        "required": "Este campo es obligatorio.",
+        "generic": "No se pudo guardar el perfil. Inténtalo de nuevo.",
+        "processing": "No se puede guardar mientras la generación está en curso."
+      }
+    },
+    "errors": {
+      "loadFailed": "No se pudo cargar el perfil ideal. Inténtalo de nuevo."
+    }
+  },
+  "Settings": {
+    "eyebrow": "Preferencias",
+    "title": "Configuración",
+    "description": "Ajusta parámetros de la plataforma, incluyendo el prompt de generación del perfil ideal.",
+    "ibpPrompt": {
+      "title": "Prompt del perfil ideal (IBP)",
+      "description": "Instrucciones de negocio que la IA usa al generar el perfil ideal de marca.",
+      "hint": "El formato JSON de salida y los datos del influencer se añaden automáticamente. Solo edita las instrucciones de negocio.",
+      "instructionsLabel": "Instrucciones",
+      "loading": "Cargando prompt...",
+      "characterCount": "{current} / {max} caracteres",
+      "usingDefault": "Usando valor predeterminado",
+      "customized": "Personalizado",
+      "readOnlyHint": "Solo los administradores pueden editar este prompt.",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "saveSuccess": "Prompt guardado correctamente.",
+      "reset": "Restaurar predeterminado",
+      "resetting": "Restaurando...",
+      "resetConfirm": "¿Restaurar el prompt predeterminado?",
+      "resetConfirmAction": "Confirmar",
+      "resetCancel": "Cancelar",
+      "resetSuccess": "Prompt restaurado al valor predeterminado.",
+      "errors": {
+        "loadFailed": "No se pudo cargar el prompt. Inténtalo de nuevo.",
+        "saveFailed": "No se pudo guardar el prompt. Inténtalo de nuevo.",
+        "resetFailed": "No se pudo restaurar el prompt. Inténtalo de nuevo.",
+        "required": "Las instrucciones no pueden estar vacías.",
+        "tooLong": "Las instrucciones no pueden superar los 8000 caracteres."
+      }
     }
   }
 }

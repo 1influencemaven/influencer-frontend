@@ -4,42 +4,30 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { generateProfile } from "@/services/influencers.service";
+import { generateIdealBrandProfile } from "@/services/ideal-brand-profiles.service";
 import { getApiErrorMessage, isApiError } from "@/types/api-error";
-import type { ProfileStatus } from "@/types/influencer";
 
-type GenerateProfileButtonProps = {
+type GenerateIbpButtonProps = {
   influencerId: string;
-  profileStatus: ProfileStatus;
+  disabled?: boolean;
   onSuccess?: () => void;
-  className?: string;
 };
 
-export function GenerateProfileButton({
+export function GenerateIbpButton({
   influencerId,
-  profileStatus,
+  disabled = false,
   onSuccess,
-  className,
-}: GenerateProfileButtonProps) {
-  const t = useTranslations("InfluencerDetail.generateProfile");
+}: GenerateIbpButtonProps) {
+  const t = useTranslations("IdealBrandProfile.generate");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  const isDisabled = isGenerating || profileStatus === "PROCESSING";
 
   async function handleGenerate() {
-    if (isDisabled) {
-      return;
-    }
-
     setIsGenerating(true);
     setError(null);
-    setSuccessMessage(null);
 
     try {
-      await generateProfile(influencerId);
-      setSuccessMessage(t("success"));
+      await generateIdealBrandProfile(influencerId);
       onSuccess?.();
     } catch (generateError) {
       if (isApiError(generateError) && generateError.status === 409) {
@@ -55,21 +43,14 @@ export function GenerateProfileButton({
   }
 
   return (
-    <div className={className}>
+    <div>
       <Button
         type="button"
-        disabled={isDisabled}
+        disabled={disabled || isGenerating}
         onClick={() => void handleGenerate()}
       >
         {isGenerating ? t("generating") : t("action")}
       </Button>
-
-      {successMessage ? (
-        <p className="mt-3 text-sm text-primary" role="status">
-          {successMessage}
-        </p>
-      ) : null}
-
       {error ? (
         <p className="mt-3 text-sm text-destructive" role="alert">
           {error}

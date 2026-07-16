@@ -3,9 +3,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 
-import { CommercialProfileSection } from "@/components/influencers/commercial-profile-section";
-import { GenerateProfileButton } from "@/components/influencers/generate-profile-button";
-import { ProfileStatusBadge } from "@/components/influencers/profile-status-badge";
+import { IdealBrandProfileSection } from "@/components/influencers/ideal-brand-profile-section";
+import { IbpStatusBadge } from "@/components/influencers/ibp-status-badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -135,17 +134,6 @@ export function InfluencerDetailView({ influencerId }: InfluencerDetailViewProps
     }
   }
 
-  function handleGenerateSuccess() {
-    setInfluencer((current) =>
-      current
-        ? {
-            ...current,
-            profileStatus: "PROCESSING",
-          }
-        : current,
-    );
-  }
-
   if (isLoading) {
     return (
       <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
@@ -173,7 +161,7 @@ export function InfluencerDetailView({ influencerId }: InfluencerDetailViewProps
             <h1 className="text-3xl font-semibold tracking-tight">
               {influencer.name}
             </h1>
-            <ProfileStatusBadge status={influencer.profileStatus} />
+            <IbpStatusBadge status={influencer.idealBrandProfile?.status ?? null} />
           </div>
           <p className="text-sm text-muted-foreground">
             {t("updatedAt", {
@@ -183,13 +171,6 @@ export function InfluencerDetailView({ influencerId }: InfluencerDetailViewProps
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          {influencer.profileStatus !== "PROCESSING" ? (
-            <GenerateProfileButton
-              influencerId={influencer.id}
-              profileStatus={influencer.profileStatus}
-              onSuccess={handleGenerateSuccess}
-            />
-          ) : null}
           <Button asChild variant="outline">
             <Link href={`/dashboard/creators/${influencer.id}/edit`}>
               {t("editAction")}
@@ -319,34 +300,11 @@ export function InfluencerDetailView({ influencerId }: InfluencerDetailViewProps
             />
           </CardContent>
         </Card>
-
-        <Card className="gap-0 border-border/80 py-0 shadow-sm">
-          <CardHeader className="gap-1 py-5">
-            <CardTitle className="text-base font-semibold">
-              {t("sections.status")}
-            </CardTitle>
-            <CardDescription>{t("sections.statusDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 pb-5">
-            <ProfileStatusBadge status={influencer.profileStatus} />
-            {influencer.profileStatus === "PROCESSING" ? (
-              <p className="text-sm text-muted-foreground">
-                {t("processingHint")}
-              </p>
-            ) : null}
-            <Button type="button" variant="outline" size="sm" onClick={() => void loadInfluencer()}>
-              {t("refresh")}
-            </Button>
-          </CardContent>
-        </Card>
       </div>
 
-      <CommercialProfileSection
-        profileStatus={influencer.profileStatus}
-        commercialProfile={influencer.commercialProfile}
+      <IdealBrandProfileSection
         influencerId={influencer.id}
-        showGenerateButton={influencer.profileStatus !== "PROCESSING"}
-        onGenerateSuccess={handleGenerateSuccess}
+        influencerUpdatedAt={influencer.updatedAt}
       />
     </div>
   );

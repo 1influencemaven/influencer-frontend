@@ -119,8 +119,7 @@ describe("CreateInfluencerForm", () => {
       engagement: null,
       email: null,
       mediaKitUrl: null,
-      profileStatus: "PENDING",
-      commercialProfile: null,
+      idealBrandProfile: null,
       createdAt: "2026-06-28T12:00:00.000Z",
       updatedAt: "2026-06-28T12:00:00.000Z",
     });

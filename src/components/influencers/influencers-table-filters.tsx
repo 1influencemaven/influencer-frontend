@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { InfluencersListFilters } from "@/hooks/use-influencers-list";
-import { PROFILE_STATUSES } from "@/types/influencer";
+import { IBP_STATUSES } from "@/types/ideal-brand-profile";
 
 type InfluencersTableFiltersProps = {
   filters: InfluencersListFilters;
@@ -37,24 +37,22 @@ export function InfluencersTableFilters({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="influencers-profile-status">
-            {t("filters.profileStatus")}
-          </Label>
+          <Label htmlFor="influencers-ibp-status">{t("filters.ibpStatus")}</Label>
           <select
-            id="influencers-profile-status"
+            id="influencers-ibp-status"
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-            value={filters.profileStatus}
+            value={filters.ibpStatus}
             disabled={disabled}
             onChange={(event) =>
               onFiltersChange({
-                profileStatus: event.target.value as InfluencersListFilters["profileStatus"],
+                ibpStatus: event.target.value as InfluencersListFilters["ibpStatus"],
               })
             }
           >
             <option value="">{t("filters.allStatuses")}</option>
-            {PROFILE_STATUSES.map((status) => (
+            {IBP_STATUSES.map((status) => (
               <option key={status} value={status}>
-                {t(`profileStatus.${status}`)}
+                {t(`ibpStatus.${status}`)}
               </option>
             ))}
           </select>
@@ -113,7 +111,7 @@ export function InfluencersTableFilters({
               country: "",
               language: "",
               niche: "",
-              profileStatus: "",
+              ibpStatus: "",
             })
           }
         >

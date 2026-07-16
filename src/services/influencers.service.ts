@@ -2,7 +2,6 @@ import apiClient from "@/lib/api/client";
 import type {
   CreateInfluencerPayload,
   DeleteInfluencerResponse,
-  GenerateProfileResponse,
   Influencer,
   InfluencersQueryParams,
   PaginatedInfluencersResponse,
@@ -42,8 +41,8 @@ function buildQueryString(params: InfluencersQueryParams): string {
     searchParams.set("subNiche", params.subNiche);
   }
 
-  if (params.profileStatus) {
-    searchParams.set("profileStatus", params.profileStatus);
+  if (params.ibpStatus) {
+    searchParams.set("ibpStatus", params.ibpStatus);
   }
 
   if (params.sortBy) {
@@ -104,20 +103,10 @@ export async function deleteInfluencer(
   return data;
 }
 
-export async function generateProfile(
-  id: string,
-): Promise<GenerateProfileResponse> {
-  const { data } = await apiClient.post<GenerateProfileResponse>(
-    `${INFLUENCERS_PATH}/${id}/generate-profile`,
-  );
-  return data;
-}
-
 export const influencersService = {
   listInfluencers,
   getInfluencer,
   createInfluencer,
   updateInfluencer,
   deleteInfluencer,
-  generateProfile,
 };

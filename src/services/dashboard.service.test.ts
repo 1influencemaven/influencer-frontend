@@ -41,7 +41,7 @@ describe("dashboard.service", () => {
     expect(mockedListInfluencers).toHaveBeenNthCalledWith(2, {
       page: 1,
       limit: 1,
-      profileStatus: "COMPLETED",
+      ibpStatus: "ACTIVE",
     });
   });
 
