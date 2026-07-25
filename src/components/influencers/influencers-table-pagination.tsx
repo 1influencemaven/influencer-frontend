@@ -38,7 +38,7 @@ export function InfluencersTablePagination({
         <label className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>{t("pageSize")}</span>
           <select
-            className="h-9 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-9 rounded-md border border-input bg-background px-2 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
             value={meta.limit}
             disabled={disabled}
             onChange={(event) => onLimitChange(Number(event.target.value))}
