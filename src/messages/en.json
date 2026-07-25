@@ -57,6 +57,7 @@
     "dashboard": "Dashboard",
     "campaigns": "Campaigns",
     "creators": "Influencers",
+    "brandDiscovery": "Brands",
     "users": "Users",
     "settings": "Settings"
   },
@@ -391,10 +392,10 @@
   "Settings": {
     "eyebrow": "Preferences",
     "title": "Settings",
-    "description": "Adjust platform parameters, including the ideal brand profile generation prompt.",
+    "description": "Adjust the guidance the AI receives when generating the ideal brand profile and when searching for candidate brands.",
     "ibpPrompt": {
       "title": "Ideal brand profile (IBP) prompt",
-      "description": "Business instructions the AI uses when generating the ideal brand profile.",
+      "description": "Instructions the AI receives when generating the ideal brand profile.",
       "hint": "The JSON output format and influencer data are appended automatically. Only edit the business instructions.",
       "instructionsLabel": "Instructions",
       "loading": "Loading prompt...",
@@ -418,6 +419,87 @@
         "required": "Instructions cannot be empty.",
         "tooLong": "Instructions cannot exceed 8000 characters."
       }
+    },
+    "brandDiscoveryPrompt": {
+      "title": "Brand search prompt",
+      "description": "Instructions the AI receives when searching and scoring candidate brands.",
+      "hint": "The JSON output contract, IBP, and search hits are appended automatically. Only edit the business guidance. Web search queries are not edited here.",
+      "instructionsLabel": "Instructions",
+      "loading": "Loading prompt...",
+      "characterCount": "{current} / {max} characters",
+      "usingDefault": "Using default",
+      "customized": "Customized",
+      "readOnlyHint": "Only administrators can edit this prompt.",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Prompt saved successfully.",
+      "reset": "Restore default",
+      "resetting": "Restoring...",
+      "resetConfirm": "Restore the default prompt?",
+      "resetConfirmAction": "Confirm",
+      "resetCancel": "Cancel",
+      "resetSuccess": "Prompt restored to the default value.",
+      "errors": {
+        "loadFailed": "Could not load the prompt. Please try again.",
+        "saveFailed": "Could not save the prompt. Please try again.",
+        "resetFailed": "Could not restore the prompt. Please try again.",
+        "required": "Instructions cannot be empty.",
+        "tooLong": "Instructions cannot exceed 8000 characters."
+      }
+    }
+  },
+  "BrandDiscovery": {
+    "eyebrow": "Prospecting",
+    "title": "Brand search",
+    "description": "Select influencers with an active ideal profile and discover candidate brands. Email search comes in a later phase.",
+    "selectTitle": "Influencers",
+    "selectDescription": "Only influencers with an active IBP are listed. You can select several.",
+    "selectAll": "Select all",
+    "clearSelection": "Clear",
+    "limitLabel": "Brands per influencer",
+    "limitHint": "Minimum 1, maximum 20",
+    "searchAction": "Search brands",
+    "searching": "Searching...",
+    "loadingInfluencers": "Loading influencers...",
+    "emptyInfluencers": "No influencers with an active IBP. Save an ideal profile first.",
+    "ibpActive": "Active IBP",
+    "runsTitle": "Recent searches",
+    "runsDescription": "Discovery job status per influencer.",
+    "emptyRuns": "No searches yet.",
+    "resultsTitle": "Selected brands",
+    "resultsDescription": "Expand each influencer and each brand to review details and actions.",
+    "emptyResults": "No brands yet. Start a search to begin.",
+    "emptyInfluencerResults": "This influencer has no candidate brands yet.",
+    "emptyViewSelection": "Select influencers with brands to show them in the accordion.",
+    "emptyFilteredResults": "No brands with this status for this influencer.",
+    "viewTitle": "View brands",
+    "viewDescription": "Only influencers that already have candidates. Choose which ones to show below.",
+    "selectAllView": "Select all",
+    "clearViewSelection": "Clear view",
+    "brandCount": "{count} brands",
+    "goToSearch": "Go to brand search",
+    "influencerSectionTitle": "Candidate brands",
+    "influencerSectionDescription": "Brands discovered for this influencer. Filter by review status.",
+    "loadingCandidates": "Loading brands...",
+    "statusFilterLabel": "Filter by status",
+    "statusFilter": {
+      "all": "All"
+    },
+    "score": "Score {value}",
+    "evidence": "Evidence",
+    "approve": "Approve",
+    "reject": "Reject",
+    "postpone": "Postpone",
+    "runStatus": {
+      "PROCESSING": "Processing",
+      "COMPLETED": "Completed",
+      "FAILED": "Failed"
+    },
+    "candidateStatus": {
+      "UNDER_REVIEW": "Under review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "POSTPONED": "Postponed"
     }
   }
 }

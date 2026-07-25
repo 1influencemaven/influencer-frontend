@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 
 import { IdealBrandProfileSection } from "@/components/influencers/ideal-brand-profile-section";
+import { InfluencerBrandCandidatesSection } from "@/components/influencers/influencer-brand-candidates-section";
 import { IbpStatusBadge } from "@/components/influencers/ibp-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -306,6 +307,8 @@ export function InfluencerDetailView({ influencerId }: InfluencerDetailViewProps
         influencerId={influencer.id}
         influencerUpdatedAt={influencer.updatedAt}
       />
+
+      <InfluencerBrandCandidatesSection influencerId={influencer.id} />
     </div>
   );
 }
