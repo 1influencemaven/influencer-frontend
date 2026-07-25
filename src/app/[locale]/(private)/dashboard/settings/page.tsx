@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { BrandDiscoveryPromptSettings } from "@/components/settings/brand-discovery-prompt-settings";
 import { IbpPromptSettings } from "@/components/settings/ibp-prompt-settings";
 import { routing, type AppLocale } from "@/i18n/routing";
 
@@ -28,6 +29,7 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
       </div>
 
       <IbpPromptSettings />
+      <BrandDiscoveryPromptSettings />
     </div>
   );
 }
