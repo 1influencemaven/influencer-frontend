@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { LeadContactsPanel } from "@/components/lead-discovery/lead-contacts-panel";
 import type {
   BrandCandidate,
   UpdateBrandCandidateStatusPayload,
@@ -135,6 +136,9 @@ export function BrandCandidateAccordion({
                 </div>
               ) : null}
             </div>
+            {candidate.status === "APPROVED" ? (
+              <LeadContactsPanel brandCandidateId={candidate.id} />
+            ) : null}
           </AccordionContent>
         </AccordionItem>
       ))}

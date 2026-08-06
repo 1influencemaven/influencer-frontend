@@ -392,7 +392,7 @@
   "Settings": {
     "eyebrow": "Preferencias",
     "title": "Configuración",
-    "description": "Ajusta las directrices que recibe la IA al generar el perfil ideal y al buscar marcas candidatas.",
+    "description": "Ajusta las directrices que recibe la IA al generar el perfil ideal, buscar marcas y descubrir contactos.",
     "ibpPrompt": {
       "title": "Prompt perfil ideal (IBP)",
       "description": "Instrucciones que recibe la IA al generar el perfil ideal de marca.",
@@ -446,12 +446,39 @@
         "required": "Las instrucciones no pueden estar vacías.",
         "tooLong": "Las instrucciones no pueden superar los 8000 caracteres."
       }
+    },
+    "leadDiscoveryPrompt": {
+      "title": "Prompt búsqueda de contactos",
+      "description": "Instrucciones que recibe la IA al planificar la búsqueda de contactos comerciales.",
+      "hint": "El plan JSON (queries Tavily + scrapers Bright Data) y la lista de scrapers permitidos se añaden automáticamente. Solo edita las directrices de negocio (roles, prioridades).",
+      "instructionsLabel": "Instrucciones",
+      "loading": "Cargando prompt...",
+      "characterCount": "{current} / {max} caracteres",
+      "usingDefault": "Usando predeterminado",
+      "customized": "Personalizado",
+      "readOnlyHint": "Solo los administradores pueden editar este prompt.",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "saveSuccess": "Prompt guardado correctamente.",
+      "reset": "Restaurar predeterminado",
+      "resetting": "Restaurando...",
+      "resetConfirm": "¿Restaurar el prompt predeterminado?",
+      "resetConfirmAction": "Confirmar",
+      "resetCancel": "Cancelar",
+      "resetSuccess": "Prompt restaurado al valor predeterminado.",
+      "errors": {
+        "loadFailed": "No se pudo cargar el prompt. Inténtalo de nuevo.",
+        "saveFailed": "No se pudo guardar el prompt. Inténtalo de nuevo.",
+        "resetFailed": "No se pudo restaurar el prompt. Inténtalo de nuevo.",
+        "required": "Las instrucciones no pueden estar vacías.",
+        "tooLong": "Las instrucciones no pueden superar los 8000 caracteres."
+      }
     }
   },
   "BrandDiscovery": {
     "eyebrow": "Prospección",
     "title": "Búsqueda de marcas",
-    "description": "Selecciona influencers con perfil ideal activo y descubre marcas candidatas. La búsqueda de correos llega en una fase posterior.",
+    "description": "Selecciona influencers con perfil ideal activo y descubre marcas candidatas. En marcas aprobadas puedes buscar varios contactos/emails.",
     "selectTitle": "Influencers",
     "selectDescription": "Solo aparecen influencers con IBP activo. Puedes seleccionar varios.",
     "selectAll": "Seleccionar todos",
@@ -500,6 +527,32 @@
       "APPROVED": "Aprobada",
       "REJECTED": "Rechazada",
       "POSTPONED": "Pospuesta"
+    }
+  },
+  "LeadDiscovery": {
+    "panelTitle": "Contactos / correos",
+    "panelDescription": "La IA planifica la búsqueda (Tavily + Bright Data) y propone contactos. Tú solo revisas y apruebas.",
+    "limitLabel": "Contactos máx.",
+    "searchAction": "Buscar contactos con IA",
+    "searching": "Buscando...",
+    "noProviders": "Ningún proveedor configurado",
+    "leadsTitle": "Leads",
+    "emptyLeads": "Aún no hay contactos. Lanza una búsqueda.",
+    "approve": "Aprobar",
+    "discard": "Descartar",
+    "generic": "Genérico",
+    "leadStatus": {
+      "UNDER_REVIEW": "En revisión",
+      "APPROVED": "Aprobado",
+      "DISCARDED": "Descartado",
+      "DUPLICATE": "Duplicado"
+    },
+    "confidence": {
+      "VALID": "Válido",
+      "PROBABLE": "Probable",
+      "DOUBTFUL": "Dudoso",
+      "INVALID": "Inválido",
+      "UNKNOWN": "Desconocido"
     }
   }
 }

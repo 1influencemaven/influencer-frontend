@@ -392,7 +392,7 @@
   "Settings": {
     "eyebrow": "Preferences",
     "title": "Settings",
-    "description": "Adjust the guidance the AI receives when generating the ideal brand profile and when searching for candidate brands.",
+    "description": "Adjust the guidance the AI receives when generating the ideal brand profile, searching for brands, and discovering contacts.",
     "ibpPrompt": {
       "title": "Ideal brand profile (IBP) prompt",
       "description": "Instructions the AI receives when generating the ideal brand profile.",
@@ -446,12 +446,39 @@
         "required": "Instructions cannot be empty.",
         "tooLong": "Instructions cannot exceed 8000 characters."
       }
+    },
+    "leadDiscoveryPrompt": {
+      "title": "Contact search prompt",
+      "description": "Instructions the AI receives when planning commercial contact discovery.",
+      "hint": "The JSON plan (Tavily queries + Bright Data scrapers) and the scraper allowlist are appended automatically. Only edit business guidance (roles, priorities).",
+      "instructionsLabel": "Instructions",
+      "loading": "Loading prompt...",
+      "characterCount": "{current} / {max} characters",
+      "usingDefault": "Using default",
+      "customized": "Customized",
+      "readOnlyHint": "Only administrators can edit this prompt.",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Prompt saved successfully.",
+      "reset": "Restore default",
+      "resetting": "Restoring...",
+      "resetConfirm": "Restore the default prompt?",
+      "resetConfirmAction": "Confirm",
+      "resetCancel": "Cancel",
+      "resetSuccess": "Prompt restored to the default value.",
+      "errors": {
+        "loadFailed": "Could not load the prompt. Please try again.",
+        "saveFailed": "Could not save the prompt. Please try again.",
+        "resetFailed": "Could not restore the prompt. Please try again.",
+        "required": "Instructions cannot be empty.",
+        "tooLong": "Instructions cannot exceed 8000 characters."
+      }
     }
   },
   "BrandDiscovery": {
     "eyebrow": "Prospecting",
     "title": "Brand search",
-    "description": "Select influencers with an active ideal profile and discover candidate brands. Email search comes in a later phase.",
+    "description": "Select influencers with an active ideal profile and discover candidate brands. On approved brands you can search multiple contacts/emails.",
     "selectTitle": "Influencers",
     "selectDescription": "Only influencers with an active IBP are listed. You can select several.",
     "selectAll": "Select all",
@@ -500,6 +527,32 @@
       "APPROVED": "Approved",
       "REJECTED": "Rejected",
       "POSTPONED": "Postponed"
+    }
+  },
+  "LeadDiscovery": {
+    "panelTitle": "Contacts / emails",
+    "panelDescription": "AI plans the search (Tavily + Bright Data) and proposes contacts. You only review and approve.",
+    "limitLabel": "Max contacts",
+    "searchAction": "Search contacts with AI",
+    "searching": "Searching...",
+    "noProviders": "No provider configured",
+    "leadsTitle": "Leads",
+    "emptyLeads": "No contacts yet. Start a search.",
+    "approve": "Approve",
+    "discard": "Discard",
+    "generic": "Generic",
+    "leadStatus": {
+      "UNDER_REVIEW": "Under review",
+      "APPROVED": "Approved",
+      "DISCARDED": "Discarded",
+      "DUPLICATE": "Duplicate"
+    },
+    "confidence": {
+      "VALID": "Valid",
+      "PROBABLE": "Probable",
+      "DOUBTFUL": "Doubtful",
+      "INVALID": "Invalid",
+      "UNKNOWN": "Unknown"
     }
   }
 }
