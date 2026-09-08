@@ -1,6 +1,7 @@
 import apiClient from "@/lib/api/client";
 import type {
   Lead,
+  LeadDetail,
   LeadDiscoveryRun,
   LeadProviderOptionsResponse,
   LeadProvidersResponse,
@@ -82,10 +83,25 @@ export async function listLeads(filters?: {
   return data;
 }
 
+export async function getLeadById(id: string): Promise<LeadDetail> {
+  const { data } = await apiClient.get<LeadDetail>(`${PATH}/leads/${id}`);
+  return data;
+}
+
 export async function updateLeadStatus(
   id: string,
   payload: UpdateLeadStatusPayload,
 ): Promise<Lead> {
   const { data } = await apiClient.patch<Lead>(`${PATH}/leads/${id}`, payload);
+  return data;
+}
+
+export async function selectLeadForOutreach(id: string): Promise<Lead> {
+  const { data } = await apiClient.post<Lead>(`${PATH}/leads/${id}/select`);
+  return data;
+}
+
+export async function deselectLeadForOutreach(id: string): Promise<Lead> {
+  const { data } = await apiClient.delete<Lead>(`${PATH}/leads/${id}/select`);
   return data;
 }
