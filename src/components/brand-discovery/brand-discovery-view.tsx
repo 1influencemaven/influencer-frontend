@@ -31,6 +31,7 @@ export function BrandDiscoveryView() {
     limit,
     setLimit,
     updatingId,
+    deletingId,
     error,
     hasProcessing,
     toggleInfluencer,
@@ -42,6 +43,7 @@ export function BrandDiscoveryView() {
     setInfluencerStatusFilter,
     startSearch,
     updateStatus,
+    deleteCandidate,
   } = useBrandDiscovery();
 
   return (
@@ -288,9 +290,13 @@ export function BrandDiscoveryView() {
                     <BrandCandidateAccordion
                       candidates={group.items}
                       updatingId={updatingId}
+                      deletingId={deletingId}
                       emptyMessage={t("emptyFilteredResults")}
                       onUpdateStatus={(id, payload) => {
                         void updateStatus(id, payload);
+                      }}
+                      onDelete={(id) => {
+                        void deleteCandidate(id);
                       }}
                     />
                   </div>

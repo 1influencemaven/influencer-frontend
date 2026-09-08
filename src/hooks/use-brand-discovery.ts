@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
+  deleteBrandCandidate,
   listBrandCandidates,
   listBrandDiscoveryRuns,
   searchBrands,
@@ -51,6 +52,7 @@ export function useBrandDiscovery() {
   const [searching, setSearching] = useState(false);
   const [limit, setLimit] = useState(20);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const influencersWithBrands = useMemo(() => {
@@ -264,6 +266,19 @@ export function useBrandDiscovery() {
     [],
   );
 
+  const deleteCandidate = useCallback(async (id: string) => {
+    setDeletingId(id);
+    setError(null);
+    try {
+      await deleteBrandCandidate(id);
+      setCandidates((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Could not delete brand"));
+    } finally {
+      setDeletingId(null);
+    }
+  }, []);
+
   return {
     influencers,
     selectedIds,
@@ -276,6 +291,7 @@ export function useBrandDiscovery() {
     limit,
     setLimit,
     updatingId,
+    deletingId,
     error,
     hasProcessing,
     toggleInfluencer,
@@ -287,6 +303,7 @@ export function useBrandDiscovery() {
     setInfluencerStatusFilter,
     startSearch,
     updateStatus,
+    deleteCandidate,
     refreshResults,
   };
 }

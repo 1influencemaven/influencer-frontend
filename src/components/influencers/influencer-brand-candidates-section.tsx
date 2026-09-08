@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import {
+  deleteBrandCandidate,
   listBrandCandidates,
   updateBrandCandidateStatus,
 } from "@/services/brand-discovery.service";
@@ -38,6 +39,7 @@ export function InfluencerBrandCandidatesSection({
   const [candidates, setCandidates] = useState<BrandCandidate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const loadCandidates = useCallback(async () => {
@@ -81,6 +83,22 @@ export function InfluencerBrandCandidatesSection({
     [statusFilter],
   );
 
+  const handleDelete = useCallback(
+    async (id: string) => {
+      setDeletingId(id);
+      setError(null);
+      try {
+        await deleteBrandCandidate(id);
+        setCandidates((prev) => prev.filter((item) => item.id !== id));
+      } catch (err) {
+        setError(getApiErrorMessage(err, t("deleteError")));
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [t],
+  );
+
   return (
     <Card className="gap-0 border-border/80 py-0 shadow-sm">
       <CardHeader className="gap-1 py-5">
@@ -116,8 +134,12 @@ export function InfluencerBrandCandidatesSection({
           <BrandCandidateAccordion
             candidates={candidates}
             updatingId={updatingId}
+            deletingId={deletingId}
             onUpdateStatus={(id, payload) => {
               void handleUpdateStatus(id, payload);
+            }}
+            onDelete={(id) => {
+              void handleDelete(id);
             }}
           />
         )}

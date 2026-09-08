@@ -64,3 +64,7 @@ export async function updateBrandCandidateStatus(
   );
   return data;
 }
+
+export async function deleteBrandCandidate(id: string): Promise<void> {
+  await apiClient.delete(`${PATH}/candidates/${id}`);
+}

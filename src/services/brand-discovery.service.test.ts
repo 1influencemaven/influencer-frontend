@@ -13,7 +13,10 @@ jest.mock("../lib/api/client", () => ({
 }));
 
 import apiClient from "@/lib/api/client";
-import { searchBrands } from "@/services/brand-discovery.service";
+import {
+  deleteBrandCandidate,
+  searchBrands,
+} from "@/services/brand-discovery.service";
 import { createAxiosResponse } from "@/services/service-test-utils";
 import type { SearchBrandsResponse } from "@/types/brand-discovery";
 
@@ -53,5 +56,15 @@ describe("brand-discovery.service", () => {
       influencerIds: ["id-1"],
       limit: 5,
     });
+  });
+
+  it("deletes a brand candidate", async () => {
+    mockedApiClient.delete.mockResolvedValue(createAxiosResponse(undefined));
+
+    await deleteBrandCandidate("bc-1");
+
+    expect(mockedApiClient.delete).toHaveBeenCalledWith(
+      "/brand-discovery/candidates/bc-1",
+    );
   });
 });

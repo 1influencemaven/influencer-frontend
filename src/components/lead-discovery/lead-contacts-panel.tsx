@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
+import { LeadListItem } from "@/components/lead-discovery/lead-list-item";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useLeadDiscovery } from "@/hooks/use-lead-discovery";
@@ -24,9 +24,12 @@ export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) 
     error,
     hasProcessing,
     loadingMeta,
+    loadingLeads,
     canSearch,
     startSearch,
     updateStatus,
+    selectForOutreach,
+    deselectForOutreach,
   } = useLeadDiscovery(brandCandidateId);
 
   return (
@@ -74,67 +77,26 @@ export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) 
         <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {t("leadsTitle")}
         </h5>
-        {leads.length === 0 ? (
+        {loadingLeads ? (
+          <p className="text-xs text-muted-foreground">{t("loadingLeads")}</p>
+        ) : leads.length === 0 ? (
           <p className="text-xs text-muted-foreground">{t("emptyLeads")}</p>
         ) : (
           <ul className="space-y-2">
             {leads.map((lead) => (
-              <li
+              <LeadListItem
                 key={lead.id}
-                className="flex flex-col gap-2 rounded-md border border-border bg-background p-2 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="min-w-0 space-y-1">
-                  <p className="truncate text-sm font-medium">
-                    {lead.contactName}
-                    {lead.title ? (
-                      <span className="font-normal text-muted-foreground">
-                        {" "}
-                        · {lead.title}
-                      </span>
-                    ) : null}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {lead.email}
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    <Badge variant="outline">
-                      {t(`leadStatus.${lead.status}`)}
-                    </Badge>
-                    <Badge variant="secondary">
-                      {t(`confidence.${lead.emailConfidence}`)}
-                    </Badge>
-                    {lead.isGeneric ? (
-                      <Badge variant="destructive">{t("generic")}</Badge>
-                    ) : null}
-                    <Badge variant="outline">{lead.providerId}</Badge>
-                  </div>
-                </div>
-                {lead.status === "UNDER_REVIEW" ? (
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      disabled={updatingId === lead.id}
-                      onClick={() =>
-                        void updateStatus(lead.id, { status: "APPROVED" })
-                      }
-                    >
-                      {t("approve")}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={updatingId === lead.id}
-                      onClick={() =>
-                        void updateStatus(lead.id, { status: "DISCARDED" })
-                      }
-                    >
-                      {t("discard")}
-                    </Button>
-                  </div>
-                ) : null}
-              </li>
+                lead={lead}
+                isUpdating={updatingId === lead.id}
+                onApprove={() =>
+                  void updateStatus(lead.id, { status: "APPROVED" })
+                }
+                onDiscard={() =>
+                  void updateStatus(lead.id, { status: "DISCARDED" })
+                }
+                onSelectForOutreach={() => void selectForOutreach(lead.id)}
+                onDeselectForOutreach={() => void deselectForOutreach(lead.id)}
+              />
             ))}
           </ul>
         )}

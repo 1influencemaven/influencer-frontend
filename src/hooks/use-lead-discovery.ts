@@ -3,15 +3,19 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
+  deselectLeadForOutreach,
+  getLeadById,
   listLeadDiscoveryRuns,
   listLeadProviders,
   listLeads,
   searchLeads,
+  selectLeadForOutreach,
   updateLeadStatus,
 } from "@/services/lead-discovery.service";
+import { fetchLeadDetailsForList } from "@/lib/lead-discovery-enrichment";
 import { getApiErrorMessage } from "@/types/api-error";
 import type {
-  Lead,
+  LeadDetail,
   LeadDiscoveryRun,
   UpdateLeadStatusPayload,
 } from "@/types/lead-discovery";
@@ -19,13 +23,18 @@ import type {
 const POLL_INTERVAL_MS = 2500;
 const AUTONOMOUS_PROVIDER = "ai+brightdata";
 
+/**
+ * Lead discovery for an approved brand. List rows use {@link LeadDetail} (enriched
+ * via GET /leads/:id) — temporary D3.1 until the list endpoint includes channels.
+ */
 export function useLeadDiscovery(brandCandidateId: string | null) {
   const [providers, setProviders] = useState<string[]>([]);
   const [defaultProvider, setDefaultProvider] = useState<string | null>(null);
   const [limit, setLimit] = useState(10);
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leads, setLeads] = useState<LeadDetail[]>([]);
   const [runs, setRuns] = useState<LeadDiscoveryRun[]>([]);
   const [loadingMeta, setLoadingMeta] = useState(false);
+  const [loadingLeads, setLoadingLeads] = useState(false);
   const [searching, setSearching] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,11 +49,12 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
     if (!brandCandidateId) {
       return;
     }
-    const [nextLeads, nextRuns] = await Promise.all([
+    const [listRows, nextRuns] = await Promise.all([
       listLeads({ brandCandidateId }),
       listLeadDiscoveryRuns({ brandCandidateId }),
     ]);
-    setLeads(nextLeads);
+    const details = await fetchLeadDetailsForList(listRows.map((row) => row.id));
+    setLeads(details);
     setRuns(nextRuns);
   }, [brandCandidateId]);
 
@@ -76,17 +86,21 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
 
   useEffect(() => {
     if (!brandCandidateId) {
-      setLeads([]);
-      setRuns([]);
       return;
     }
     let cancelled = false;
     async function load() {
+      setLoadingLeads(true);
+      setError(null);
       try {
         await refreshLeadsAndRuns();
       } catch (err) {
         if (!cancelled) {
           setError(getApiErrorMessage(err));
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingLeads(false);
         }
       }
     }
@@ -138,32 +152,65 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
     refreshLeadsAndRuns,
   ]);
 
+  const replaceLeadDetail = useCallback((detail: LeadDetail) => {
+    setLeads((prev) =>
+      prev.map((lead) => (lead.id === detail.id ? detail : lead)),
+    );
+  }, []);
+
   const updateStatus = useCallback(
     async (id: string, payload: UpdateLeadStatusPayload) => {
       setUpdatingId(id);
       setError(null);
       try {
-        const updated = await updateLeadStatus(id, payload);
-        setLeads((prev) =>
-          prev.map((lead) => (lead.id === id ? updated : lead)),
-        );
+        await updateLeadStatus(id, payload);
+        const detail = await getLeadById(id);
+        replaceLeadDetail(detail);
       } catch (err) {
         setError(getApiErrorMessage(err));
       } finally {
         setUpdatingId(null);
       }
     },
-    [],
+    [replaceLeadDetail],
   );
+
+  const selectForOutreach = useCallback(async (id: string) => {
+    setUpdatingId(id);
+    setError(null);
+    try {
+      await selectLeadForOutreach(id);
+      await refreshLeadsAndRuns();
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setUpdatingId(null);
+    }
+  }, [refreshLeadsAndRuns]);
+
+  const deselectForOutreach = useCallback(async (id: string) => {
+    setUpdatingId(id);
+    setError(null);
+    try {
+      await deselectLeadForOutreach(id);
+      const detail = await getLeadById(id);
+      replaceLeadDetail(detail);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setUpdatingId(null);
+    }
+  }, [replaceLeadDetail]);
 
   return {
     providers,
     defaultProvider,
     limit,
     setLimit,
-    leads,
-    runs,
+    leads: brandCandidateId ? leads : [],
+    runs: brandCandidateId ? runs : [],
     loadingMeta,
+    loadingLeads,
     searching,
     updatingId,
     error,
@@ -171,5 +218,7 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
     canSearch,
     startSearch,
     updateStatus,
+    selectForOutreach,
+    deselectForOutreach,
   };
 }
