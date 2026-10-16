@@ -24,6 +24,9 @@ export type ContactChannelSource =
   | "LEGACY_MIGRATION"
   | "BRAND_WEBSITE";
 
+/** ADR-0016 — orthogonal to isGeneric. UI does not surface this in Phase 0. */
+export type CommercialRelevance = "HIGH" | "NEUTRAL" | "LOW" | "UNKNOWN";
+
 export type OutreachReadiness = "LIMITED" | "PARTIAL" | "READY";
 
 export type ContactChannel = {
@@ -35,6 +38,7 @@ export type ContactChannel = {
   source: ContactChannelSource;
   sourceUrl: string | null;
   isGeneric: boolean | null;
+  commercialRelevance?: CommercialRelevance;
   metadata: unknown;
   createdAt: string;
   updatedAt: string;
@@ -91,6 +95,8 @@ export type LeadDiscoveryRun = {
   providerId: string;
   providerOptions: unknown;
   limit: number;
+  /** ADR-0017 — present on COMPLETED runs when provider returned audit metadata. */
+  searchMetadata?: LeadSearchMetadata | null;
   errorMessage: string | null;
   createdAt: string;
   updatedAt: string;
@@ -105,6 +111,30 @@ export type LeadDiscoveryRun = {
     id: string;
     name: string;
   };
+};
+
+export type BusinessContactDiscoverySummary = {
+  pagesAttempted: number;
+  pagesSucceeded: number;
+  pagesFailed: number;
+  emailsFound: number;
+  contactsCreated: number;
+  contactsUpdated: number;
+};
+
+/** ADR-0017 / ADR-0018 run audit. See docs — not a UI surface yet. */
+export type LeadSearchMetadata = {
+  strategy: "llm" | "manual" | "unknown";
+  tracks: Array<"2A" | "2B" | "2C">;
+  priorityRoles: string[];
+  scraperIds: string[];
+  plannedQueriesCount: number;
+  validatedQueriesCount: number;
+  queries: string[];
+  fallbackUsed: boolean;
+  fallbackReason: string | null;
+  searchHitsCount: number;
+  businessContactDiscovery?: BusinessContactDiscoverySummary;
 };
 
 export type Lead = {
