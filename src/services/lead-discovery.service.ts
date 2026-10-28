@@ -1,5 +1,6 @@
 import apiClient from "@/lib/api/client";
 import type {
+  BrandBusinessContact,
   Lead,
   LeadDetail,
   LeadDiscoveryRun,
@@ -8,8 +9,10 @@ import type {
   LeadStatus,
   SearchLeadsPayload,
   SearchLeadsResponse,
+  UnlockerDiagnosticResult,
   UpdateLeadStatusPayload,
 } from "@/types/lead-discovery";
+import { UNLOCKER_DIAGNOSTIC_ALLOWED_URL } from "@/types/lead-discovery";
 
 const PATH = "/lead-discovery";
 
@@ -53,6 +56,16 @@ export async function listLeadDiscoveryRuns(filters?: {
   const query = params.toString();
   const { data } = await apiClient.get<LeadDiscoveryRun[]>(
     `${PATH}/runs${query ? `?${query}` : ""}`,
+  );
+  return data;
+}
+
+export async function listBrandBusinessContacts(
+  brandCandidateId: string,
+): Promise<BrandBusinessContact[]> {
+  const params = new URLSearchParams({ brandCandidateId });
+  const { data } = await apiClient.get<BrandBusinessContact[]>(
+    `${PATH}/business-contacts?${params.toString()}`,
   );
   return data;
 }
@@ -103,5 +116,16 @@ export async function selectLeadForOutreach(id: string): Promise<Lead> {
 
 export async function deselectLeadForOutreach(id: string): Promise<Lead> {
   const { data } = await apiClient.delete<Lead>(`${PATH}/leads/${id}/select`);
+  return data;
+}
+
+/** ADMIN local Unlocker probe — one URL, no discovery run, no HTML in response. */
+export async function probeUnlockerDiagnostic(
+  url: typeof UNLOCKER_DIAGNOSTIC_ALLOWED_URL = UNLOCKER_DIAGNOSTIC_ALLOWED_URL,
+): Promise<UnlockerDiagnosticResult> {
+  const { data } = await apiClient.post<UnlockerDiagnosticResult>(
+    `${PATH}/diagnostics/unlocker`,
+    { url },
+  );
   return data;
 }

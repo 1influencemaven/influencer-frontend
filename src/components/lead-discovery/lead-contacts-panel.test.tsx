@@ -17,6 +17,10 @@ const messages = {
   searching: "Searching...",
   leadsTitle: "Leads",
   emptyLeads: "No leads found yet.",
+  emptyLeadsLegitimate:
+    "Search finished with no matching people. This is a valid empty result, not a technical failure.",
+  emptyLeadsAfterProviderFailure:
+    "No leads were saved because a discovery provider failed. See the warning above.",
   loadingLeads: "Loading leads…",
   approve: "Approve",
   discard: "Discard",
@@ -43,28 +47,82 @@ const messages = {
     PARTIAL: "Partial",
     READY: "Ready",
   },
+  runOutcome: {
+    providerFailureTitle: "Provider failure",
+    emptyLegitimateTitle: "No matching contacts",
+    emptyLegitimateBody: "Valid empty.",
+    pagesSummary:
+      "Pages attempted: {attempted}, succeeded: {succeeded}, failed: {failed}",
+    peopleTraceSummary: "hits {hits}",
+    warnings: {
+      unlocker_all_pages_failed: "Unlocker failed for every attempted page.",
+      people_scraper_all_failed: "Scraper failed.",
+      people_search_provider_failed: "Search failed.",
+      mixed_provider_failure: "Mixed failure.",
+      generic: "Provider failed.",
+    },
+    failureCategories: {
+      network_error: "Network error",
+      http_error: "HTTP error",
+      empty_body: "Empty response",
+      timeout: "Timeout",
+      url_normalization_error: "Invalid URL",
+      unknown_error: "Unknown error",
+    },
+  },
 };
 
 jest.mock("next-intl", () => ({
-  useTranslations: (namespace?: string) => (key: string) => {
-    if (namespace === "LeadDiscovery.channels") {
-      return messages.channels[key as keyof typeof messages.channels] ?? key;
-    }
-    if (namespace === "LeadDiscovery.outreachReadiness") {
-      return (
-        messages.outreachReadiness[
-          key as keyof typeof messages.outreachReadiness
-        ] ?? key
-      );
-    }
-    if (key.startsWith("leadStatus.")) {
-      const status = key.replace(
-        "leadStatus.",
-        "",
-      ) as keyof typeof messages.leadStatus;
-      return messages.leadStatus[status] ?? key;
-    }
-    return messages[key as keyof typeof messages] ?? key;
+  useTranslations: (namespace?: string) => {
+    const translate = (key: string, values?: Record<string, number>) => {
+      if (namespace === "LeadDiscovery.channels") {
+        return messages.channels[key as keyof typeof messages.channels] ?? key;
+      }
+      if (namespace === "LeadDiscovery.outreachReadiness") {
+        return (
+          messages.outreachReadiness[
+            key as keyof typeof messages.outreachReadiness
+          ] ?? key
+        );
+      }
+      if (namespace === "LeadDiscovery.runOutcome") {
+        if (key.startsWith("warnings.")) {
+          const code = key.replace(
+            "warnings.",
+            "",
+          ) as keyof typeof messages.runOutcome.warnings;
+          return messages.runOutcome.warnings[code] ?? key;
+        }
+        if (key.startsWith("failureCategories.")) {
+          const cat = key.replace(
+            "failureCategories.",
+            "",
+          ) as keyof typeof messages.runOutcome.failureCategories;
+          return messages.runOutcome.failureCategories[cat] ?? key;
+        }
+        const template =
+          messages.runOutcome[key as keyof typeof messages.runOutcome];
+        if (typeof template !== "string") {
+          return key;
+        }
+        if (!values) {
+          return template;
+        }
+        return Object.entries(values).reduce(
+          (acc, [name, value]) => acc.replace(`{${name}}`, String(value)),
+          template,
+        );
+      }
+      if (key.startsWith("leadStatus.")) {
+        const status = key.replace(
+          "leadStatus.",
+          "",
+        ) as keyof typeof messages.leadStatus;
+        return messages.leadStatus[status] ?? key;
+      }
+      return (messages[key as keyof typeof messages] as string) ?? key;
+    };
+    return translate;
   },
 }));
 
@@ -158,6 +216,97 @@ describe("LeadContactsPanel", () => {
     mockHook({ leads: [] });
     render(<LeadContactsPanel brandCandidateId="b1" />);
     expect(screen.getByText(messages.emptyLeads)).toBeInTheDocument();
+  });
+
+  it("shows provider-failure empty copy and warning banner", () => {
+    mockHook({
+      leads: [],
+      runs: [
+        {
+          id: "r1",
+          brandCandidateId: "b1",
+          influencerId: "i1",
+          status: "COMPLETED",
+          providerId: "ai+brightdata",
+          providerOptions: {},
+          limit: 5,
+          errorMessage: null,
+          createdAt: "2026-10-22T20:34:02.544Z",
+          updatedAt: "2026-10-22T20:34:02.544Z",
+          searchMetadata: {
+            strategy: "llm",
+            tracks: ["2A", "2B"],
+            priorityRoles: [],
+            scraperIds: [],
+            plannedQueriesCount: 0,
+            validatedQueriesCount: 0,
+            queries: [],
+            fallbackUsed: true,
+            fallbackReason: "search_tavily",
+            searchHitsCount: 50,
+            outcome: "PROVIDER_FAILURE",
+            warningCode: "unlocker_all_pages_failed",
+            warningMessage: "Unlocker failed",
+            businessContactDiscovery: {
+              pagesAttempted: 12,
+              pagesSucceeded: 0,
+              pagesFailed: 12,
+              emailsFound: 0,
+              contactsCreated: 0,
+              contactsUpdated: 0,
+              failureCountsByCategory: { network_error: 12 },
+            },
+          },
+        },
+      ],
+    });
+    render(<LeadContactsPanel brandCandidateId="b1" />);
+    expect(
+      screen.getByText(messages.emptyLeadsAfterProviderFailure),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("Provider failure");
+    expect(
+      screen.getByText("Unlocker failed for every attempted page."),
+    ).toBeInTheDocument();
+  });
+
+  it("shows legitimate empty copy without alert role", () => {
+    mockHook({
+      leads: [],
+      runs: [
+        {
+          id: "r2",
+          brandCandidateId: "b1",
+          influencerId: "i1",
+          status: "COMPLETED",
+          providerId: "ai+brightdata",
+          providerOptions: {},
+          limit: 5,
+          errorMessage: null,
+          createdAt: "2026-10-22T20:34:02.544Z",
+          updatedAt: "2026-10-22T20:34:02.544Z",
+          searchMetadata: {
+            strategy: "llm",
+            tracks: ["2B"],
+            priorityRoles: [],
+            scraperIds: [],
+            plannedQueriesCount: 0,
+            validatedQueriesCount: 0,
+            queries: [],
+            fallbackUsed: false,
+            fallbackReason: null,
+            searchHitsCount: 0,
+            outcome: "EMPTY_LEGITIMATE",
+            warningCode: null,
+            warningMessage: null,
+          },
+        },
+      ],
+    });
+    render(<LeadContactsPanel brandCandidateId="b1" />);
+    expect(screen.getByText(messages.emptyLeadsLegitimate)).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("No matching contacts");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("shows loading state", () => {

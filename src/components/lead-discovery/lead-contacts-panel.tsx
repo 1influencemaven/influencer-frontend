@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import { LeadListItem } from "@/components/lead-discovery/lead-list-item";
+import { LeadRunOutcomeBanner } from "@/components/lead-discovery/lead-run-outcome-banner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useLeadDiscovery } from "@/hooks/use-lead-discovery";
@@ -13,12 +14,32 @@ type LeadContactsPanelProps = {
   brandCandidateId: string;
 };
 
+function emptyLeadsMessageKey(
+  runs: ReturnType<typeof useLeadDiscovery>["runs"],
+): "emptyLeads" | "emptyLeadsAfterProviderFailure" | "emptyLeadsLegitimate" {
+  const completed = runs
+    .filter((run) => run.status === "COMPLETED" && run.searchMetadata?.outcome)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  const outcome = completed[0]?.searchMetadata?.outcome;
+  if (outcome === "PROVIDER_FAILURE") {
+    return "emptyLeadsAfterProviderFailure";
+  }
+  if (outcome === "EMPTY_LEGITIMATE") {
+    return "emptyLeadsLegitimate";
+  }
+  return "emptyLeads";
+}
+
 export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) {
   const t = useTranslations("LeadDiscovery");
   const {
     limit,
     setLimit,
     leads,
+    runs,
     searching,
     updatingId,
     error,
@@ -44,6 +65,8 @@ export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) 
           {error}
         </p>
       ) : null}
+
+      <LeadRunOutcomeBanner runs={runs} />
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
@@ -80,7 +103,9 @@ export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) 
         {loadingLeads ? (
           <p className="text-xs text-muted-foreground">{t("loadingLeads")}</p>
         ) : leads.length === 0 ? (
-          <p className="text-xs text-muted-foreground">{t("emptyLeads")}</p>
+          <p className="text-xs text-muted-foreground">
+            {t(emptyLeadsMessageKey(runs))}
+          </p>
         ) : (
           <ul className="space-y-2">
             {leads.map((lead) => (

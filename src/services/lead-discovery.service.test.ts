@@ -16,11 +16,19 @@ import apiClient from "@/lib/api/client";
 import {
   deselectLeadForOutreach,
   getLeadById,
+  listBrandBusinessContacts,
+  probeUnlockerDiagnostic,
   searchLeads,
   selectLeadForOutreach,
 } from "@/services/lead-discovery.service";
 import { createAxiosResponse } from "@/services/service-test-utils";
-import type { Lead, LeadDetail, SearchLeadsResponse } from "@/types/lead-discovery";
+import type {
+  BrandBusinessContact,
+  Lead,
+  LeadDetail,
+  SearchLeadsResponse,
+} from "@/types/lead-discovery";
+import { UNLOCKER_DIAGNOSTIC_ALLOWED_URL } from "@/types/lead-discovery";
 
 const mockedApiClient = jest.mocked(apiClient);
 
@@ -114,5 +122,51 @@ describe("lead-discovery.service", () => {
 
     expect(mockedApiClient.get).toHaveBeenCalledWith("/lead-discovery/leads/l1");
     expect(result.outreachReadiness).toBe("LIMITED");
+  });
+
+  it("lists brand business contacts by brandCandidateId", async () => {
+    const contacts: BrandBusinessContact[] = [
+      {
+        id: "bbc1",
+        brandCandidateId: "b1",
+        email: "partnerships@acme.com",
+        label: "Partnerships",
+        isGeneric: true,
+        commercialRelevance: "HIGH",
+        source: "PUBLIC_WEB",
+        sourceUrl: "https://acme.com/partners",
+        evidences: [],
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
+    ];
+    mockedApiClient.get.mockResolvedValue(createAxiosResponse(contacts));
+
+    const result = await listBrandBusinessContacts("b1");
+
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      "/lead-discovery/business-contacts?brandCandidateId=b1",
+    );
+    expect(result).toEqual(contacts);
+  });
+
+  it("posts unlocker diagnostic probe for the allowlisted URL", async () => {
+    const diagnostic = {
+      url: UNLOCKER_DIAGNOSTIC_ALLOWED_URL,
+      outcome: "ok",
+      apiHttpStatus: 200,
+      bodyLength: 12,
+      elapsedMs: 50,
+      zone: "mcp_unlocker",
+    };
+    mockedApiClient.post.mockResolvedValue(createAxiosResponse(diagnostic));
+
+    const result = await probeUnlockerDiagnostic();
+
+    expect(mockedApiClient.post).toHaveBeenCalledWith(
+      "/lead-discovery/diagnostics/unlocker",
+      { url: UNLOCKER_DIAGNOSTIC_ALLOWED_URL },
+    );
+    expect(result).toEqual(diagnostic);
   });
 });

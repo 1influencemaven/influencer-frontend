@@ -473,6 +473,32 @@
         "required": "Las instrucciones no pueden estar vacías.",
         "tooLong": "Las instrucciones no pueden superar los 8000 caracteres."
       }
+    },
+    "unlockerDiagnostics": {
+      "title": "Diagnóstico Unlocker",
+      "description": "Sonda ADMIN local: una sola petición Bright Data Unlocker a una URL allowlisted. No inicia Lead Discovery.",
+      "hint": "Requiere NODE_ENV distinto de production y UNLOCKER_DIAGNOSTICS_ENABLED=true en el backend. No persiste en base de datos. apiHttpStatus es el de la API Bright Data, no del sitio objetivo.",
+      "urlLabel": "URL allowlisted",
+      "adminOnlyHint": "Solo los administradores pueden ejecutar esta sonda.",
+      "probe": "Probar Unlocker",
+      "probing": "Probando…",
+      "fields": {
+        "outcome": "Outcome",
+        "apiHttpStatus": "HTTP API BD",
+        "bodyLength": "Longitud cuerpo",
+        "elapsedMs": "Duración (ms)",
+        "zone": "Zona",
+        "errorName": "Error (nombre)",
+        "errorMessage": "Error (mensaje)",
+        "causeName": "Causa (nombre)",
+        "causeCode": "Causa (código)",
+        "causeSyscall": "Causa (syscall)",
+        "causeHostname": "Causa (hostname)",
+        "causePort": "Causa (puerto)"
+      },
+      "errors": {
+        "probeFailed": "No se pudo ejecutar la sonda Unlocker. Revisa el flag de entorno y tus permisos."
+      }
     }
   },
   "BrandDiscovery": {
@@ -536,6 +562,21 @@
     }
   },
   "LeadDiscovery": {
+    "businessContacts": {
+      "title": "Contactos comerciales de la marca",
+      "description": "Buzones de la empresa descubiertos en su web. No son personas (Leads).",
+      "loading": "Cargando contactos comerciales…",
+      "empty": "Aún no hay contactos comerciales de marca.",
+      "retry": "Reintentar",
+      "evidence": "Evidencia",
+      "openEvidence": "Abrir evidencia",
+      "relevance": {
+        "HIGH": "Alta",
+        "NEUTRAL": "Neutral",
+        "LOW": "Baja",
+        "UNKNOWN": "Desconocida"
+      }
+    },
     "panelTitle": "Leads",
     "panelDescription": "Descubre personas relevantes y sus canales de contacto. Revisa, aprueba y opcionalmente elige una para outreach futuro (sin enviar email).",
     "limitLabel": "Leads máx.",
@@ -544,6 +585,33 @@
     "noProviders": "Ningún proveedor configurado",
     "leadsTitle": "Leads",
     "emptyLeads": "Aún no hay leads.",
+    "emptyLeadsLegitimate": "La búsqueda terminó sin personas válidas. Es un resultado vacío legítimo, no un fallo técnico.",
+    "emptyLeadsAfterProviderFailure": "No se guardaron leads porque falló un proveedor de descubrimiento. Revisa el aviso de arriba.",
+    "runOutcome": {
+      "providerFailureTitle": "Fallo de proveedor",
+      "emptyLegitimateTitle": "Sin contactos válidos",
+      "emptyLegitimateBody": "La búsqueda terminó sin errores críticos de proveedor, pero no se encontraron contactos válidos.",
+      "bbcOnlyTitle": "Contactos comerciales encontrados, sin person leads",
+      "bbcOnlyBody": "Se guardaron contactos comerciales de marca. El descubrimiento de person leads no produjo perfiles LinkedIn cualificados por encima del umbral de ranking.",
+      "resultCounts": "Contactos comerciales creados: {businessContacts}; person leads creados: {personLeads}",
+      "pagesSummary": "Páginas intentadas: {attempted}, exitosas: {succeeded}, fallidas: {failed}",
+      "peopleTraceSummary": "Resultados de búsqueda: {hits}; perfiles LinkedIn validados: {linkedin}; sobre umbral: {qualified}",
+      "warnings": {
+        "unlocker_all_pages_failed": "Unlocker de contactos comerciales falló en todas las páginas intentadas.",
+        "people_scraper_all_failed": "El scraper de personas falló en todos los perfiles seleccionados.",
+        "people_search_provider_failed": "El proveedor de búsqueda de personas falló sin resultados utilizables.",
+        "mixed_provider_failure": "Falló más de un proveedor de descubrimiento; los resultados pueden estar incompletos.",
+        "generic": "Falló un proveedor de descubrimiento; los resultados pueden estar incompletos."
+      },
+      "failureCategories": {
+        "http_error": "Error HTTP",
+        "empty_body": "Respuesta vacía",
+        "timeout": "Tiempo de espera",
+        "network_error": "Error de red",
+        "url_normalization_error": "URL inválida",
+        "unknown_error": "Error desconocido"
+      }
+    },
     "loadingLeads": "Cargando leads…",
     "approve": "Aprobar",
     "discard": "Descartar",

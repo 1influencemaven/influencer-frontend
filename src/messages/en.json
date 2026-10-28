@@ -473,6 +473,32 @@
         "required": "Instructions cannot be empty.",
         "tooLong": "Instructions cannot exceed 8000 characters."
       }
+    },
+    "unlockerDiagnostics": {
+      "title": "Unlocker diagnostics",
+      "description": "ADMIN local probe: a single Bright Data Unlocker request to an allowlisted URL. Does not start Lead Discovery.",
+      "hint": "Requires NODE_ENV other than production and UNLOCKER_DIAGNOSTICS_ENABLED=true on the backend. Does not persist to the database. apiHttpStatus is the Bright Data API status, not the target site.",
+      "urlLabel": "Allowlisted URL",
+      "adminOnlyHint": "Only administrators can run this probe.",
+      "probe": "Test Unlocker",
+      "probing": "Testing…",
+      "fields": {
+        "outcome": "Outcome",
+        "apiHttpStatus": "BD API HTTP",
+        "bodyLength": "Body length",
+        "elapsedMs": "Duration (ms)",
+        "zone": "Zone",
+        "errorName": "Error (name)",
+        "errorMessage": "Error (message)",
+        "causeName": "Cause (name)",
+        "causeCode": "Cause (code)",
+        "causeSyscall": "Cause (syscall)",
+        "causeHostname": "Cause (hostname)",
+        "causePort": "Cause (port)"
+      },
+      "errors": {
+        "probeFailed": "Could not run the Unlocker probe. Check the env flag and your permissions."
+      }
     }
   },
   "BrandDiscovery": {
@@ -536,6 +562,21 @@
     }
   },
   "LeadDiscovery": {
+    "businessContacts": {
+      "title": "Brand business contacts",
+      "description": "Company inboxes found on the brand website. These are not person leads.",
+      "loading": "Loading business contacts…",
+      "empty": "No brand business contacts yet.",
+      "retry": "Retry",
+      "evidence": "Evidence",
+      "openEvidence": "Open evidence",
+      "relevance": {
+        "HIGH": "High",
+        "NEUTRAL": "Neutral",
+        "LOW": "Low",
+        "UNKNOWN": "Unknown"
+      }
+    },
     "panelTitle": "Leads",
     "panelDescription": "Discover relevant people and their contact channels. Review, approve, and optionally select one for future outreach (no email is sent).",
     "limitLabel": "Max leads",
@@ -544,6 +585,33 @@
     "noProviders": "No provider configured",
     "leadsTitle": "Leads",
     "emptyLeads": "No leads found yet.",
+    "emptyLeadsLegitimate": "Search finished with no matching people. This is a valid empty result, not a technical failure.",
+    "emptyLeadsAfterProviderFailure": "No leads were saved because a discovery provider failed. See the warning above.",
+    "runOutcome": {
+      "providerFailureTitle": "Provider failure",
+      "emptyLegitimateTitle": "No matching contacts",
+      "emptyLegitimateBody": "The search completed without critical provider errors, but no valid contacts were found.",
+      "bbcOnlyTitle": "Business contacts found, no person leads",
+      "bbcOnlyBody": "Brand business contacts were saved. Person lead discovery did not produce qualified LinkedIn profiles above the ranking threshold.",
+      "resultCounts": "Business contacts created: {businessContacts}; person leads created: {personLeads}",
+      "pagesSummary": "Pages attempted: {attempted}, succeeded: {succeeded}, failed: {failed}",
+      "peopleTraceSummary": "Search hits: {hits}; LinkedIn profiles validated: {linkedin}; above threshold: {qualified}",
+      "warnings": {
+        "unlocker_all_pages_failed": "Business-contact Unlocker failed for every attempted page.",
+        "people_scraper_all_failed": "People scraper failed for every selected profile.",
+        "people_search_provider_failed": "People search provider failed with no usable hits.",
+        "mixed_provider_failure": "More than one discovery provider failed; results may be incomplete.",
+        "generic": "A discovery provider failed; results may be incomplete."
+      },
+      "failureCategories": {
+        "http_error": "HTTP error",
+        "empty_body": "Empty response",
+        "timeout": "Timeout",
+        "network_error": "Network error",
+        "url_normalization_error": "Invalid URL",
+        "unknown_error": "Unknown error"
+      }
+    },
     "loadingLeads": "Loading leads…",
     "approve": "Approve",
     "discard": "Discard",

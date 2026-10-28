@@ -40,6 +40,10 @@ jest.mock("../lead-discovery/lead-contacts-panel", () => ({
   LeadContactsPanel: () => <div>Lead contacts</div>,
 }));
 
+jest.mock("../lead-discovery/brand-business-contacts-panel", () => ({
+  BrandBusinessContactsPanel: () => <div>Brand business contacts</div>,
+}));
+
 function candidate(
   overrides: Partial<BrandCandidate> = {},
 ): BrandCandidate {

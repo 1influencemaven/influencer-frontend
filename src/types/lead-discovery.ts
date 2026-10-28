@@ -24,8 +24,29 @@ export type ContactChannelSource =
   | "LEGACY_MIGRATION"
   | "BRAND_WEBSITE";
 
-/** ADR-0016 — orthogonal to isGeneric. UI does not surface this in Phase 0. */
+/** ADR-0016 — orthogonal to isGeneric. Surfaced on BrandBusinessContact Visibility. */
 export type CommercialRelevance = "HIGH" | "NEUTRAL" | "LOW" | "UNKNOWN";
+
+export type BrandBusinessContactEvidence = {
+  sourceUrl: string;
+  evidenceSnippet: string;
+  discoveredAt: string;
+};
+
+/** ADR-0016/0018 — brand inbox without a person. Not a Lead. */
+export type BrandBusinessContact = {
+  id: string;
+  brandCandidateId: string;
+  email: string;
+  label: string | null;
+  isGeneric: boolean;
+  commercialRelevance: CommercialRelevance;
+  source: ContactChannelSource;
+  sourceUrl: string | null;
+  evidences: BrandBusinessContactEvidence[];
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type OutreachReadiness = "LIMITED" | "PARTIAL" | "READY";
 
@@ -113,6 +134,56 @@ export type LeadDiscoveryRun = {
   };
 };
 
+/** Fixed allowlist URL for ADMIN Unlocker diagnostic probe (local only). */
+export const UNLOCKER_DIAGNOSTIC_ALLOWED_URL =
+  "https://lightartsy.com/contact" as const;
+
+/** Response of POST /lead-discovery/diagnostics/unlocker (no HTML). */
+export type UnlockerDiagnosticResult = {
+  url: string;
+  outcome: string;
+  /** Bright Data API `/request` status — not the target site. */
+  apiHttpStatus: number;
+  bodyLength: number;
+  elapsedMs: number;
+  zone: string;
+  errorName?: string;
+  errorMessage?: string;
+  /** Sanitized transport `error.cause` fields (outbound BD API connection). */
+  causeName?: string;
+  causeCode?: string;
+  causeSyscall?: string;
+  causeHostname?: string;
+  causePort?: number;
+};
+
+/** Per-page Unlocker diagnostics (2A). No HTML bodies or emails. */
+export type BusinessContactPageOutcome =
+  | "ok"
+  | "http_error"
+  | "empty_body"
+  | "timeout"
+  | "network_error"
+  | "url_normalization_error"
+  | "unknown_error";
+
+export type BusinessContactPageResult = {
+  url: string;
+  outcome: BusinessContactPageOutcome;
+  /** Bright Data API `/request` status — not the target site. */
+  apiHttpStatus: number;
+  bodyLength: number;
+  elapsedMs: number;
+  zone: string;
+  errorName?: string;
+  errorMessage?: string;
+  causeName?: string;
+  causeCode?: string;
+  causeSyscall?: string;
+  causeHostname?: string;
+  causePort?: number;
+};
+
 export type BusinessContactDiscoverySummary = {
   pagesAttempted: number;
   pagesSucceeded: number;
@@ -120,9 +191,71 @@ export type BusinessContactDiscoverySummary = {
   emailsFound: number;
   contactsCreated: number;
   contactsUpdated: number;
+  unlockerZone?: string;
+  failureCountsByCategory?: Record<string, number>;
+  pageResults?: BusinessContactPageResult[];
 };
 
-/** ADR-0017 / ADR-0018 run audit. See docs — not a UI surface yet. */
+/**
+ * COMPLETED-run quality (status stays COMPLETED|FAILED).
+ * Absent on historical runs → treat as unknown.
+ */
+export type LeadDiscoveryOutcome =
+  | "FULL"
+  | "EMPTY_LEGITIMATE"
+  | "PROVIDER_FAILURE";
+
+export type LeadDiscoveryWarningCode =
+  | "unlocker_all_pages_failed"
+  | "people_scraper_all_failed"
+  | "people_search_provider_failed"
+  | "mixed_provider_failure";
+
+export type PeopleSearchBrightDataDiagnostics = {
+  requests: number;
+  hits: number;
+  emptyBody: number;
+  parseError: number;
+  organicEmpty: number;
+  networkError: number;
+  httpError: number;
+  httpStatusCounts: Record<string, number>;
+};
+
+export type PeopleSearchTavilyDiagnostics = {
+  requests: number;
+  hits: number;
+  httpOkWithResults: number;
+  httpOkEmptyResults: number;
+  httpError: number;
+  networkError: number;
+  timeout: number;
+};
+
+/**
+ * 2B people-search audit. Absent → counters unknown (legacy).
+ * Present with `0` → known zero (not unknown).
+ */
+export type PeopleSearchTrace = {
+  searchHitsReceived: number;
+  linkedinUrlValidated: number;
+  scoredCandidates: number;
+  qualifiedCandidates: number;
+  selectedProfileUrlsCount: number;
+  selectedProfileUrls: string[];
+  brightDataSearchRequests: number;
+  brightDataSearchFailures: number;
+  tavilyFallbackRequests: number;
+  scraperInvocations: number;
+  scraperSuccesses: number;
+  scraperFailures: number;
+  searchFailureCodes: string[];
+  scraperErrorCodes: string[];
+  brightDataDiagnostics?: PeopleSearchBrightDataDiagnostics;
+  tavilyDiagnostics?: PeopleSearchTavilyDiagnostics;
+};
+
+/** ADR-0017 / ADR-0018 run audit (+ outcome / peopleSearchTrace). */
 export type LeadSearchMetadata = {
   strategy: "llm" | "manual" | "unknown";
   tracks: Array<"2A" | "2B" | "2C">;
@@ -134,7 +267,15 @@ export type LeadSearchMetadata = {
   fallbackUsed: boolean;
   fallbackReason: string | null;
   searchHitsCount: number;
+  outcome?: LeadDiscoveryOutcome;
+  warningCode?: LeadDiscoveryWarningCode | null;
+  warningMessage?: string | null;
+  /** Person Leads persisted (orthogonal to BrandBusinessContact). */
+  personLeadsCreated?: number;
+  /** BrandBusinessContact upserts created in this run. */
+  businessContactsCreated?: number;
   businessContactDiscovery?: BusinessContactDiscoverySummary;
+  peopleSearchTrace?: PeopleSearchTrace;
 };
 
 export type Lead = {
