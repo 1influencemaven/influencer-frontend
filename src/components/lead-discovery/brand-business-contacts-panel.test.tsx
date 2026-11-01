@@ -2,15 +2,16 @@
  * @jest-environment jsdom
  */
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { BrandBusinessContactsPanel } from "@/components/lead-discovery/brand-business-contacts-panel";
-import { listBrandBusinessContacts } from "@/services/lead-discovery.service";
+import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
 import type { BrandBusinessContact } from "@/types/lead-discovery";
+import type { BbcUiState } from "@/lib/bbc-run-ui-state";
 
-jest.mock("../../services/lead-discovery.service", () => ({
-  listBrandBusinessContacts: jest.fn(),
+jest.mock("../../hooks/use-bbc-discovery", () => ({
+  useBbcDiscovery: jest.fn(),
 }));
 
 const messages: Record<string, string> = {
@@ -18,20 +19,77 @@ const messages: Record<string, string> = {
   description: "Company inboxes — not person leads.",
   loading: "Loading business contacts…",
   empty: "No brand business contacts yet.",
+  emptyAfterProviderFailure:
+    "No brand business contacts were saved because Bright Data did not return usable content.",
+  emptyAfterNoMatches: "BBC search completed with no matches.",
+  emptyAfterFailed: "Run failed empty.",
   retry: "Retry",
   evidence: "Evidence",
   openEvidence: "Open evidence",
+  source: "Source",
+  evidenceUnverified: "Found in source; not SMTP-verified",
+  "type.generic": "Brand inbox",
+  "type.personLike": "Person-like local part",
+  "sections.genericTitle": "Brand inboxes (generic)",
+  "sections.genericDescription": "Department inboxes",
+  "sections.genericEmpty": "No generic brand inboxes persisted yet.",
+  "sections.otherTitle": "Other commercial emails",
+  "sections.otherDescription": "Other emails",
+  "sections.otherEmpty": "No other commercial emails persisted yet.",
+  "sections.agenciesTitle": "Influencer agencies",
+  "sections.agenciesPending": "Agency discovery (track 2C) is not implemented yet.",
   "relevance.HIGH": "High",
   "relevance.NEUTRAL": "Neutral",
   "relevance.LOW": "Low",
   "relevance.UNKNOWN": "Unknown",
+  activeBanner: "BBC v1 mode active",
+  searchAction: "Search business contacts",
+  searching: "Searching contacts…",
+  refresh: "Refresh results",
+  processingTitle: "Search in progress",
+  processingBody: "Job running",
+  partialProcessingTitle: "Partial",
+  partialProcessingBody: "{count} contacts",
+  resultsFoundTitle: "Business contacts found",
+  resultsFoundBody: "Created: {created}; updated: {updated}.",
+  resultsFoundPartial: "Partial pages",
+  noMatchesTitle: "No valid matches",
+  noMatchesBody: "No emails",
+  providerFailureTitle: "Provider failure",
+  providerFailureBody: "Unreliable ({kind})",
+  failedTitle: "Run failure",
+  failedBody: "App failure",
+  failedOrphansNote: "Orphans",
+  pollErrorTitle: "Poll failed",
+  researchTraceTitle: "Research progress",
+  researchTraceCounts:
+    "SERP queries: {serp}/{maxSerp}; pages fetched: {pages}/{maxPages}",
+  researchFinalize: "Finished: {summary}",
+  "failureKind.transport": "transport",
+  "failureKind.http": "HTTP",
+  "failureKind.malformed": "malformed",
+  "failureKind.empty_body": "empty",
+  "failureKind.unknown": "unknown",
 };
 
 jest.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => messages[key] ?? key,
+  useTranslations: (namespace?: string) => {
+    return (key: string, values?: Record<string, unknown>) => {
+      if (namespace === "LeadDiscovery.bbc" || namespace === "LeadDiscovery.businessContacts") {
+        let text = messages[key] ?? key;
+        if (values) {
+          for (const [k, v] of Object.entries(values)) {
+            text = text.replace(`{${k}}`, String(v));
+          }
+        }
+        return text;
+      }
+      return messages[key] ?? key;
+    };
+  },
 }));
 
-const mockedList = jest.mocked(listBrandBusinessContacts);
+const mockedHook = jest.mocked(useBbcDiscovery);
 
 function contact(
   overrides: Partial<BrandBusinessContact> = {},
@@ -58,73 +116,120 @@ function contact(
   };
 }
 
+function mockBbc(
+  partial: Partial<ReturnType<typeof useBbcDiscovery>> = {},
+) {
+  const startSearch = jest.fn();
+  const refresh = jest.fn();
+  const uiState: BbcUiState = partial.uiState ?? {
+    kind: "idle",
+    contactCount: partial.contacts?.length ?? 0,
+  };
+
+  mockedHook.mockReturnValue({
+    bbcV1Active: false,
+    canSearch: false,
+    contacts: [],
+    runs: [],
+    loading: false,
+    loadingMeta: false,
+    searching: false,
+    hasProcessing: false,
+    error: null,
+    pollError: null,
+    startSearch,
+    refresh,
+    refreshQuiet: jest.fn(),
+    ...partial,
+    uiState: partial.uiState ?? uiState,
+  });
+
+  return { startSearch, refresh };
+}
+
 describe("BrandBusinessContactsPanel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("shows loading then contacts (not as person leads)", async () => {
-    let resolveList!: (value: BrandBusinessContact[]) => void;
-    mockedList.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveList = resolve;
-        }),
-    );
-
+  it("shows contacts (not as person leads)", () => {
+    mockBbc({ contacts: [contact()] });
     render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
-    expect(screen.getByText("Loading business contacts…")).toBeInTheDocument();
     expect(screen.getByText("Brand business contacts")).toBeInTheDocument();
     expect(
-      screen.getByText("Company inboxes — not person leads."),
+      screen.getByRole("link", { name: "partnerships@mcgeeandco.com" }),
     ).toBeInTheDocument();
-
-    resolveList([contact()]);
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole("link", { name: "partnerships@mcgeeandco.com" }),
-      ).toBeInTheDocument();
-    });
-    expect(screen.getByText("High")).toBeInTheDocument();
-    expect(screen.getByText(/Evidence:/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Open evidence" })).toHaveAttribute(
-      "href",
-      "https://www.mcgeeandco.com/pages/contact",
-    );
-    expect(screen.queryByText("Leads")).not.toBeInTheDocument();
-    expect(screen.queryByText("Select for outreach")).not.toBeInTheDocument();
+    expect(screen.getByText("Brand inbox")).toBeInTheDocument();
   });
 
-  it("shows empty state", async () => {
-    mockedList.mockResolvedValue([]);
-    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
-    await waitFor(() => {
-      expect(
-        screen.getByText("No brand business contacts yet."),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("shows error and retries", async () => {
+  it("shows BBC search controls when bbcV1Active", async () => {
     const user = userEvent.setup();
-    mockedList
-      .mockRejectedValueOnce(new Error("Network down"))
-      .mockResolvedValueOnce([contact()]);
+    const { startSearch } = mockBbc({
+      bbcV1Active: true,
+      canSearch: true,
+      uiState: { kind: "idle", contactCount: 0 },
+    });
 
     render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
-
-    await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent("Network down");
+    expect(screen.getByText("BBC v1 mode active")).toBeInTheDocument();
+    const button = screen.getByRole("button", {
+      name: "Search business contacts",
     });
+    await user.click(button);
+    expect(startSearch).toHaveBeenCalled();
+  });
 
+  it("shows PROCESSING status without treating as empty error", () => {
+    mockBbc({
+      bbcV1Active: true,
+      canSearch: true,
+      hasProcessing: true,
+      uiState: { kind: "processing", runId: "r1", contactCount: 0 },
+    });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
+    expect(screen.getByText("Search in progress")).toBeInTheDocument();
+    expect(
+      screen.queryByText("No brand business contacts yet."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows PROVIDER_FAILURE empty copy, not no-matches", () => {
+    mockBbc({
+      uiState: {
+        kind: "provider_failure",
+        contactCount: 0,
+        providerFailureKind: "http",
+      },
+    });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
+    expect(
+      screen.getByText(
+        "No brand business contacts were saved because Bright Data did not return usable content.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("BBC search completed with no matches."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows NO_MATCHES empty copy", () => {
+    mockBbc({
+      uiState: { kind: "no_matches", contactCount: 0 },
+    });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
+    expect(
+      screen.getByText("BBC search completed with no matches."),
+    ).toBeInTheDocument();
+  });
+
+  it("retries on load error", async () => {
+    const user = userEvent.setup();
+    const { refresh } = mockBbc({
+      error: "Network error",
+      uiState: { kind: "load_error", errorMessage: "Network error", contactCount: 0 },
+    });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
     await user.click(screen.getByRole("button", { name: "Retry" }));
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole("link", { name: "partnerships@mcgeeandco.com" }),
-      ).toBeInTheDocument();
-    });
-    expect(mockedList).toHaveBeenCalledTimes(2);
+    expect(refresh).toHaveBeenCalled();
   });
 });

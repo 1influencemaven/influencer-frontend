@@ -12,6 +12,9 @@ import type { ContactChannel, LeadDetail } from "@/types/lead-discovery";
 const messages = {
   panelTitle: "Leads",
   panelDescription: "Discover relevant people.",
+  bbcV1PersonLeadsBanner:
+    "BBC v1 is active: search creates business contacts, not person leads.",
+  refreshLeads: "Refresh leads",
   limitLabel: "Max leads",
   searchAction: "Search leads with AI",
   searching: "Searching...",
@@ -186,6 +189,8 @@ function mockHook(partial: Partial<ReturnType<typeof useLeadDiscovery>> = {}) {
   mockedUseLeadDiscovery.mockReturnValue({
     providers: ["ai+brightdata"],
     defaultProvider: "ai+brightdata",
+    rebuildMode: false,
+    bbcV1Active: false,
     limit: 10,
     setLimit,
     leads: [],
@@ -198,6 +203,7 @@ function mockHook(partial: Partial<ReturnType<typeof useLeadDiscovery>> = {}) {
     hasProcessing: false,
     canSearch: true,
     startSearch,
+    refreshLeadsAndRuns: jest.fn(),
     updateStatus,
     selectForOutreach,
     deselectForOutreach,
@@ -410,4 +416,25 @@ describe("LeadContactsPanel", () => {
       screen.getByRole("button", { name: messages.approve }),
     ).toBeInTheDocument();
   });
+
+  it("in BBC v1 mode hides person search and shows historical curation banner", () => {
+    mockHook({
+      bbcV1Active: true,
+      rebuildMode: true,
+      canSearch: false,
+      leads: [],
+    });
+    render(<LeadContactsPanel brandCandidateId="b1" />);
+
+    expect(
+      screen.getByText(messages.bbcV1PersonLeadsBanner),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: messages.searchAction }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: messages.refreshLeads }),
+    ).toBeInTheDocument();
+  });
 });
+

@@ -2,9 +2,10 @@
 
 import { useTranslations } from "next-intl";
 
-import type {
-  LeadDiscoveryRun,
-  LeadSearchMetadata,
+import {
+  isBbcSearchMetadata,
+  type LeadDiscoveryRun,
+  type LeadSearchMetadata,
 } from "@/types/lead-discovery";
 
 type LeadRunOutcomeBannerProps = {
@@ -64,6 +65,11 @@ export function LeadRunOutcomeBanner({ runs }: LeadRunOutcomeBannerProps) {
   const metadata = latestCompletedWithMetadata(runs);
 
   if (!metadata?.outcome) {
+    return null;
+  }
+
+  // BBC v1 schemaVersion 2 is owned by BbcRunStatusBanner (business contacts panel).
+  if (isBbcSearchMetadata(metadata) || metadata.schemaVersion === 2) {
     return null;
   }
 

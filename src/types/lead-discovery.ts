@@ -92,9 +92,17 @@ export type LeadDetail = {
   updatedAt?: string;
 };
 
+/** Logical provider id for Contact Discovery BBC v1 (ADR-0020). */
+export const BBC_BRIGHTDATA_PROVIDER_ID = "bbc-brightdata" as const;
+
 export type LeadProvidersResponse = {
   available: string[];
   default: string | null;
+  /**
+   * When true, POST /search uses BBC v1 (`contact-discovery` queue).
+   * When false, legacy `find-leads` / prospecting.
+   */
+  rebuildMode?: boolean;
 };
 
 export type LeadSourceOption = {
@@ -194,16 +202,47 @@ export type BusinessContactDiscoverySummary = {
   unlockerZone?: string;
   failureCountsByCategory?: Record<string, number>;
   pageResults?: BusinessContactPageResult[];
+  plannedSearchQueries?: string[];
+  searchHitsProcessed?: number;
+  discardCountsByReason?: Record<string, number>;
 };
 
 /**
  * COMPLETED-run quality (status stays COMPLETED|FAILED).
  * Absent on historical runs → treat as unknown.
+ * BBC v1 (schemaVersion 2): RESULTS_FOUND | NO_MATCHES | PROVIDER_FAILURE.
+ * Legacy 2A/2B: FULL | EMPTY_LEGITIMATE | PROVIDER_FAILURE.
  */
 export type LeadDiscoveryOutcome =
   | "FULL"
   | "EMPTY_LEGITIMATE"
+  | "PROVIDER_FAILURE"
+  | "RESULTS_FOUND"
+  | "NO_MATCHES";
+
+export type BbcProviderFailureKind =
+  | "transport"
+  | "http"
+  | "empty_body"
+  | "malformed";
+
+export type BbcRunOutcome =
+  | "RESULTS_FOUND"
+  | "NO_MATCHES"
   | "PROVIDER_FAILURE";
+
+/** Nested businessContacts block on BBC searchMetadata schemaVersion 2. */
+export type BbcBusinessContactsMeta = {
+  created: number;
+  updated: number;
+  emailsFound: number;
+  pagesAttempted: number;
+  pagesSucceeded: number;
+  pagesFailed: number;
+  failureCountsByCategory?: Record<string, number>;
+  discardCountsByReason?: Record<string, number>;
+  pageResults?: BusinessContactPageResult[];
+};
 
 export type LeadDiscoveryWarningCode =
   | "unlocker_all_pages_failed"
@@ -255,28 +294,82 @@ export type PeopleSearchTrace = {
   tavilyDiagnostics?: PeopleSearchTavilyDiagnostics;
 };
 
-/** ADR-0017 / ADR-0018 run audit (+ outcome / peopleSearchTrace). */
+/**
+ * Run audit metadata.
+ * - Legacy ADR-0017/0018: strategy/tracks/…
+ * - BBC v1 schemaVersion 2: outcome + businessContacts (no person pipeline)
+ */
 export type LeadSearchMetadata = {
-  strategy: "llm" | "manual" | "unknown";
-  tracks: Array<"2A" | "2B" | "2C">;
-  priorityRoles: string[];
-  scraperIds: string[];
-  plannedQueriesCount: number;
-  validatedQueriesCount: number;
-  queries: string[];
-  fallbackUsed: boolean;
-  fallbackReason: string | null;
-  searchHitsCount: number;
+  /** 2 = Contact Discovery BBC v1 */
+  schemaVersion?: number;
+  providerId?: string;
+  /** Legacy planning fields — often absent on BBC v1. */
+  strategy?: "llm" | "manual" | "unknown";
+  tracks?: Array<"2A" | "2B" | "2C">;
+  priorityRoles?: string[];
+  scraperIds?: string[];
+  plannedQueriesCount?: number;
+  validatedQueriesCount?: number;
+  queries?: string[];
+  fallbackUsed?: boolean;
+  fallbackReason?: string | null;
+  searchHitsCount?: number;
   outcome?: LeadDiscoveryOutcome;
+  providerFailureKind?: BbcProviderFailureKind;
+  errorSummary?: {
+    code: string;
+    message: string;
+    retryable?: boolean;
+  };
   warningCode?: LeadDiscoveryWarningCode | null;
   warningMessage?: string | null;
   /** Person Leads persisted (orthogonal to BrandBusinessContact). */
   personLeadsCreated?: number;
-  /** BrandBusinessContact upserts created in this run. */
+  /** BrandBusinessContact upserts created in this run (legacy top-level). */
   businessContactsCreated?: number;
+  /** Legacy 2A summary shape. */
   businessContactDiscovery?: BusinessContactDiscoverySummary;
+  /** BBC v1 nested summary (schemaVersion 2). */
+  businessContacts?: BbcBusinessContactsMeta;
   peopleSearchTrace?: PeopleSearchTrace;
+  /** AI research orchestration (demo) — operational steps, not private chain-of-thought. */
+  orchestrationMode?: string;
+  researchTrace?: {
+    mode?: string;
+    serpQueriesUsed?: number;
+    pagesFetched?: number;
+    maxSerp?: number;
+    maxPages?: number;
+    finalizeSummary?: string;
+    steps?: Array<{
+      iteration: number;
+      action: string;
+      reason: string;
+      query?: string;
+      url?: string;
+      observation: string;
+    }>;
+  };
 };
+
+export function isBbcSearchMetadata(
+  metadata: LeadSearchMetadata | null | undefined,
+): metadata is LeadSearchMetadata & {
+  schemaVersion: 2;
+  outcome: BbcRunOutcome;
+  businessContacts: BbcBusinessContactsMeta;
+} {
+  if (!metadata || metadata.schemaVersion !== 2) {
+    return false;
+  }
+  const outcome = metadata.outcome;
+  return (
+    (outcome === "RESULTS_FOUND" ||
+      outcome === "NO_MATCHES" ||
+      outcome === "PROVIDER_FAILURE") &&
+    metadata.businessContacts != null
+  );
+}
 
 export type Lead = {
   id: string;

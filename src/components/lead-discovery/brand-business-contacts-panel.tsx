@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
+import { BbcRunStatusBanner } from "@/components/lead-discovery/bbc-run-status-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { listBrandBusinessContacts } from "@/services/lead-discovery.service";
-import { getApiErrorMessage } from "@/types/api-error";
+import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
 import type { BrandBusinessContact } from "@/types/lead-discovery";
 
 type BrandBusinessContactsPanelProps = {
@@ -42,50 +42,120 @@ function evidenceSnippet(contact: BrandBusinessContact): string | null {
   return snippet?.trim() || null;
 }
 
+function ContactList({
+  contacts,
+  emptyLabel,
+  t,
+}: {
+  contacts: BrandBusinessContact[];
+  emptyLabel: string;
+  t: (key: string) => string;
+}) {
+  if (contacts.length === 0) {
+    return <p className="text-xs text-muted-foreground">{emptyLabel}</p>;
+  }
+
+  return (
+    <ul className="space-y-2">
+      {contacts.map((contact) => {
+        const link = evidenceLink(contact);
+        const snippet = evidenceSnippet(contact);
+        return (
+          <li
+            key={contact.id}
+            className="rounded-md border border-border bg-background p-3 text-sm"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href={`mailto:${contact.email}`}
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                {contact.email}
+              </a>
+              {contact.label ? (
+                <Badge variant="outline">{contact.label}</Badge>
+              ) : null}
+              <Badge variant="secondary">
+                {contact.isGeneric ? t("type.generic") : t("type.personLike")}
+              </Badge>
+              <Badge variant="secondary">
+                {t(`relevance.${contact.commercialRelevance}`)}
+              </Badge>
+            </div>
+            {snippet ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  {t("evidence")}:{" "}
+                </span>
+                {snippet}
+              </p>
+            ) : null}
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("source")}: {contact.source}
+              {!snippet ? ` · ${t("evidenceUnverified")}` : null}
+            </p>
+            {link ? (
+              <a
+                href={link}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-block text-xs text-primary underline-offset-4 hover:underline"
+              >
+                {t("openEvidence")}
+              </a>
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function BrandBusinessContactsPanel({
   brandCandidateId,
 }: BrandBusinessContactsPanelProps) {
   const t = useTranslations("LeadDiscovery.businessContacts");
-  const [contacts, setContacts] = useState<BrandBusinessContact[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  /** Bumped from retry (event handler) to re-run the effect without sync setState in it. */
-  const [reloadToken, setReloadToken] = useState(0);
+  const tBbc = useTranslations("LeadDiscovery.bbc");
+  const {
+    bbcV1Active,
+    canSearch,
+    contacts,
+    runs,
+    loading,
+    loadingMeta,
+    searching,
+    hasProcessing,
+    error,
+    pollError,
+    uiState,
+    startSearch,
+    refresh,
+  } = useBbcDiscovery(brandCandidateId);
 
-  useEffect(() => {
-    let cancelled = false;
+  const genericContacts = useMemo(
+    () => contacts.filter((c) => c.isGeneric),
+    [contacts],
+  );
+  const otherContacts = useMemo(
+    () => contacts.filter((c) => !c.isGeneric),
+    [contacts],
+  );
 
-    void (async () => {
-      try {
-        const rows = await listBrandBusinessContacts(brandCandidateId);
-        if (cancelled) {
-          return;
-        }
-        setContacts(rows);
-        setError(null);
-      } catch (err) {
-        if (cancelled) {
-          return;
-        }
-        setContacts([]);
-        setError(getApiErrorMessage(err));
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
+  const emptyMessageKey =
+    uiState.kind === "provider_failure"
+      ? "emptyAfterProviderFailure"
+      : uiState.kind === "no_matches"
+        ? "emptyAfterNoMatches"
+        : uiState.kind === "failed"
+          ? "emptyAfterFailed"
+          : "empty";
 
-    return () => {
-      cancelled = true;
-    };
-  }, [brandCandidateId, reloadToken]);
-
-  function handleRetry() {
-    setLoading(true);
-    setError(null);
-    setReloadToken((token) => token + 1);
-  }
+  const showEmpty =
+    !loading &&
+    !error &&
+    contacts.length === 0 &&
+    uiState.kind !== "processing" &&
+    uiState.kind !== "partial_while_processing";
 
   return (
     <section
@@ -102,11 +172,56 @@ export function BrandBusinessContactsPanel({
         <p className="text-xs text-muted-foreground">{t("description")}</p>
       </div>
 
+      {bbcV1Active ? (
+        <p
+          className="rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground"
+          role="status"
+        >
+          {tBbc("activeBanner")}
+        </p>
+      ) : null}
+
       {error ? (
         <div className="space-y-2" role="alert">
           <p className="text-sm text-destructive">{error}</p>
-          <Button type="button" size="sm" variant="outline" onClick={handleRetry}>
+          <Button type="button" size="sm" variant="outline" onClick={refresh}>
             {t("retry")}
+          </Button>
+        </div>
+      ) : null}
+
+      <BbcRunStatusBanner
+        state={uiState}
+        pollError={pollError}
+        runs={runs}
+      />
+
+      {bbcV1Active ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            disabled={
+              searching ||
+              hasProcessing ||
+              loadingMeta ||
+              !canSearch ||
+              loading
+            }
+            onClick={() => void startSearch()}
+          >
+            {searching || hasProcessing
+              ? tBbc("searching")
+              : tBbc("searchAction")}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={loading || searching}
+            onClick={refresh}
+          >
+            {tBbc("refresh")}
           </Button>
         </div>
       ) : null}
@@ -115,56 +230,63 @@ export function BrandBusinessContactsPanel({
         <p className="text-xs text-muted-foreground">{t("loading")}</p>
       ) : null}
 
-      {!loading && !error && contacts.length === 0 ? (
-        <p className="text-xs text-muted-foreground">{t("empty")}</p>
+      {showEmpty ? (
+        <p
+          className={`text-xs ${
+            uiState.kind === "provider_failure" || uiState.kind === "failed"
+              ? "text-destructive"
+              : "text-muted-foreground"
+          }`}
+          role={
+            uiState.kind === "provider_failure" || uiState.kind === "failed"
+              ? "alert"
+              : undefined
+          }
+        >
+          {t(emptyMessageKey)}
+        </p>
       ) : null}
 
       {!loading && contacts.length > 0 ? (
-        <ul className="space-y-2">
-          {contacts.map((contact) => {
-            const link = evidenceLink(contact);
-            const snippet = evidenceSnippet(contact);
-            return (
-              <li
-                key={contact.id}
-                className="rounded-md border border-border bg-background p-3 text-sm"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <a
-                    href={`mailto:${contact.email}`}
-                    className="font-medium text-primary underline-offset-4 hover:underline"
-                  >
-                    {contact.email}
-                  </a>
-                  {contact.label ? (
-                    <Badge variant="outline">{contact.label}</Badge>
-                  ) : null}
-                  <Badge variant="secondary">
-                    {t(`relevance.${contact.commercialRelevance}`)}
-                  </Badge>
-                </div>
-                {snippet ? (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {t("evidence")}:{" "}
-                    </span>
-                    {snippet}
-                  </p>
-                ) : null}
-                {link ? (
-                  <a
-                    href={link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 inline-block text-xs text-primary underline-offset-4 hover:underline"
-                  >
-                    {t("openEvidence")}
-                  </a>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t("sections.genericTitle")}
+            </h5>
+            <p className="text-xs text-muted-foreground">
+              {t("sections.genericDescription")}
+            </p>
+            <ContactList
+              contacts={genericContacts}
+              emptyLabel={t("sections.genericEmpty")}
+              t={t}
+            />
+          </div>
+          <div className="space-y-2">
+            <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t("sections.otherTitle")}
+            </h5>
+            <p className="text-xs text-muted-foreground">
+              {t("sections.otherDescription")}
+            </p>
+            <ContactList
+              contacts={otherContacts}
+              emptyLabel={t("sections.otherEmpty")}
+              t={t}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {!loading ? (
+        <div className="space-y-1 border-t border-border pt-3">
+          <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("sections.agenciesTitle")}
+          </h5>
+          <p className="text-xs text-muted-foreground">
+            {t("sections.agenciesPending")}
+          </p>
+        </div>
       ) : null}
     </section>
   );

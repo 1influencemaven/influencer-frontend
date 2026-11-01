@@ -47,7 +47,10 @@ export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) 
     loadingMeta,
     loadingLeads,
     canSearch,
+    rebuildMode,
+    bbcV1Active,
     startSearch,
+    refreshLeadsAndRuns,
     updateStatus,
     selectForOutreach,
     deselectForOutreach,
@@ -60,6 +63,15 @@ export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) 
         <p className="text-xs text-muted-foreground">{t("panelDescription")}</p>
       </div>
 
+      {bbcV1Active || rebuildMode ? (
+        <p
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm text-muted-foreground"
+          role="status"
+        >
+          {t("bbcV1PersonLeadsBanner")}
+        </p>
+      ) : null}
+
       {error ? (
         <p className="text-sm text-destructive" role="alert">
           {error}
@@ -68,33 +80,45 @@ export function LeadContactsPanel({ brandCandidateId }: LeadContactsPanelProps) 
 
       <LeadRunOutcomeBanner runs={runs} />
 
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="space-y-1">
-          <Label className="text-xs">{t("limitLabel")}</Label>
-          <select
-            className="h-9 min-w-16 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-            value={limit}
-            disabled={searching || hasProcessing}
-            onChange={(event) => setLimit(Number(event.target.value))}
+      {!bbcV1Active ? (
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">{t("limitLabel")}</Label>
+            <select
+              className="h-9 min-w-16 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+              value={limit}
+              disabled={searching || hasProcessing}
+              onChange={(event) => setLimit(Number(event.target.value))}
+            >
+              {LIMIT_OPTIONS.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            disabled={
+              searching || hasProcessing || loadingMeta || !canSearch
+            }
+            onClick={() => void startSearch()}
           >
-            {LIMIT_OPTIONS.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
+            {searching || hasProcessing ? t("searching") : t("searchAction")}
+          </Button>
         </div>
+      ) : (
         <Button
           type="button"
           size="sm"
-          disabled={
-            searching || hasProcessing || loadingMeta || !canSearch
-          }
-          onClick={() => void startSearch()}
+          variant="outline"
+          disabled={loadingLeads}
+          onClick={() => void refreshLeadsAndRuns().catch(() => undefined)}
         >
-          {searching || hasProcessing ? t("searching") : t("searchAction")}
+          {t("refreshLeads")}
         </Button>
-      </div>
+      )}
 
       <div className="space-y-2">
         <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

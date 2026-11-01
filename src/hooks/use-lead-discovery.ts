@@ -14,22 +14,26 @@ import {
 } from "@/services/lead-discovery.service";
 import { fetchLeadDetailsForList } from "@/lib/lead-discovery-enrichment";
 import { getApiErrorMessage } from "@/types/api-error";
-import type {
-  LeadDetail,
-  LeadDiscoveryRun,
-  UpdateLeadStatusPayload,
+import {
+  BBC_BRIGHTDATA_PROVIDER_ID,
+  type LeadDetail,
+  type LeadDiscoveryRun,
+  type UpdateLeadStatusPayload,
 } from "@/types/lead-discovery";
 
 const POLL_INTERVAL_MS = 2500;
 const AUTONOMOUS_PROVIDER = "ai+brightdata";
 
 /**
- * Lead discovery for an approved brand. List rows use {@link LeadDetail} (enriched
- * via GET /leads/:id) — temporary D3.1 until the list endpoint includes channels.
+ * Person-lead discovery for an approved brand (legacy path).
+ * When `rebuildMode` (BBC v1), person search is disabled here — commercial
+ * discovery lives in {@link useBbcDiscovery} / BrandBusinessContactsPanel.
+ * List rows use {@link LeadDetail} (enriched via GET /leads/:id).
  */
 export function useLeadDiscovery(brandCandidateId: string | null) {
   const [providers, setProviders] = useState<string[]>([]);
   const [defaultProvider, setDefaultProvider] = useState<string | null>(null);
+  const [rebuildMode, setRebuildMode] = useState(false);
   const [limit, setLimit] = useState(10);
   const [leads, setLeads] = useState<LeadDetail[]>([]);
   const [runs, setRuns] = useState<LeadDiscoveryRun[]>([]);
@@ -40,10 +44,14 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   const hasProcessing = runs.some((run) => run.status === "PROCESSING");
+  /** Legacy person search only when rebuild/BBC write path is off. */
   const canSearch =
-    providers.includes(AUTONOMOUS_PROVIDER) ||
-    providers.includes(defaultProvider ?? "") ||
-    providers.length > 0;
+    !rebuildMode &&
+    (providers.includes(AUTONOMOUS_PROVIDER) ||
+      providers.includes(defaultProvider ?? "") ||
+      (providers.length > 0 &&
+        !providers.every((id) => id === BBC_BRIGHTDATA_PROVIDER_ID)));
+  const bbcV1Active = rebuildMode;
 
   const refreshLeadsAndRuns = useCallback(async () => {
     if (!brandCandidateId) {
@@ -68,6 +76,7 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
         if (cancelled) return;
         setProviders(providersResponse.available);
         setDefaultProvider(providersResponse.default);
+        setRebuildMode(Boolean(providersResponse.rebuildMode));
       } catch (err) {
         if (!cancelled) {
           setError(getApiErrorMessage(err));
@@ -132,11 +141,21 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
         (providers.includes(AUTONOMOUS_PROVIDER)
           ? AUTONOMOUS_PROVIDER
           : providers[0]);
-      await searchLeads({
+      const response = await searchLeads({
         brandCandidateIds: [brandCandidateId],
         ...(providerId ? { providerId } : {}),
         limit,
       });
+      // Seed PROCESSING runs immediately so polling starts before list refresh.
+      if (response.runs?.length) {
+        setRuns((prev) => {
+          const byId = new Map(prev.map((run) => [run.id, run]));
+          for (const run of response.runs) {
+            byId.set(run.id, run);
+          }
+          return Array.from(byId.values());
+        });
+      }
       await refreshLeadsAndRuns();
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -205,6 +224,8 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
   return {
     providers,
     defaultProvider,
+    rebuildMode,
+    bbcV1Active,
     limit,
     setLimit,
     leads: brandCandidateId ? leads : [],
@@ -217,6 +238,7 @@ export function useLeadDiscovery(brandCandidateId: string | null) {
     hasProcessing,
     canSearch,
     startSearch,
+    refreshLeadsAndRuns,
     updateStatus,
     selectForOutreach,
     deselectForOutreach,
