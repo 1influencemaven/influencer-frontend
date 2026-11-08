@@ -56,6 +56,21 @@ describe("useBbcDiscovery", () => {
     });
   });
 
+  it("enables BBC search when rebuildMode and mastra-contact-emails are available", async () => {
+    mockedProviders.mockResolvedValue({
+      available: ["mastra-contact-emails"],
+      default: "mastra-contact-emails",
+      rebuildMode: true,
+    });
+    mockedContacts.mockResolvedValue([]);
+    mockedRuns.mockResolvedValue([]);
+
+    const { result } = renderHook(() => useBbcDiscovery("b1"));
+    await waitFor(() => expect(result.current.loadingMeta).toBe(false));
+    expect(result.current.bbcV1Active).toBe(true);
+    expect(result.current.canSearch).toBe(true);
+  });
+
   it("enables BBC search when rebuildMode and bbc-brightdata are available", async () => {
     const { result } = renderHook(() => useBbcDiscovery("b1"));
 

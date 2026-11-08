@@ -58,6 +58,35 @@ describe("resolveBbcUiState", () => {
     expect(state.runId).toBe("run-1");
   });
 
+  it("treats mastra-contact-emails providerId as a BBC run", () => {
+    const state = resolveBbcUiState({
+      runs: [
+        bbcRun({
+          id: "run-mastra",
+          providerId: "mastra-contact-emails",
+          status: "COMPLETED",
+          searchMetadata: {
+            schemaVersion: 2,
+            providerId: "bbc-brightdata",
+            outcome: "NO_MATCHES",
+            businessContacts: {
+              created: 0,
+              updated: 0,
+              emailsFound: 0,
+              pagesAttempted: 3,
+              pagesSucceeded: 3,
+              pagesFailed: 0,
+            },
+            engine: "mastra",
+          },
+        }),
+      ],
+      contacts: [],
+    });
+    expect(state.kind).toBe("no_matches");
+    expect(state.runId).toBe("run-mastra");
+  });
+
   it("maps PROCESSING + contacts to partial_while_processing", () => {
     const state = resolveBbcUiState({
       runs: [bbcRun({ status: "PROCESSING" })],

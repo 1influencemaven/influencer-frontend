@@ -12,6 +12,7 @@ import {
 import { getApiErrorMessage } from "@/types/api-error";
 import {
   BBC_BRIGHTDATA_PROVIDER_ID,
+  isBbcWriteProviderId,
   type BrandBusinessContact,
   type LeadDiscoveryRun,
 } from "@/types/lead-discovery";
@@ -39,8 +40,8 @@ export function useBbcDiscovery(brandCandidateId: string | null) {
   const bbcV1Active = rebuildMode;
   const canSearch =
     bbcV1Active &&
-    (providers.includes(BBC_BRIGHTDATA_PROVIDER_ID) ||
-      defaultProvider === BBC_BRIGHTDATA_PROVIDER_ID);
+    (providers.some((id) => isBbcWriteProviderId(id)) ||
+      isBbcWriteProviderId(defaultProvider));
 
   const refresh = useCallback(async () => {
     if (!brandCandidateId) {

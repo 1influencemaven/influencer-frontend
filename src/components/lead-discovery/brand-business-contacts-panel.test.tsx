@@ -43,6 +43,7 @@ const messages: Record<string, string> = {
   "relevance.LOW": "Low",
   "relevance.UNKNOWN": "Unknown",
   activeBanner: "BBC v1 mode active",
+  engineMastra: "Engine: Mastra (FIND_BRAND_EMAILS)",
   searchAction: "Search business contacts",
   searching: "Searching contacts…",
   refresh: "Refresh results",

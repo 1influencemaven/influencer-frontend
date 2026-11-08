@@ -1,6 +1,6 @@
 import {
-  BBC_BRIGHTDATA_PROVIDER_ID,
   isBbcSearchMetadata,
+  isBbcWriteProviderId,
   type BrandBusinessContact,
   type BbcProviderFailureKind,
   type BbcRunOutcome,
@@ -36,7 +36,7 @@ export type BbcUiState = {
 };
 
 function isBbcRun(run: LeadDiscoveryRun): boolean {
-  if (run.providerId === BBC_BRIGHTDATA_PROVIDER_ID) {
+  if (isBbcWriteProviderId(run.providerId)) {
     return true;
   }
   return isBbcSearchMetadata(run.searchMetadata);

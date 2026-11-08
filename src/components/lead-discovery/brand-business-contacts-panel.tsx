@@ -7,7 +7,10 @@ import { BbcRunStatusBanner } from "@/components/lead-discovery/bbc-run-status-b
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
-import type { BrandBusinessContact } from "@/types/lead-discovery";
+import {
+  MASTRA_CONTACT_EMAILS_PROVIDER_ID,
+  type BrandBusinessContact,
+} from "@/types/lead-discovery";
 
 type BrandBusinessContactsPanelProps = {
   brandCandidateId: string;
@@ -157,6 +160,18 @@ export function BrandBusinessContactsPanel({
     uiState.kind !== "processing" &&
     uiState.kind !== "partial_while_processing";
 
+  const showMastraEngine = useMemo(() => {
+    const latest = [...runs].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )[0];
+    if (!latest) return false;
+    if (latest.providerId === MASTRA_CONTACT_EMAILS_PROVIDER_ID) return true;
+    const engine = (latest.searchMetadata as { engine?: string } | null)
+      ?.engine;
+    return engine === "mastra";
+  }, [runs]);
+
   return (
     <section
       className="mt-4 space-y-3 rounded-md border border-border bg-muted/30 p-3"
@@ -173,12 +188,13 @@ export function BrandBusinessContactsPanel({
       </div>
 
       {bbcV1Active ? (
-        <p
-          className="rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground"
+        <div
+          className="space-y-1 rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground"
           role="status"
         >
-          {tBbc("activeBanner")}
-        </p>
+          <p>{tBbc("activeBanner")}</p>
+          {showMastraEngine ? <p>{tBbc("engineMastra")}</p> : null}
+        </div>
       ) : null}
 
       {error ? (

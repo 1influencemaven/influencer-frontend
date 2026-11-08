@@ -95,6 +95,17 @@ export type LeadDetail = {
 /** Logical provider id for Contact Discovery BBC v1 (ADR-0020). */
 export const BBC_BRIGHTDATA_PROVIDER_ID = "bbc-brightdata" as const;
 
+/** Mastra FIND_BRAND_EMAILS write path (Paso 3+; Nest CONTACT_DISCOVERY_ENGINE=mastra). */
+export const MASTRA_CONTACT_EMAILS_PROVIDER_ID = "mastra-contact-emails" as const;
+
+/** Providers that write BrandBusinessContact (not person Lead discovery). */
+export function isBbcWriteProviderId(providerId: string | null | undefined): boolean {
+  return (
+    providerId === BBC_BRIGHTDATA_PROVIDER_ID ||
+    providerId === MASTRA_CONTACT_EMAILS_PROVIDER_ID
+  );
+}
+
 export type LeadProvidersResponse = {
   available: string[];
   default: string | null;

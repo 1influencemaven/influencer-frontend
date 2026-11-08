@@ -36,10 +36,6 @@ jest.mock("next-intl", () => ({
   },
 }));
 
-jest.mock("../lead-discovery/lead-contacts-panel", () => ({
-  LeadContactsPanel: () => <div>Lead contacts</div>,
-}));
-
 jest.mock("../lead-discovery/brand-business-contacts-panel", () => ({
   BrandBusinessContactsPanel: () => <div>Brand business contacts</div>,
 }));
@@ -69,6 +65,26 @@ function candidate(
     ...overrides,
   };
 }
+
+describe("BrandCandidateAccordion Paso 4 cutover", () => {
+  it("shows BBC panel for APPROVED brands without person LeadContactsPanel", async () => {
+    const user = userEvent.setup();
+    render(
+      <BrandCandidateAccordion
+        candidates={[
+          candidate({ id: "bc-2", name: "Senic", status: "APPROVED" }),
+        ]}
+        updatingId={null}
+        onUpdateStatus={jest.fn()}
+        onDelete={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByText("Senic"));
+    expect(screen.getByText("Brand business contacts")).toBeInTheDocument();
+    expect(screen.queryByText("Lead contacts")).not.toBeInTheDocument();
+  });
+});
 
 describe("BrandCandidateAccordion delete", () => {
   it("shows Delete brand for UNDER_REVIEW and APPROVED", async () => {
