@@ -3,7 +3,10 @@ import type {
   CreateInfluencerPayload,
   DeleteInfluencerResponse,
   Influencer,
+  InfluencerManager,
   InfluencersQueryParams,
+  InstagramResearchResponse,
+  InstagramUsernameResearchResponse,
   PaginatedInfluencersResponse,
   UpdateInfluencerPayload,
 } from "@/types/influencer";
@@ -37,8 +40,24 @@ function buildQueryString(params: InfluencersQueryParams): string {
     searchParams.set("niche", params.niche);
   }
 
+  if (params.niches) {
+    searchParams.set("niches", params.niches);
+  }
+
   if (params.subNiche) {
     searchParams.set("subNiche", params.subNiche);
+  }
+
+  if (params.managerId) {
+    searchParams.set("managerId", params.managerId);
+  }
+
+  if (params.year !== undefined) {
+    searchParams.set("year", String(params.year));
+  }
+
+  if (params.quarter) {
+    searchParams.set("quarter", params.quarter);
   }
 
   if (params.ibpStatus) {
@@ -62,6 +81,13 @@ export async function listInfluencers(
 ): Promise<PaginatedInfluencersResponse> {
   const { data } = await apiClient.get<PaginatedInfluencersResponse>(
     `${INFLUENCERS_PATH}${buildQueryString(params)}`,
+  );
+  return data;
+}
+
+export async function listInfluencerManagers(): Promise<InfluencerManager[]> {
+  const { data } = await apiClient.get<InfluencerManager[]>(
+    `${INFLUENCERS_PATH}/managers`,
   );
   return data;
 }
@@ -103,10 +129,39 @@ export async function deleteInfluencer(
   return data;
 }
 
+/** Align with Nest Bright Data scraper poll window (default 120s) + buffer. */
+const INSTAGRAM_RESEARCH_TIMEOUT_MS = 150_000;
+
+export async function researchInfluencerInstagram(
+  id: string,
+): Promise<InstagramResearchResponse> {
+  const { data } = await apiClient.post<InstagramResearchResponse>(
+    `${INFLUENCERS_PATH}/${id}/instagram-research`,
+    undefined,
+    { timeout: INSTAGRAM_RESEARCH_TIMEOUT_MS },
+  );
+  return data;
+}
+
+/** Phase 1: lookup by username — does not create/update influencers. */
+export async function researchInstagramUsername(
+  username: string,
+): Promise<InstagramUsernameResearchResponse> {
+  const { data } = await apiClient.post<InstagramUsernameResearchResponse>(
+    `${INFLUENCERS_PATH}/instagram-research`,
+    { username },
+    { timeout: INSTAGRAM_RESEARCH_TIMEOUT_MS },
+  );
+  return data;
+}
+
 export const influencersService = {
   listInfluencers,
+  listInfluencerManagers,
   getInfluencer,
   createInfluencer,
   updateInfluencer,
   deleteInfluencer,
+  researchInfluencerInstagram,
+  researchInstagramUsername,
 };

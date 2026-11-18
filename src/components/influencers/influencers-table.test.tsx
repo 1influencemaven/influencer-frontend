@@ -6,7 +6,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { InfluencersTable } from "@/components/influencers/influencers-table";
-import { deleteInfluencer, listInfluencers } from "@/services/influencers.service";
+import {
+  deleteInfluencer,
+  listInfluencerManagers,
+  listInfluencers,
+} from "@/services/influencers.service";
+import { createQueryWrapper } from "@/test-utils/query-wrapper";
 
 const influencersMessages = {
   emptyState: "No influencers match the current filters.",
@@ -32,6 +37,14 @@ const influencersMessages = {
     languagePlaceholder: "es",
     niche: "Niche",
     nichePlaceholder: "Fitness",
+    niches: "Niches",
+    nichesPlaceholder: "Fitness",
+    manager: "Manager",
+    allManagers: "All managers",
+    year: "Year",
+    yearPlaceholder: "2026",
+    quarter: "Quarter",
+    allQuarters: "All",
     exactMatchHint: "Exact match required.",
     clear: "Clear filters",
   },
@@ -50,6 +63,9 @@ const influencersMessages = {
   },
   columns: {
     name: "Name",
+    instagram: "Instagram",
+    niches: "Niches",
+    manager: "Manager",
     niche: "Niche",
     followers: "Followers",
     engagement: "Engagement",
@@ -94,9 +110,11 @@ const translateInfluencers = (key: string) => {
 jest.mock("next-intl", () => ({
   useTranslations: (namespace?: string) => (key: string) => {
     if (namespace === "IdealBrandProfile.status") {
-      return influencersMessages.ibpStatus[
-        key as keyof typeof influencersMessages.ibpStatus
-      ] ?? key;
+      return (
+        influencersMessages.ibpStatus[
+          key as keyof typeof influencersMessages.ibpStatus
+        ] ?? key
+      );
     }
 
     return translateInfluencers(key);
@@ -116,26 +134,39 @@ jest.mock("../../i18n/navigation", () => ({
 
 jest.mock("../../services/influencers.service", () => ({
   listInfluencers: jest.fn(),
+  listInfluencerManagers: jest.fn(),
   deleteInfluencer: jest.fn(),
 }));
 
 const mockedListInfluencers = jest.mocked(listInfluencers);
+const mockedListManagers = jest.mocked(listInfluencerManagers);
 const mockedDeleteInfluencer = jest.mocked(deleteInfluencer);
 
 const influencer = {
   id: "inf-1",
   name: "Laura Martinez",
   instagram: "@laura",
+  instagramNormalized: "laura",
   tiktok: null,
   youtube: null,
   country: "ES",
   language: "es",
   niche: "Fitness",
   subNiche: null,
+  niches: ["Fitness"],
   followers: 180000,
   engagement: "4.50",
   email: "laura@example.com",
+  outgoingEmail: "out@agency.com",
   mediaKitUrl: null,
+  managerId: "mgr-1",
+  manager: {
+    id: "mgr-1",
+    name: "Ana Manager",
+    email: "ana@example.com",
+    role: "ADMIN",
+  },
+  quarterAssignments: [],
   idealBrandProfile: null,
   createdAt: "2026-06-01T10:00:00.000Z",
   updatedAt: "2026-06-01T10:00:00.000Z",
@@ -144,11 +175,14 @@ const influencer = {
 describe("InfluencersTable", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
+    mockedListManagers.mockResolvedValue([
+      {
+        id: "mgr-1",
+        name: "Ana Manager",
+        email: "ana@example.com",
+        role: "ADMIN",
+      },
+    ]);
   });
 
   it("renders empty state when there are no influencers", async () => {
@@ -157,15 +191,16 @@ describe("InfluencersTable", () => {
       meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
     });
 
-    render(<InfluencersTable />);
+    const { Wrapper } = createQueryWrapper();
+    render(<InfluencersTable />, { wrapper: Wrapper });
 
     await waitFor(() => {
       expect(screen.getByText(influencersMessages.emptyState)).toBeInTheDocument();
     });
   });
 
-  it("renders influencers and supports inline delete confirmation", async () => {
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  it("renders catalog rows with niches and manager filters", async () => {
+    const user = userEvent.setup();
 
     mockedListInfluencers.mockResolvedValue({
       data: [influencer],
@@ -175,10 +210,26 @@ describe("InfluencersTable", () => {
       message: "Influencer deleted successfully",
     });
 
-    render(<InfluencersTable />);
+    const { Wrapper } = createQueryWrapper();
+    render(<InfluencersTable />, { wrapper: Wrapper });
 
     await waitFor(() => {
       expect(screen.getByText("Laura Martinez")).toBeInTheDocument();
+      expect(screen.getByText("@laura")).toBeInTheDocument();
+      expect(screen.getAllByText("Fitness").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Ana Manager").length).toBeGreaterThan(0);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Manager")).toBeInTheDocument();
+    });
+
+    await user.selectOptions(screen.getByLabelText("Manager"), "mgr-1");
+
+    await waitFor(() => {
+      expect(mockedListInfluencers).toHaveBeenCalledWith(
+        expect.objectContaining({ managerId: "mgr-1" }),
+      );
     });
 
     await user.click(screen.getByRole("button", { name: "Delete" }));
@@ -199,7 +250,8 @@ describe("InfluencersTable", () => {
       message: influencersMessages.loadError,
     });
 
-    render(<InfluencersTable />);
+    const { Wrapper } = createQueryWrapper();
+    render(<InfluencersTable />, { wrapper: Wrapper });
 
     await waitFor(() => {
       expect(screen.getByText(influencersMessages.loadError)).toBeInTheDocument();

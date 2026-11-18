@@ -17,6 +17,7 @@ import {
   createInfluencer,
   deleteInfluencer,
   getInfluencer,
+  listInfluencerManagers,
   listInfluencers,
   updateInfluencer,
 } from "@/services/influencers.service";
@@ -28,16 +29,22 @@ const influencer = {
   id: "inf-1",
   name: "Laura Martinez",
   instagram: "@laura",
+  instagramNormalized: "laura",
   tiktok: null,
   youtube: null,
   country: "ES",
   language: "es",
   niche: "Fitness",
   subNiche: null,
+  niches: ["Fitness"],
   followers: 180000,
   engagement: "4.50",
   email: "laura@example.com",
+  outgoingEmail: "out@agency.com",
   mediaKitUrl: null,
+  managerId: null,
+  manager: null,
+  quarterAssignments: [],
   idealBrandProfile: null,
   createdAt: "2026-06-28T12:00:00.000Z",
   updatedAt: "2026-06-28T12:00:00.000Z",
@@ -49,7 +56,7 @@ describe("influencers.service", () => {
   });
 
   describe("listInfluencers", () => {
-    it("fetches paginated influencers with query params", async () => {
+    it("fetches paginated influencers with TM query params", async () => {
       const response = {
         data: [influencer],
         meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
@@ -62,6 +69,10 @@ describe("influencers.service", () => {
           page: 1,
           limit: 20,
           search: "laura",
+          niches: "Fitness",
+          managerId: "mgr-1",
+          year: 2026,
+          quarter: "Q1",
           ibpStatus: "DRAFT",
           sortBy: "name",
           sortOrder: "asc",
@@ -69,8 +80,25 @@ describe("influencers.service", () => {
       ).resolves.toEqual(response);
 
       expect(mockedApiClient.get).toHaveBeenCalledWith(
-        "/influencers?page=1&limit=20&search=laura&ibpStatus=DRAFT&sortBy=name&sortOrder=asc",
+        "/influencers?page=1&limit=20&search=laura&niches=Fitness&managerId=mgr-1&year=2026&quarter=Q1&ibpStatus=DRAFT&sortBy=name&sortOrder=asc",
       );
+    });
+  });
+
+  describe("listInfluencerManagers", () => {
+    it("fetches eligible managers", async () => {
+      const managers = [
+        {
+          id: "mgr-1",
+          name: "Ana",
+          email: "ana@example.com",
+          role: "ADMIN",
+        },
+      ];
+      mockedApiClient.get.mockResolvedValue(createAxiosResponse(managers));
+
+      await expect(listInfluencerManagers()).resolves.toEqual(managers);
+      expect(mockedApiClient.get).toHaveBeenCalledWith("/influencers/managers");
     });
   });
 
@@ -84,15 +112,25 @@ describe("influencers.service", () => {
   });
 
   describe("createInfluencer", () => {
-    it("creates an influencer", async () => {
+    it("creates an influencer with TM payload", async () => {
       mockedApiClient.post.mockResolvedValue(createAxiosResponse(influencer));
 
       await expect(
-        createInfluencer({ name: "Laura Martinez" }),
+        createInfluencer({
+          name: "Laura Martinez",
+          instagram: "@laura",
+          country: "ES",
+          niches: ["Fitness"],
+          outgoingEmail: "out@agency.com",
+        }),
       ).resolves.toEqual(influencer);
 
       expect(mockedApiClient.post).toHaveBeenCalledWith("/influencers", {
         name: "Laura Martinez",
+        instagram: "@laura",
+        country: "ES",
+        niches: ["Fitness"],
+        outgoingEmail: "out@agency.com",
       });
     });
   });
@@ -102,11 +140,12 @@ describe("influencers.service", () => {
       mockedApiClient.patch.mockResolvedValue(createAxiosResponse(influencer));
 
       await expect(
-        updateInfluencer("inf-1", { niche: "Wellness" }),
+        updateInfluencer("inf-1", { niches: ["Wellness"], managerId: null }),
       ).resolves.toEqual(influencer);
 
       expect(mockedApiClient.patch).toHaveBeenCalledWith("/influencers/inf-1", {
-        niche: "Wellness",
+        niches: ["Wellness"],
+        managerId: null,
       });
     });
   });

@@ -5,8 +5,10 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useInfluencerManagers } from "@/hooks/use-influencer-managers";
 import type { InfluencersListFilters } from "@/hooks/use-influencers-list";
 import { IBP_STATUSES } from "@/types/ideal-brand-profile";
+import { INFLUENCER_QUARTERS } from "@/types/influencer";
 
 type InfluencersTableFiltersProps = {
   filters: InfluencersListFilters;
@@ -14,12 +16,16 @@ type InfluencersTableFiltersProps = {
   disabled?: boolean;
 };
 
+const selectClassName =
+  "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50";
+
 export function InfluencersTableFilters({
   filters,
   onFiltersChange,
   disabled = false,
 }: InfluencersTableFiltersProps) {
   const t = useTranslations("Influencers");
+  const managersQuery = useInfluencerManagers();
 
   return (
     <section className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm">
@@ -37,10 +43,78 @@ export function InfluencersTableFilters({
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="influencers-niches">{t("filters.niches")}</Label>
+          <Input
+            id="influencers-niches"
+            placeholder={t("filters.nichesPlaceholder")}
+            value={filters.niches}
+            disabled={disabled}
+            onChange={(event) => onFiltersChange({ niches: event.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="influencers-manager">{t("filters.manager")}</Label>
+          <select
+            id="influencers-manager"
+            className={selectClassName}
+            value={filters.managerId}
+            disabled={disabled || managersQuery.isLoading}
+            onChange={(event) =>
+              onFiltersChange({ managerId: event.target.value })
+            }
+          >
+            <option value="">{t("filters.allManagers")}</option>
+            {(managersQuery.data ?? []).map((manager) => (
+              <option key={manager.id} value={manager.id}>
+                {manager.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="influencers-year">{t("filters.year")}</Label>
+          <Input
+            id="influencers-year"
+            type="number"
+            min={2000}
+            max={2100}
+            placeholder={t("filters.yearPlaceholder")}
+            value={filters.year}
+            disabled={disabled}
+            onChange={(event) => onFiltersChange({ year: event.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="influencers-quarter">{t("filters.quarter")}</Label>
+          <select
+            id="influencers-quarter"
+            className={selectClassName}
+            value={filters.quarter}
+            disabled={disabled}
+            onChange={(event) =>
+              onFiltersChange({
+                quarter: event.target
+                  .value as InfluencersListFilters["quarter"],
+              })
+            }
+          >
+            <option value="">{t("filters.allQuarters")}</option>
+            {INFLUENCER_QUARTERS.map((quarter) => (
+              <option key={quarter} value={quarter}>
+                {quarter}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="influencers-ibp-status">{t("filters.ibpStatus")}</Label>
           <select
             id="influencers-ibp-status"
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+            className={selectClassName}
             value={filters.ibpStatus}
             disabled={disabled}
             onChange={(event) =>
@@ -111,6 +185,10 @@ export function InfluencersTableFilters({
               country: "",
               language: "",
               niche: "",
+              niches: "",
+              managerId: "",
+              year: "",
+              quarter: "",
               ibpStatus: "",
             })
           }

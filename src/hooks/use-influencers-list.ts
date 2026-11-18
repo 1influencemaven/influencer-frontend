@@ -1,14 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
+import { influencerKeys } from "@/lib/influencer-query-keys";
 import { listInfluencers } from "@/services/influencers.service";
 import { getApiErrorMessage } from "@/types/api-error";
 import type { IbpStatus } from "@/types/ideal-brand-profile";
 import type {
+  InfluencerQuarter,
   InfluencerSortBy,
   InfluencersQueryParams,
-  PaginatedInfluencersResponse,
   SortOrder,
 } from "@/types/influencer";
 
@@ -17,6 +19,10 @@ export type InfluencersListFilters = {
   country: string;
   language: string;
   niche: string;
+  niches: string;
+  managerId: string;
+  year: string;
+  quarter: InfluencerQuarter | "";
   ibpStatus: IbpStatus | "";
 };
 
@@ -33,6 +39,10 @@ const DEFAULT_FILTERS: InfluencersListFilters = {
   country: "",
   language: "",
   niche: "",
+  niches: "",
+  managerId: "",
+  year: "",
+  quarter: "",
   ibpStatus: "",
 };
 
@@ -44,7 +54,9 @@ const DEFAULT_STATE: InfluencersListState = {
   filters: DEFAULT_FILTERS,
 };
 
-function buildQueryParams(state: InfluencersListState): InfluencersQueryParams {
+export function buildInfluencersQueryParams(
+  state: InfluencersListState,
+): InfluencersQueryParams {
   const params: InfluencersQueryParams = {
     page: state.page,
     limit: state.limit,
@@ -68,6 +80,25 @@ function buildQueryParams(state: InfluencersListState): InfluencersQueryParams {
     params.niche = state.filters.niche.trim();
   }
 
+  if (state.filters.niches.trim()) {
+    params.niches = state.filters.niches.trim();
+  }
+
+  if (state.filters.managerId.trim()) {
+    params.managerId = state.filters.managerId.trim();
+  }
+
+  if (state.filters.year.trim()) {
+    const year = Number(state.filters.year);
+    if (Number.isInteger(year)) {
+      params.year = year;
+    }
+  }
+
+  if (state.filters.quarter) {
+    params.quarter = state.filters.quarter;
+  }
+
   if (state.filters.ibpStatus) {
     params.ibpStatus = state.filters.ibpStatus;
   }
@@ -81,45 +112,35 @@ type UseInfluencersListOptions = {
 
 export function useInfluencersList({ loadErrorMessage }: UseInfluencersListOptions) {
   const [state, setState] = useState<InfluencersListState>(DEFAULT_STATE);
-  const [data, setData] = useState<PaginatedInfluencersResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const queryParams = useMemo(() => buildInfluencersQueryParams(state), [state]);
 
-  const fetchInfluencers = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const query = useQuery({
+    queryKey: influencerKeys.list(queryParams),
+    queryFn: () => listInfluencers(queryParams),
+  });
 
-    try {
-      const response = await listInfluencers(buildQueryParams(state));
-      setData(response);
-    } catch (loadError) {
-      setError(getApiErrorMessage(loadError, loadErrorMessage));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [state, loadErrorMessage]);
+  const error = query.error
+    ? getApiErrorMessage(query.error, loadErrorMessage)
+    : null;
 
-  useEffect(() => {
-    void fetchInfluencers();
-  }, [fetchInfluencers]);
-
-  function setPage(page: number) {
+  const setPage = useCallback((page: number) => {
     setState((current) => ({ ...current, page }));
-  }
+  }, []);
 
-  function setLimit(limit: number) {
+  const setLimit = useCallback((limit: number) => {
     setState((current) => ({ ...current, limit, page: 1 }));
-  }
+  }, []);
 
-  function setFilters(filters: Partial<InfluencersListFilters>) {
+  const setFilters = useCallback((filters: Partial<InfluencersListFilters>) => {
     setState((current) => ({
       ...current,
       page: 1,
       filters: { ...current.filters, ...filters },
     }));
-  }
+  }, []);
 
-  function toggleSort(sortBy: InfluencerSortBy) {
+  const toggleSort = useCallback((sortBy: InfluencerSortBy) => {
     setState((current) => {
       if (current.sortBy === sortBy) {
         return {
@@ -134,34 +155,40 @@ export function useInfluencersList({ loadErrorMessage }: UseInfluencersListOptio
         sortOrder: "desc",
       };
     });
-  }
+  }, []);
 
-  function removeInfluencer(id: string) {
-    setData((current) => {
-      if (!current) {
-        return current;
-      }
+  const removeInfluencer = useCallback(
+    (id: string) => {
+      queryClient.setQueryData(
+        influencerKeys.list(queryParams),
+        (current: Awaited<ReturnType<typeof listInfluencers>> | undefined) => {
+          if (!current) {
+            return current;
+          }
 
-      return {
-        data: current.data.filter((influencer) => influencer.id !== id),
-        meta: {
-          ...current.meta,
-          total: Math.max(0, current.meta.total - 1),
+          return {
+            data: current.data.filter((influencer) => influencer.id !== id),
+            meta: {
+              ...current.meta,
+              total: Math.max(0, current.meta.total - 1),
+            },
+          };
         },
-      };
-    });
-  }
+      );
+    },
+    [queryClient, queryParams],
+  );
 
   return {
     state,
-    data,
-    isLoading,
+    data: query.data ?? null,
+    isLoading: query.isLoading || query.isFetching,
     error,
     setPage,
     setLimit,
     setFilters,
     toggleSort,
     removeInfluencer,
-    refetch: fetchInfluencers,
+    refetch: () => query.refetch(),
   };
 }

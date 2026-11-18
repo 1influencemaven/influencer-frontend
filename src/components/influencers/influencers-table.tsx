@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { useInfluencersList } from "@/hooks/use-influencers-list";
 import { Link } from "@/i18n/navigation";
+import { invalidateInfluencerQueries } from "@/lib/influencer-query-keys";
 import { deleteInfluencer } from "@/services/influencers.service";
 import { getApiErrorMessage, isApiError } from "@/types/api-error";
 import type { InfluencerSortBy } from "@/types/influencer";
@@ -32,22 +34,6 @@ function formatCreatedAt(value: string | undefined, locale: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
-}
-
-function formatFollowers(value: number | null): string {
-  if (value === null || value === undefined) {
-    return "—";
-  }
-
-  return new Intl.NumberFormat().format(value);
-}
-
-function formatEngagement(value: string | null): string {
-  if (!value) {
-    return "—";
-  }
-
-  return `${value}%`;
 }
 
 function SortIcon({
@@ -73,6 +59,7 @@ function SortIcon({
 export function InfluencersTable() {
   const t = useTranslations("Influencers");
   const locale = useLocale();
+  const queryClient = useQueryClient();
   const {
     state,
     data,
@@ -88,8 +75,11 @@ export function InfluencersTable() {
 
   const [searchInput, setSearchInput] = useState(state.filters.search);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+
+  const deleteMutation = useMutation({
+    mutationFn: (influencerId: string) => deleteInfluencer(influencerId),
+  });
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -102,13 +92,13 @@ export function InfluencersTable() {
   }, [searchInput, state.filters.search, setFilters]);
 
   async function handleDelete(influencerId: string) {
-    setDeletingId(influencerId);
     setActionError(null);
 
     try {
-      await deleteInfluencer(influencerId);
+      await deleteMutation.mutateAsync(influencerId);
       removeInfluencer(influencerId);
       setPendingDeleteId(null);
+      await invalidateInfluencerQueries(queryClient);
 
       if (data && data.data.length === 1 && state.page > 1) {
         setPage(state.page - 1);
@@ -121,8 +111,6 @@ export function InfluencersTable() {
       } else {
         setActionError(getApiErrorMessage(deleteError, t("deleteError")));
       }
-    } finally {
-      setDeletingId(null);
     }
   }
 
@@ -195,18 +183,14 @@ export function InfluencersTable() {
               <TableRow className="hover:bg-muted/40">
                 {renderSortableHead("name", t("columns.name"), "px-4")}
                 <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("columns.niche")}
+                  {t("columns.instagram")}
                 </TableHead>
-                {renderSortableHead(
-                  "followers",
-                  t("columns.followers"),
-                  "px-4",
-                )}
-                {renderSortableHead(
-                  "engagement",
-                  t("columns.engagement"),
-                  "px-4",
-                )}
+                <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  {t("columns.niches")}
+                </TableHead>
+                <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  {t("columns.manager")}
+                </TableHead>
                 <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   {t("columns.ibpStatus")}
                 </TableHead>
@@ -233,7 +217,9 @@ export function InfluencersTable() {
                   ))
                 : influencers.map((influencer) => {
                     const isPendingDelete = pendingDeleteId === influencer.id;
-                    const isDeleting = deletingId === influencer.id;
+                    const isDeleting =
+                      deleteMutation.isPending &&
+                      deleteMutation.variables === influencer.id;
 
                     return (
                       <TableRow key={influencer.id}>
@@ -246,13 +232,15 @@ export function InfluencersTable() {
                           </Link>
                         </TableCell>
                         <TableCell className="px-4 text-sm text-muted-foreground">
-                          {influencer.niche ?? "—"}
+                          {influencer.instagram ?? "—"}
                         </TableCell>
                         <TableCell className="px-4 text-sm text-muted-foreground">
-                          {formatFollowers(influencer.followers)}
+                          {influencer.niches?.length
+                            ? influencer.niches.join(", ")
+                            : (influencer.niche ?? "—")}
                         </TableCell>
                         <TableCell className="px-4 text-sm text-muted-foreground">
-                          {formatEngagement(influencer.engagement)}
+                          {influencer.manager?.name ?? "—"}
                         </TableCell>
                         <TableCell className="px-4">
                           <IbpStatusBadge

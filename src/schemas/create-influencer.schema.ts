@@ -1,165 +1,105 @@
 import { z } from "zod";
 
-import type { CreateInfluencerPayload } from "@/types/influencer";
+import { isIsoCountryCode } from "@/lib/countries";
+import type {
+  CreateInfluencerPayload,
+  InfluencerQuarter,
+  InstagramResearchCreatePayload,
+  QuarterAssignmentInput,
+} from "@/types/influencer";
+import { INFLUENCER_QUARTERS } from "@/types/influencer";
 
 export type CreateInfluencerSchemaMessages = {
   nameRequired: string;
   nameMin: string;
   nameMax: string;
+  instagramRequired: string;
   instagramMax: string;
-  tiktokMax: string;
-  youtubeMax: string;
-  countryLength: string;
-  languageLength: string;
-  nicheMax: string;
-  subNicheMax: string;
-  followersMin: string;
-  followersInt: string;
-  engagementMin: string;
-  engagementMax: string;
-  engagementDecimals: string;
-  emailInvalid: string;
-  mediaKitUrlInvalid: string;
-  mediaKitUrlMax: string;
+  countryRequired: string;
+  countryInvalid: string;
+  nicheItemMax: string;
+  nichesMax: string;
+  quarterYearInvalid: string;
+  quartersDuplicate: string;
+  outgoingEmailInvalid: string;
+  managerIdRequired: string;
+  managerIdInvalid: string;
 };
 
-const optionalString = z.string().optional().or(z.literal(""));
-
-const optionalNumericInput = z.union([z.string(), z.number()]).optional();
-
-function parseOptionalNumber(value: string | number | undefined): number | undefined {
-  if (value === undefined || value === "") {
-    return undefined;
-  }
-
-  const parsed = typeof value === "number" ? value : Number(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
-}
-
-function optionalIntField(
-  messages: Pick<CreateInfluencerSchemaMessages, "followersMin" | "followersInt">,
-) {
-  return optionalNumericInput
-    .refine(
-      (value) => {
-        if (value === undefined || value === "") return true;
-        return parseOptionalNumber(value) !== undefined;
-      },
-      messages.followersInt,
-    )
-    .refine(
-      (value) => {
-        if (value === undefined || value === "") return true;
-        const parsed = parseOptionalNumber(value);
-        return parsed !== undefined && Number.isInteger(parsed);
-      },
-      messages.followersInt,
-    )
-    .refine(
-      (value) => {
-        if (value === undefined || value === "") return true;
-        const parsed = parseOptionalNumber(value);
-        return parsed !== undefined && parsed >= 0;
-      },
-      messages.followersMin,
-    )
-    .transform((value) => parseOptionalNumber(value));
-}
-
-function optionalEngagementField(
-  messages: Pick<
-    CreateInfluencerSchemaMessages,
-    "engagementMin" | "engagementMax" | "engagementDecimals"
-  >,
-) {
-  return optionalNumericInput
-    .refine(
-      (value) => {
-        if (value === undefined || value === "") return true;
-        return parseOptionalNumber(value) !== undefined;
-      },
-      messages.engagementDecimals,
-    )
-    .refine(
-      (value) => {
-        if (value === undefined || value === "") return true;
-        const parsed = parseOptionalNumber(value);
-        return parsed !== undefined && parsed >= 0;
-      },
-      messages.engagementMin,
-    )
-    .refine(
-      (value) => {
-        if (value === undefined || value === "") return true;
-        const parsed = parseOptionalNumber(value);
-        return parsed !== undefined && parsed <= 100;
-      },
-      messages.engagementMax,
-    )
-    .refine(
-      (value) => {
-        if (value === undefined || value === "") return true;
-        const parsed = parseOptionalNumber(value);
-        if (parsed === undefined) return true;
-        const decimals = parsed.toString().split(".")[1];
-        return !decimals || decimals.length <= 2;
-      },
-      messages.engagementDecimals,
-    )
-    .transform((value) => parseOptionalNumber(value));
+function quarterKey(item: QuarterAssignmentInput): string {
+  return `${item.year}:${item.quarter}`;
 }
 
 export function createCreateInfluencerSchema(
   messages: CreateInfluencerSchemaMessages,
 ) {
+  const quarterSchema = z.object({
+    year: z
+      .number()
+      .int()
+      .min(2000, messages.quarterYearInvalid)
+      .max(2100, messages.quarterYearInvalid),
+    quarter: z.enum(INFLUENCER_QUARTERS),
+  });
+
   return z.object({
     name: z
       .string()
       .min(1, messages.nameRequired)
       .min(2, messages.nameMin)
       .max(200, messages.nameMax),
-    instagram: optionalString.refine(
-      (value) => !value || value.length <= 255,
-      messages.instagramMax,
-    ),
-    tiktok: optionalString.refine(
-      (value) => !value || value.length <= 255,
-      messages.tiktokMax,
-    ),
-    youtube: optionalString.refine(
-      (value) => !value || value.length <= 255,
-      messages.youtubeMax,
-    ),
-    country: optionalString.refine(
-      (value) => !value || value.length === 2,
-      messages.countryLength,
-    ),
-    language: optionalString.refine(
-      (value) => !value || value.length === 2,
-      messages.languageLength,
-    ),
-    niche: optionalString.refine(
-      (value) => !value || value.length <= 100,
-      messages.nicheMax,
-    ),
-    subNiche: optionalString.refine(
-      (value) => !value || value.length <= 100,
-      messages.subNicheMax,
-    ),
-    followers: optionalIntField(messages),
-    engagement: optionalEngagementField(messages),
-    email: optionalString.refine(
-      (value) => !value || z.string().email().safeParse(value).success,
-      messages.emailInvalid,
-    ),
-    mediaKitUrl: optionalString
-      .refine(
-        (value) => !value || z.string().url().safeParse(value).success,
-        messages.mediaKitUrlInvalid,
+    instagram: z
+      .string()
+      .min(1, messages.instagramRequired)
+      .max(100, messages.instagramMax),
+    country: z
+      .string()
+      .min(1, messages.countryRequired)
+      .transform((value) => value.trim().toUpperCase())
+      .refine((value) => isIsoCountryCode(value), messages.countryInvalid),
+    niches: z
+      .array(
+        z
+          .string()
+          .trim()
+          .min(1)
+          .max(100, messages.nicheItemMax),
       )
+      .max(50, messages.nichesMax)
+      .default([]),
+    quarters: z
+      .array(quarterSchema)
+      .max(40)
+      .superRefine((items, ctx) => {
+        const seen = new Set<string>();
+        for (const item of items) {
+          const key = quarterKey(item);
+          if (seen.has(key)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: messages.quartersDuplicate,
+            });
+            return;
+          }
+          seen.add(key);
+        }
+      })
+      .default([]),
+    managerId: z
+      .string()
+      .min(1, messages.managerIdRequired)
       .refine(
-        (value) => !value || value.length <= 2048,
-        messages.mediaKitUrlMax,
+        (value) => z.string().uuid().safeParse(value).success,
+        messages.managerIdInvalid,
+      ),
+    outgoingEmail: z
+      .string()
+      .optional()
+      .or(z.literal(""))
+      .refine(
+        (value) =>
+          !value || z.string().email().safeParse(value).success,
+        messages.outgoingEmailInvalid,
       ),
   });
 }
@@ -174,37 +114,54 @@ export type CreateInfluencerFormValues = z.output<
 
 export function toCreateInfluencerPayload(
   values: CreateInfluencerFormValues,
+  options?: {
+    instagramResearch?: InstagramResearchCreatePayload | null;
+  },
 ): CreateInfluencerPayload {
   const payload: CreateInfluencerPayload = {
     name: values.name.trim(),
+    instagram: values.instagram.trim(),
+    country: values.country.trim().toUpperCase(),
+    managerId: values.managerId.trim(),
   };
 
-  const optionalFields = [
-    "instagram",
-    "tiktok",
-    "youtube",
-    "country",
-    "language",
-    "niche",
-    "subNiche",
-    "email",
-    "mediaKitUrl",
-  ] as const satisfies ReadonlyArray<keyof CreateInfluencerFormValues>;
-
-  for (const field of optionalFields) {
-    const value = values[field];
-    if (typeof value === "string" && value.trim()) {
-      payload[field] = value.trim();
-    }
+  if (values.niches.length > 0) {
+    payload.niches = values.niches.map((niche) => niche.trim()).filter(Boolean);
   }
 
-  if (values.followers !== undefined) {
-    payload.followers = values.followers;
+  if (values.quarters.length > 0) {
+    payload.quarters = values.quarters.map((item) => ({
+      year: item.year,
+      quarter: item.quarter as InfluencerQuarter,
+    }));
   }
 
-  if (values.engagement !== undefined) {
-    payload.engagement = values.engagement;
+  if (values.outgoingEmail && values.outgoingEmail.trim()) {
+    payload.outgoingEmail = values.outgoingEmail.trim();
+  }
+
+  if (options?.instagramResearch) {
+    payload.instagramResearch = options.instagramResearch;
   }
 
   return payload;
+}
+
+/** Builds the create research package from a username lookup response. */
+export function toInstagramResearchCreatePayload(lookup: {
+  research: {
+    source: string;
+    fetchedAt: string;
+    handleNormalized: string;
+    profileUrl: string;
+  };
+  normalized: InstagramResearchCreatePayload["normalized"];
+}): InstagramResearchCreatePayload {
+  return {
+    source: lookup.research.source,
+    fetchedAt: lookup.research.fetchedAt,
+    handleNormalized: lookup.research.handleNormalized,
+    profileUrl: lookup.research.profileUrl,
+    normalized: lookup.normalized,
+  };
 }

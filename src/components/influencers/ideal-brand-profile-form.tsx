@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -8,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { invalidateInfluencerQueries } from "@/lib/influencer-query-keys";
 import {
   formValuesToPayload,
   ibpToFormValues,
@@ -58,6 +60,7 @@ export function IdealBrandProfileForm({
   onSaved,
 }: IdealBrandProfileFormProps) {
   const t = useTranslations("IdealBrandProfile.form");
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -80,6 +83,8 @@ export function IdealBrandProfileForm({
         formValuesToPayload(values),
       );
       onSaved(saved);
+      // List column "perfil ideal" reads influencers list cache — refresh ACTIVE.
+      await invalidateInfluencerQueries(queryClient, influencerId);
     } catch (saveError) {
       if (isApiError(saveError) && saveError.status === 409) {
         setError("root", { message: t("errors.processing") });
