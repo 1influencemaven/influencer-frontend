@@ -158,33 +158,54 @@ export function BrandDiscoveryView() {
           <p className="text-sm text-muted-foreground">{t("emptyRuns")}</p>
         ) : (
           <ul className="space-y-2">
-            {runs.slice(0, 10).map((run) => (
-              <li
-                key={run.id}
-                className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2 text-sm"
-              >
-                <span className="font-medium">{run.influencer.name}</span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">{run.source}</Badge>
-                  <Badge
-                    variant={
-                      run.status === "FAILED"
-                        ? "destructive"
-                        : run.status === "COMPLETED"
-                          ? "secondary"
-                          : "default"
-                    }
-                  >
-                    {t(`runStatus.${run.status}`)}
-                  </Badge>
-                </div>
-                {run.errorMessage ? (
-                  <p className="w-full text-xs text-destructive">
-                    {run.errorMessage}
-                  </p>
-                ) : null}
-              </li>
-            ))}
+            {runs.slice(0, 10).map((run) => {
+              const meta = run.searchMetadata;
+              const queries = meta?.queries?.filter(Boolean) ?? [];
+              return (
+                <li
+                  key={run.id}
+                  className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2 text-sm"
+                >
+                  <span className="font-medium">{run.influencer.name}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{run.source}</Badge>
+                    <Badge
+                      variant={
+                        run.status === "FAILED"
+                          ? "destructive"
+                          : run.status === "COMPLETED"
+                            ? "secondary"
+                            : "default"
+                      }
+                    >
+                      {t(`runStatus.${run.status}`)}
+                    </Badge>
+                  </div>
+                  {meta && run.status === "COMPLETED" ? (
+                    <p className="w-full text-xs text-muted-foreground">
+                      {t("runMetaSummary", {
+                        hits: meta.searchHitsCount ?? 0,
+                        persisted: meta.persistedCount ?? 0,
+                        afterFilters: meta.afterHardFiltersCount ?? 0,
+                      })}
+                      {meta.skippedPersistReason === "NO_SERP_HITS"
+                        ? ` · ${t("runMetaNoSerp")}`
+                        : null}
+                    </p>
+                  ) : null}
+                  {queries.length > 0 ? (
+                    <p className="w-full text-xs text-muted-foreground">
+                      {t("runMetaQueries")}: {queries.join(" · ")}
+                    </p>
+                  ) : null}
+                  {run.errorMessage ? (
+                    <p className="w-full text-xs text-destructive">
+                      {run.errorMessage}
+                    </p>
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

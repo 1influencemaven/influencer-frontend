@@ -3,7 +3,9 @@
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
+import { AgencyContactsPanel } from "@/components/lead-discovery/agency-contacts-panel";
 import { BbcRunStatusBanner } from "@/components/lead-discovery/bbc-run-status-banner";
+import { BrandPeopleLeadsPanel } from "@/components/lead-discovery/brand-people-leads-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
@@ -14,6 +16,8 @@ import {
 
 type BrandBusinessContactsPanelProps = {
   brandCandidateId: string;
+  /** Required for 2C.4.8 AgencyContact commercial list. */
+  influencerId?: string | null;
 };
 
 function isHttpUrl(value: string | null | undefined): value is string {
@@ -82,7 +86,9 @@ function ContactList({
                 {contact.isGeneric ? t("type.generic") : t("type.personLike")}
               </Badge>
               <Badge variant="secondary">
-                {t(`relevance.${contact.commercialRelevance}`)}
+                {contact.commercialCoverageTier
+                  ? t(`coverageTier.${contact.commercialCoverageTier}`)
+                  : t(`relevance.${contact.commercialRelevance}`)}
               </Badge>
             </div>
             {snippet ? (
@@ -95,7 +101,14 @@ function ContactList({
             ) : null}
             <p className="mt-1 text-xs text-muted-foreground">
               {t("source")}: {contact.source}
-              {!snippet ? ` · ${t("evidenceUnverified")}` : null}
+              {contact.attributionStatus
+                ? ` · ${t(`attribution.${contact.attributionStatus}`)}`
+                : null}
+              {` · ${
+                contact.verificationStatus === "VERIFIED"
+                  ? t("verification.VERIFIED")
+                  : t("verification.UNVERIFIED")
+              }`}
             </p>
             {link ? (
               <a
@@ -116,6 +129,7 @@ function ContactList({
 
 export function BrandBusinessContactsPanel({
   brandCandidateId,
+  influencerId = null,
 }: BrandBusinessContactsPanelProps) {
   const t = useTranslations("LeadDiscovery.businessContacts");
   const tBbc = useTranslations("LeadDiscovery.bbc");
@@ -123,6 +137,7 @@ export function BrandBusinessContactsPanel({
     bbcV1Active,
     canSearch,
     contacts,
+    leads,
     runs,
     loading,
     loadingMeta,
@@ -160,19 +175,59 @@ export function BrandBusinessContactsPanel({
     uiState.kind !== "processing" &&
     uiState.kind !== "partial_while_processing";
 
-  const showMastraEngine = useMemo(() => {
-    const latest = [...runs].sort(
+  const latestRun = useMemo(() => {
+    return [...runs].sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )[0];
-    if (!latest) return false;
-    if (latest.providerId === MASTRA_CONTACT_EMAILS_PROVIDER_ID) return true;
-    const engine = (latest.searchMetadata as { engine?: string } | null)
-      ?.engine;
-    return engine === "mastra";
   }, [runs]);
 
+  const showMastraEngine = useMemo(() => {
+    if (!latestRun) return false;
+    if (latestRun.providerId === MASTRA_CONTACT_EMAILS_PROVIDER_ID) return true;
+    const engine = (latestRun.searchMetadata as { engine?: string } | null)
+      ?.engine;
+    return engine === "mastra";
+  }, [latestRun]);
+
+  const track2CStatus = useMemo(() => {
+    const meta = latestRun?.searchMetadata as
+      | {
+          track2C?: {
+            executed?: boolean;
+            outcome?: "RESULTS_FOUND" | "NO_MATCHES" | "PROVIDER_FAILURE";
+            persistedCount?: number;
+          };
+          tracks?: string[];
+        }
+      | null
+      | undefined;
+    if (!meta?.track2C) {
+      if (meta?.tracks?.includes("2C")) {
+        return { kind: "executed_unknown" as const };
+      }
+      return { kind: "not_started" as const };
+    }
+    if (!meta.track2C.executed) {
+      return { kind: "not_started" as const };
+    }
+    if (meta.track2C.outcome === "RESULTS_FOUND") {
+      return {
+        kind: "results" as const,
+        count: meta.track2C.persistedCount ?? 0,
+      };
+    }
+    if (meta.track2C.outcome === "PROVIDER_FAILURE") {
+      return { kind: "failed" as const };
+    }
+    if (meta.track2C.outcome === "NO_MATCHES") {
+      return { kind: "no_matches" as const };
+    }
+    return { kind: "executed_unknown" as const };
+  }, [latestRun]);
+
   return (
+    <>
     <section
       className="mt-4 space-y-3 rounded-md border border-border bg-muted/30 p-3"
       aria-labelledby={`bbc-title-${brandCandidateId}`}
@@ -295,15 +350,37 @@ export function BrandBusinessContactsPanel({
       ) : null}
 
       {!loading ? (
-        <div className="space-y-1 border-t border-border pt-3">
-          <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t("sections.agenciesTitle")}
-          </h5>
-          <p className="text-xs text-muted-foreground">
-            {t("sections.agenciesPending")}
-          </p>
+        <div className="space-y-3 border-t border-border pt-3">
+          <div className="space-y-1">
+            <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t("sections.agenciesTitle")}
+            </h5>
+            <p className="text-xs text-muted-foreground">
+              {track2CStatus.kind === "results"
+                ? t("sections.agenciesResults", {
+                    count: track2CStatus.count,
+                  })
+                : track2CStatus.kind === "no_matches"
+                  ? t("sections.agenciesNoMatches")
+                  : track2CStatus.kind === "failed"
+                    ? t("sections.agenciesFailed")
+                    : track2CStatus.kind === "executed_unknown"
+                      ? t("sections.agenciesExecuted")
+                      : t("sections.agenciesPending")}
+            </p>
+          </div>
+          <AgencyContactsPanel
+            influencerId={influencerId}
+            pollWhile={hasProcessing}
+          />
         </div>
       ) : null}
     </section>
+    <BrandPeopleLeadsPanel
+      brandCandidateId={brandCandidateId}
+      leads={leads}
+      loading={loading}
+    />
+    </>
   );
 }

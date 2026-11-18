@@ -7,6 +7,7 @@ import {
   listBrandBusinessContacts,
   listLeadDiscoveryRuns,
   listLeadProviders,
+  listLeads,
   searchLeads,
 } from "@/services/lead-discovery.service";
 import { getApiErrorMessage } from "@/types/api-error";
@@ -14,20 +15,22 @@ import {
   BBC_BRIGHTDATA_PROVIDER_ID,
   isBbcWriteProviderId,
   type BrandBusinessContact,
+  type Lead,
   type LeadDiscoveryRun,
 } from "@/types/lead-discovery";
 
 const POLL_INTERVAL_MS = 2500;
 
 /**
- * BBC v1 discovery for one APPROVED brand: providers gate, search enqueue,
- * poll runs + business-contacts. Reuses existing HTTP services only.
+ * Contact discovery for one APPROVED brand: providers gate, search enqueue,
+ * poll runs + BBC + person Leads (2A+2B). Reuses existing HTTP services only.
  */
 export function useBbcDiscovery(brandCandidateId: string | null) {
   const [rebuildMode, setRebuildMode] = useState(false);
   const [providers, setProviders] = useState<string[]>([]);
   const [defaultProvider, setDefaultProvider] = useState<string | null>(null);
   const [contacts, setContacts] = useState<BrandBusinessContact[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [runs, setRuns] = useState<LeadDiscoveryRun[]>([]);
   const [loadingMeta, setLoadingMeta] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,11 +50,13 @@ export function useBbcDiscovery(brandCandidateId: string | null) {
     if (!brandCandidateId) {
       return;
     }
-    const [rows, nextRuns] = await Promise.all([
+    const [rows, nextLeads, nextRuns] = await Promise.all([
       listBrandBusinessContacts(brandCandidateId),
+      listLeads({ brandCandidateId }),
       listLeadDiscoveryRuns({ brandCandidateId }),
     ]);
     setContacts(rows);
+    setLeads(nextLeads);
     setRuns(nextRuns);
   }, [brandCandidateId]);
 
@@ -95,6 +100,7 @@ export function useBbcDiscovery(brandCandidateId: string | null) {
       } catch (err) {
         if (!cancelled) {
           setContacts([]);
+          setLeads([]);
           setError(getApiErrorMessage(err));
         }
       } finally {
@@ -177,6 +183,7 @@ export function useBbcDiscovery(brandCandidateId: string | null) {
     bbcV1Active,
     canSearch,
     contacts,
+    leads,
     runs,
     loading,
     loadingMeta,

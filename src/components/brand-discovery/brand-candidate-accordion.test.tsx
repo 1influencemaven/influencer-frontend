@@ -67,7 +67,7 @@ function candidate(
 }
 
 describe("BrandCandidateAccordion Paso 4 cutover", () => {
-  it("shows BBC panel for APPROVED brands without person LeadContactsPanel", async () => {
+  it("shows contact discovery panels for APPROVED brands", async () => {
     const user = userEvent.setup();
     render(
       <BrandCandidateAccordion
@@ -82,7 +82,6 @@ describe("BrandCandidateAccordion Paso 4 cutover", () => {
 
     await user.click(screen.getByText("Senic"));
     expect(screen.getByText("Brand business contacts")).toBeInTheDocument();
-    expect(screen.queryByText("Lead contacts")).not.toBeInTheDocument();
   });
 });
 
@@ -155,6 +154,118 @@ describe("BrandCandidateAccordion delete", () => {
     await user.click(screen.getByRole("button", { name: "Delete brand" }));
     await user.click(screen.getByRole("button", { name: "Delete" }));
     expect(onDelete).toHaveBeenCalledWith("bc-1");
+  });
+});
+
+describe("BrandCandidateAccordion deep research", () => {
+  it("renders legacy candidates without deepResearch", async () => {
+    const user = userEvent.setup();
+    render(
+      <BrandCandidateAccordion
+        candidates={[candidate({ metadata: null })]}
+        updatingId={null}
+        onUpdateStatus={jest.fn()}
+        onDelete={jest.fn()}
+      />,
+    );
+    await user.click(screen.getByText("Movavi"));
+    expect(screen.getByText("https://movavi.com")).toBeInTheDocument();
+    expect(screen.queryByText("deepResearch.title")).not.toBeInTheDocument();
+  });
+
+  it("shows deep research panel when metadata.deepResearch exists", async () => {
+    const user = userEvent.setup();
+    render(
+      <BrandCandidateAccordion
+        candidates={[
+          candidate({
+            metadata: {
+              deepResearch: {
+                researchStatus: "PARTIAL",
+                identity: {
+                  name: {
+                    value: "Movavi",
+                    status: "VERIFIED",
+                    evidence: [],
+                  },
+                  officialWebsite: {
+                    value: "https://movavi.com",
+                    status: "VERIFIED",
+                    evidence: [],
+                  },
+                  domain: {
+                    value: "movavi.com",
+                    status: "VERIFIED",
+                    evidence: [],
+                  },
+                },
+                company: {
+                  description: {
+                    value: "Video software",
+                    status: "PARTIAL",
+                    evidence: [],
+                  },
+                  brandSize: { value: null, status: "NOT_FOUND", evidence: [] },
+                },
+                industry: {
+                  sectors: { value: null, status: "NOT_FOUND", evidence: [] },
+                  categories: {
+                    value: null,
+                    status: "NOT_FOUND",
+                    evidence: [],
+                  },
+                },
+                offerings: {
+                  productsAndServices: {
+                    value: null,
+                    status: "NOT_FOUND",
+                    evidence: [],
+                  },
+                },
+                markets: {
+                  countriesOrRegions: {
+                    value: null,
+                    status: "NOT_FOUND",
+                    evidence: [],
+                  },
+                },
+                commercialSignals: [
+                  {
+                    kind: "affiliate",
+                    value: null,
+                    status: "NOT_FOUND",
+                    evidence: [],
+                  },
+                ],
+                influencerFit: {
+                  rationale: {
+                    value: "Possible fit",
+                    status: "PARTIAL",
+                    evidence: [],
+                  },
+                },
+                pages: [
+                  {
+                    url: "https://movavi.com/",
+                    role: "homepage",
+                    fetchStatus: "ok",
+                  },
+                ],
+              },
+            },
+          }),
+        ]}
+        updatingId={null}
+        onUpdateStatus={jest.fn()}
+        onDelete={jest.fn()}
+      />,
+    );
+    await user.click(screen.getByText("Movavi"));
+    expect(screen.getByText("deepResearch.title")).toBeInTheDocument();
+    expect(screen.getByText("Video software")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Approve" }),
+    ).toBeInTheDocument();
   });
 });
 

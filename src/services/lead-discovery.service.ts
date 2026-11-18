@@ -1,6 +1,9 @@
 import apiClient from "@/lib/api/client";
 import type {
+  AgencyContactCommercial,
+  AgencyContactKind,
   BrandBusinessContact,
+  CommercialRelevance,
   Lead,
   LeadDetail,
   LeadDiscoveryRun,
@@ -66,6 +69,25 @@ export async function listBrandBusinessContacts(
   const params = new URLSearchParams({ brandCandidateId });
   const { data } = await apiClient.get<BrandBusinessContact[]>(
     `${PATH}/business-contacts?${params.toString()}`,
+  );
+  return data;
+}
+
+/** 2C.4.8 — read-only AgencyContact commercial list for an influencer. */
+export async function listAgencyContacts(filters: {
+  influencerId: string;
+  contactKind?: AgencyContactKind;
+  commercialRelevance?: CommercialRelevance;
+}): Promise<AgencyContactCommercial[]> {
+  const params = new URLSearchParams({ influencerId: filters.influencerId });
+  if (filters.contactKind) {
+    params.set("contactKind", filters.contactKind);
+  }
+  if (filters.commercialRelevance) {
+    params.set("commercialRelevance", filters.commercialRelevance);
+  }
+  const { data } = await apiClient.get<AgencyContactCommercial[]>(
+    `${PATH}/agency-contacts?${params.toString()}`,
   );
   return data;
 }

@@ -7,11 +7,23 @@ import userEvent from "@testing-library/user-event";
 
 import { BrandBusinessContactsPanel } from "@/components/lead-discovery/brand-business-contacts-panel";
 import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
-import type { BrandBusinessContact } from "@/types/lead-discovery";
+import type { BrandBusinessContact, Lead } from "@/types/lead-discovery";
 import type { BbcUiState } from "@/lib/bbc-run-ui-state";
 
 jest.mock("../../hooks/use-bbc-discovery", () => ({
   useBbcDiscovery: jest.fn(),
+}));
+
+jest.mock("./agency-contacts-panel", () => ({
+  AgencyContactsPanel: ({
+    influencerId,
+  }: {
+    influencerId?: string | null;
+  }) => (
+    <div data-testid="agency-contacts-stub">
+      {influencerId ? `agency-for:${influencerId}` : "agency-missing"}
+    </div>
+  ),
 }));
 
 const messages: Record<string, string> = {
@@ -28,6 +40,10 @@ const messages: Record<string, string> = {
   openEvidence: "Open evidence",
   source: "Source",
   evidenceUnverified: "Found in source; not SMTP-verified",
+  "attribution.ATTRIBUTED": "Attributed to brand",
+  "attribution.UNATTRIBUTED": "Attribution uncertain",
+  "verification.UNVERIFIED": "Not SMTP-verified",
+  "verification.VERIFIED": "SMTP-verified",
   "type.generic": "Brand inbox",
   "type.personLike": "Person-like local part",
   "sections.genericTitle": "Brand inboxes (generic)",
@@ -37,11 +53,20 @@ const messages: Record<string, string> = {
   "sections.otherDescription": "Other emails",
   "sections.otherEmpty": "No other commercial emails persisted yet.",
   "sections.agenciesTitle": "Influencer agencies",
-  "sections.agenciesPending": "Agency discovery (track 2C) is not implemented yet.",
-  "relevance.HIGH": "High",
-  "relevance.NEUTRAL": "Neutral",
-  "relevance.LOW": "Low",
-  "relevance.UNKNOWN": "Unknown",
+  "sections.agenciesPending": "Agency discovery (track 2C) has not started for this run.",
+  "sections.agenciesExecuted": "Agency discovery (track 2C) ran for this Lead Discovery execution.",
+  "sections.agenciesResults": "Track 2C found {count} agency association(s).",
+  "sections.agenciesNoMatches": "Track 2C ran with no agency matches.",
+  "sections.agenciesFailed": "Track 2C failed (provider/search).",
+  "relevance.HIGH": "High — partnerships/creators",
+  "relevance.NEUTRAL": "Medium — marketing/press/affiliate",
+  "relevance.LOW": "Low — support",
+  "relevance.UNKNOWN": "Unclassified commercial relevance",
+  "coverageTier.HIGH": "High — partnerships/creators",
+  "coverageTier.MEDIUM": "Medium — marketing/press/affiliate",
+  "coverageTier.GENERAL": "General — info/contact",
+  "coverageTier.LOW": "Low — support",
+  "coverageTier.OTHER": "Other — not a known commercial mailbox",
   activeBanner: "BBC v1 mode active",
   engineMastra: "Engine: Mastra (FIND_BRAND_EMAILS)",
   searchAction: "Search business contacts",
@@ -71,12 +96,29 @@ const messages: Record<string, string> = {
   "failureKind.malformed": "malformed",
   "failureKind.empty_body": "empty",
   "failureKind.unknown": "unknown",
+  "people.title": "People (LinkedIn)",
+  "people.description": "People for this brand",
+  "people.loading": "Loading people…",
+  "people.empty": "No people for this brand yet.",
+  "people.linkedin": "LinkedIn",
+  "people.noLinkedin": "No LinkedIn",
+  "people.noEmail": "No email",
+  "people.status.UNDER_REVIEW": "Under review",
+  "people.status.APPROVED": "Approved",
+  "people.status.DISCARDED": "Discarded",
+  "people.status.DUPLICATE": "Duplicate",
 };
 
 jest.mock("next-intl", () => ({
   useTranslations: (namespace?: string) => {
     return (key: string, values?: Record<string, unknown>) => {
-      if (namespace === "LeadDiscovery.bbc" || namespace === "LeadDiscovery.businessContacts") {
+      if (namespace === "LeadDiscovery.peopleLeads") {
+        return messages[`people.${key}`] ?? key;
+      }
+      if (
+        namespace === "LeadDiscovery.bbc" ||
+        namespace === "LeadDiscovery.businessContacts"
+      ) {
         let text = messages[key] ?? key;
         if (values) {
           for (const [k, v] of Object.entries(values)) {
@@ -131,6 +173,7 @@ function mockBbc(
     bbcV1Active: false,
     canSearch: false,
     contacts: [],
+    leads: [],
     runs: [],
     loading: false,
     loadingMeta: false,
@@ -148,19 +191,81 @@ function mockBbc(
   return { startSearch, refresh };
 }
 
+function personLead(overrides: Partial<Lead> = {}): Lead {
+  return {
+    id: "lead-1",
+    brandCandidateId: "b1",
+    influencerId: "i1",
+    runId: "run-1",
+    contactName: "Alex Partner",
+    title: "Influencer Marketing Manager",
+    email: "alex@brand.com",
+    emailConfidence: "UNKNOWN",
+    isGeneric: false,
+    profileUrl: "https://www.linkedin.com/in/alex-partner",
+    providerId: "mastra-find-brand-people",
+    sourceOptionId: null,
+    fitReason: null,
+    source: "mastra-find-brand-people",
+    status: "UNDER_REVIEW",
+    selectedForOutreach: false,
+    metadata: null,
+    createdAt: "2026-11-08T00:00:00.000Z",
+    updatedAt: "2026-11-08T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
 describe("BrandBusinessContactsPanel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("shows contacts (not as person leads)", () => {
-    mockBbc({ contacts: [contact()] });
+    mockBbc({ contacts: [contact({ commercialCoverageTier: "HIGH" })] });
     render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
     expect(screen.getByText("Brand business contacts")).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "partnerships@mcgeeandco.com" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Brand inbox")).toBeInTheDocument();
+    expect(
+      screen.getByText("High — partnerships/creators"),
+    ).toBeInTheDocument();
+  });
+
+  it("RF-02.1: person-like coverage OTHER is not labeled General", () => {
+    mockBbc({
+      contacts: [
+        contact({
+          email: "john.smith@brand.com",
+          label: null,
+          isGeneric: false,
+          commercialRelevance: "UNKNOWN",
+          commercialCoverageTier: "OTHER",
+        }),
+      ],
+    });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
+    expect(
+      screen.getByText("Other — not a known commercial mailbox"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/General — info\/contact/i)).not.toBeInTheDocument();
+  });
+
+  it("RF-01 case 10: never presents found email as SMTP-verified even with evidence", () => {
+    mockBbc({
+      contacts: [
+        contact({
+          discoveryStatus: "FOUND",
+          attributionStatus: "ATTRIBUTED",
+          verificationStatus: "UNVERIFIED",
+        }),
+      ],
+    });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
+    expect(screen.getByText(/Not SMTP-verified/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^SMTP-verified$/i)).not.toBeInTheDocument();
   });
 
   it("shows BBC search controls when bbcV1Active", async () => {
@@ -232,5 +337,43 @@ describe("BrandBusinessContactsPanel", () => {
     render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
     await user.click(screen.getByRole("button", { name: "Retry" }));
     expect(refresh).toHaveBeenCalled();
+  });
+
+  it("shows people panel with name, LinkedIn and email", () => {
+    mockBbc({
+      contacts: [contact()],
+      leads: [personLead()],
+    });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
+    expect(screen.getByText("People (LinkedIn)")).toBeInTheDocument();
+    expect(screen.getByText("Alex Partner")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "LinkedIn" })).toHaveAttribute(
+      "href",
+      "https://www.linkedin.com/in/alex-partner",
+    );
+    expect(
+      screen.getByRole("link", { name: "alex@brand.com" }),
+    ).toBeInTheDocument();
+  });
+
+  it("passes influencerId into agency contacts section", () => {
+    mockBbc({ contacts: [contact()] });
+    render(
+      <BrandBusinessContactsPanel
+        brandCandidateId="b1"
+        influencerId="inf-9"
+      />,
+    );
+    expect(screen.getByTestId("agency-contacts-stub")).toHaveTextContent(
+      "agency-for:inf-9",
+    );
+  });
+
+  it("shows empty people copy when no leads", () => {
+    mockBbc({ contacts: [], leads: [] });
+    render(<BrandBusinessContactsPanel brandCandidateId="b1" />);
+    expect(
+      screen.getByText("No people for this brand yet."),
+    ).toBeInTheDocument();
   });
 });

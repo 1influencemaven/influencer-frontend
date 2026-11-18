@@ -9,6 +9,7 @@ import {
   listBrandBusinessContacts,
   listLeadDiscoveryRuns,
   listLeadProviders,
+  listLeads,
   searchLeads,
 } from "@/services/lead-discovery.service";
 
@@ -16,12 +17,14 @@ jest.mock("../services/lead-discovery.service", () => ({
   listLeadProviders: jest.fn(),
   listBrandBusinessContacts: jest.fn(),
   listLeadDiscoveryRuns: jest.fn(),
+  listLeads: jest.fn(),
   searchLeads: jest.fn(),
 }));
 
 const mockedProviders = jest.mocked(listLeadProviders);
 const mockedContacts = jest.mocked(listBrandBusinessContacts);
 const mockedRuns = jest.mocked(listLeadDiscoveryRuns);
+const mockedLeads = jest.mocked(listLeads);
 const mockedSearch = jest.mocked(searchLeads);
 
 describe("useBbcDiscovery", () => {
@@ -33,6 +36,7 @@ describe("useBbcDiscovery", () => {
       rebuildMode: true,
     });
     mockedContacts.mockResolvedValue([]);
+    mockedLeads.mockResolvedValue([]);
     mockedRuns.mockResolvedValue([]);
     const processingRun = {
       id: "run-bbc",

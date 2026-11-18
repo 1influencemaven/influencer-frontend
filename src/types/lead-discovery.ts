@@ -33,6 +33,70 @@ export type BrandBusinessContactEvidence = {
   discoveredAt: string;
 };
 
+/** RF-01 provenance concepts (metadata; not SMTP enums). */
+export type ContactEmailDiscoveryStatus = "FOUND";
+export type ContactEmailAttributionStatus = "ATTRIBUTED" | "UNATTRIBUTED";
+export type ContactEmailVerificationStatus = "UNVERIFIED" | "VERIFIED";
+
+/** RF-02.1 commercial coverage for UI (orthogonal to Prisma commercialRelevance). */
+export type CommercialCoverageTier =
+  | "HIGH"
+  | "MEDIUM"
+  | "GENERAL"
+  | "LOW"
+  | "OTHER";
+
+/** 2C.4.7 — AgencyContact commercial list item (read-only). Not a Lead. */
+export type AgencyContactKind = "MAILBOX" | "PERSON";
+
+export type AgencyRelevanceStatus =
+  | "UNDER_REVIEW"
+  | "RELEVANT"
+  | "NOT_RELEVANT"
+  | "DISCARDED";
+
+export type AgencyContactEligibilityStatus =
+  | "ACTIONABLE"
+  | "VISIBLE_NOT_ACTIONABLE"
+  | "VISIBLE_NOT_PRIORITY";
+
+export type AgencyContactEvidence = {
+  sourceUrl: string;
+  evidenceSnippet: string;
+  discoveredAt: string;
+};
+
+export type AgencyContactCommercial = {
+  agencyId: string;
+  agencyName: string;
+  agencyDomain: string;
+  agencyRelevanceStatus: AgencyRelevanceStatus;
+  agencyContactId: string;
+  contactKind: AgencyContactKind;
+  email: string;
+  displayName: string | null;
+  title: string | null;
+  label: string | null;
+  isGeneric: boolean;
+  commercialRelevance: CommercialRelevance;
+  sourceKind: string | null;
+  provenance: {
+    discoveryStatus: ContactEmailDiscoveryStatus;
+    attributionStatus: ContactEmailAttributionStatus;
+    verificationStatus: ContactEmailVerificationStatus;
+  };
+  attributionStatus: ContactEmailAttributionStatus;
+  evidence: AgencyContactEvidence[];
+  outreachRole: string | null;
+  discoveredAt: string;
+  eligibilityStatus: AgencyContactEligibilityStatus;
+  eligibilityReason: string;
+  priority: boolean;
+  origin: "AGENCY_CONTACT_RESEARCH";
+  track: "2C";
+  researchOperation: "FIND_AGENCY_EMAILS" | "FIND_AGENCY_PEOPLE";
+};
+
 /** ADR-0016/0018 — brand inbox without a person. Not a Lead. */
 export type BrandBusinessContact = {
   id: string;
@@ -41,9 +105,17 @@ export type BrandBusinessContact = {
   label: string | null;
   isGeneric: boolean;
   commercialRelevance: CommercialRelevance;
+  /** Prefer this for commercial badge; OTHER ≠ General. */
+  commercialCoverageTier?: CommercialCoverageTier;
   source: ContactChannelSource;
   sourceUrl: string | null;
   evidences: BrandBusinessContactEvidence[];
+  /** Literal discovery — always FOUND when returned from RF-01 writer. */
+  discoveryStatus?: ContactEmailDiscoveryStatus;
+  /** Brand association strength. */
+  attributionStatus?: ContactEmailAttributionStatus;
+  /** Mailbox verification — VERIFIED only after a real verify (none today). */
+  verificationStatus?: ContactEmailVerificationStatus;
   createdAt: string;
   updatedAt: string;
 };
@@ -334,6 +406,20 @@ export type LeadSearchMetadata = {
   };
   warningCode?: LeadDiscoveryWarningCode | null;
   warningMessage?: string | null;
+  /** 2C.3: Agency Discovery track status (omit / executed:false when not started). */
+  track2C?: {
+    executed: boolean;
+    outcome?: "RESULTS_FOUND" | "NO_MATCHES" | "PROVIDER_FAILURE";
+    error?: string | null;
+    candidatesCount?: number;
+    persistedCount?: number;
+    searchMetadata?: {
+      serpCalls?: number;
+      dedupedHitsCount?: number;
+      persistedCount?: number;
+      providerErrors?: string[];
+    };
+  };
   /** Person Leads persisted (orthogonal to BrandBusinessContact). */
   personLeadsCreated?: number;
   /** BrandBusinessContact upserts created in this run (legacy top-level). */

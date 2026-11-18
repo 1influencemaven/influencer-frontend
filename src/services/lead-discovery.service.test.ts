@@ -16,6 +16,7 @@ import apiClient from "@/lib/api/client";
 import {
   deselectLeadForOutreach,
   getLeadById,
+  listAgencyContacts,
   listBrandBusinessContacts,
   probeUnlockerDiagnostic,
   searchLeads,
@@ -23,6 +24,7 @@ import {
 } from "@/services/lead-discovery.service";
 import { createAxiosResponse } from "@/services/service-test-utils";
 import type {
+  AgencyContactCommercial,
   BrandBusinessContact,
   Lead,
   LeadDetail,
@@ -122,6 +124,49 @@ describe("lead-discovery.service", () => {
 
     expect(mockedApiClient.get).toHaveBeenCalledWith("/lead-discovery/leads/l1");
     expect(result.outreachReadiness).toBe("LIMITED");
+  });
+
+  it("lists agency contacts by influencerId", async () => {
+    const contacts: AgencyContactCommercial[] = [
+      {
+        agencyId: "a1",
+        agencyName: "Creator Partners",
+        agencyDomain: "creatorpartners.example",
+        agencyRelevanceStatus: "RELEVANT",
+        agencyContactId: "ac1",
+        contactKind: "MAILBOX",
+        email: "partnerships@creatorpartners.example",
+        displayName: null,
+        title: null,
+        label: null,
+        isGeneric: true,
+        commercialRelevance: "HIGH",
+        sourceKind: "agency_web",
+        provenance: {
+          discoveryStatus: "FOUND",
+          attributionStatus: "ATTRIBUTED",
+          verificationStatus: "UNVERIFIED",
+        },
+        attributionStatus: "ATTRIBUTED",
+        evidence: [],
+        outreachRole: null,
+        discoveredAt: "2026-01-01T00:00:00.000Z",
+        eligibilityStatus: "ACTIONABLE",
+        eligibilityReason: "relevant_high",
+        priority: true,
+        origin: "AGENCY_CONTACT_RESEARCH",
+        track: "2C",
+        researchOperation: "FIND_AGENCY_EMAILS",
+      },
+    ];
+    mockedApiClient.get.mockResolvedValue(createAxiosResponse(contacts));
+
+    const result = await listAgencyContacts({ influencerId: "inf-1" });
+
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      "/lead-discovery/agency-contacts?influencerId=inf-1",
+    );
+    expect(result).toEqual(contacts);
   });
 
   it("lists brand business contacts by brandCandidateId", async () => {

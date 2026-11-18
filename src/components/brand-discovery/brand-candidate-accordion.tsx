@@ -11,11 +11,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { BrandDeepResearchPanel } from "@/components/brand-discovery/brand-deep-research-panel";
 import { BrandBusinessContactsPanel } from "@/components/lead-discovery/brand-business-contacts-panel";
 import type {
   BrandCandidate,
   UpdateBrandCandidateStatusPayload,
 } from "@/types/brand-discovery";
+import { getBrandDeepResearch } from "@/types/brand-discovery";
 
 type BrandCandidateAccordionProps = {
   candidates: BrandCandidate[];
@@ -54,6 +56,7 @@ export function BrandCandidateAccordion({
         const isBusy =
           updatingId === candidate.id || deletingId === candidate.id;
         const isPendingDelete = pendingDeleteId === candidate.id;
+        const deepResearch = getBrandDeepResearch(candidate.metadata);
 
         return (
           <AccordionItem key={candidate.id} value={candidate.id}>
@@ -68,6 +71,18 @@ export function BrandCandidateAccordion({
                 <Badge variant="outline">
                   {t(`candidateStatus.${candidate.status}`)}
                 </Badge>
+                {candidate.evidenceStatus ? (
+                  <Badge variant="outline">
+                    {t(`evidenceStatus.${candidate.evidenceStatus}`)}
+                  </Badge>
+                ) : null}
+                {deepResearch ? (
+                  <Badge variant="secondary">
+                    {t(
+                      `deepResearch.researchStatus.${deepResearch.researchStatus}`,
+                    )}
+                  </Badge>
+                ) : null}
               </span>
             </AccordionTrigger>
             <AccordionContent>
@@ -108,6 +123,9 @@ export function BrandCandidateAccordion({
                         </a>
                       ))}
                     </div>
+                  ) : null}
+                  {deepResearch ? (
+                    <BrandDeepResearchPanel research={deepResearch} />
                   ) : null}
                 </div>
                 <div className="flex flex-col items-start gap-2">
@@ -197,6 +215,7 @@ export function BrandCandidateAccordion({
                 <BrandBusinessContactsPanel
                   key={candidate.id}
                   brandCandidateId={candidate.id}
+                  influencerId={candidate.influencerId}
                 />
               ) : null}
             </AccordionContent>
