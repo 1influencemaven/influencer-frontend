@@ -43,6 +43,7 @@ export function TextFormField<TFieldValues extends FieldValues>({
             disabled={disabled}
             aria-invalid={Boolean(fieldState.error)}
             {...field}
+            value={field.value ?? ""}
           />
           {fieldState.error?.message ? (
             <p className="text-sm text-destructive" role="alert">

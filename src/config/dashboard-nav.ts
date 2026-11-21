@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Megaphone,
+  Search,
   Settings,
   Shield,
   Users,
@@ -11,7 +12,13 @@ import type { UserRole } from "@/types/auth";
 
 export type DashboardNavItem = {
   href: string;
-  labelKey: "dashboard" | "campaigns" | "creators" | "users" | "settings";
+  labelKey:
+    | "dashboard"
+    | "campaigns"
+    | "creators"
+    | "brandDiscovery"
+    | "users"
+    | "settings";
   icon: LucideIcon;
   roles: readonly UserRole[];
 };
@@ -33,6 +40,12 @@ export const dashboardNavItems: DashboardNavItem[] = [
     href: "/dashboard/creators",
     labelKey: "creators",
     icon: Users,
+    roles: ["USER", "ADMIN"],
+  },
+  {
+    href: "/dashboard/brand-discovery",
+    labelKey: "brandDiscovery",
+    icon: Search,
     roles: ["USER", "ADMIN"],
   },
   {

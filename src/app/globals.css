@@ -94,6 +94,19 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  /* Native <select> menus inherit page text color but often use a light
+     system popup background in dark mode — force readable option colors. */
+  select {
+    color: var(--foreground);
+    background-color: var(--background);
+  }
+
+  select option,
+  select optgroup {
+    color: var(--popover-foreground);
+    background-color: var(--popover);
+  }
 }
 
 body {

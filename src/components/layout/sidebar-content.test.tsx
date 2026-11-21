@@ -11,6 +11,7 @@ jest.mock("next-intl", () => ({
       dashboard: "Dashboard",
       campaigns: "Campaigns",
       creators: "Creators",
+      brandDiscovery: "Brands",
       users: "Users",
       settings: "Settings",
     };

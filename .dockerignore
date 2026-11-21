@@ -1,0 +1,13 @@
+node_modules
+.next
+coverage
+.env
+.env.*
+!.env.example
+*.log
+.git
+.gitignore
+README.md
+DESIGN-notion.md
+AGENTS.md
+CLAUDE.md
