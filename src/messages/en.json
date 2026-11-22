@@ -277,6 +277,8 @@
       "timeout": "The Instagram research timed out. Try again later.",
       "notConfigured": "Bright Data is not configured on the server.",
       "invalidUsername": "Enter a valid Instagram username.",
+      "inProgress": "Instagram research is already in progress for this username.",
+      "duplicate": "That Instagram account belongs to another talent.",
       "error": "Could not research Instagram. Please try again.",
       "previewAccount": "Account",
       "previewName": "Display name",
@@ -442,6 +444,7 @@
       "notConfigured": "Bright Data is not configured on the server.",
       "duplicate": "That Instagram account belongs to another talent.",
       "invalidHandle": "This talent has no valid Instagram handle.",
+      "inProgress": "Instagram research is already in progress for this talent.",
       "error": "Could not research Instagram. Please try again."
     }
   },

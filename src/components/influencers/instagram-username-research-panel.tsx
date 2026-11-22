@@ -4,9 +4,16 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { researchInstagramUsername } from "@/services/influencers.service";
-import { getApiErrorMessage, isApiError } from "@/types/api-error";
-import type { InstagramUsernameResearchResponse } from "@/types/influencer";
+import { useInstagramResearchPolling } from "@/hooks/use-instagram-research-polling";
+import {
+  messageForInstagramResearchCode,
+  messageForInstagramResearchError,
+} from "@/lib/instagram-research-error";
+import { startInstagramUsernameResearch } from "@/services/influencers.service";
+import type {
+  InstagramResearchRun,
+  InstagramUsernameResearchResponse,
+} from "@/types/influencer";
 
 type InstagramUsernameResearchPanelProps = {
   disabled?: boolean;
@@ -30,6 +37,17 @@ function formatHashtags(values: string[]): string {
   return values.map((tag) => (tag.startsWith("#") ? tag : `#${tag}`)).join(" ");
 }
 
+function isUsernameResult(
+  result: InstagramResearchRun["result"],
+): result is InstagramUsernameResearchResponse {
+  return Boolean(
+    result &&
+      "normalized" in result &&
+      "research" in result &&
+      "persisted" in result.research,
+  );
+}
+
 export function InstagramUsernameResearchPanel({
   disabled = false,
   username: controlledUsername,
@@ -40,52 +58,68 @@ export function InstagramUsernameResearchPanel({
   const [uncontrolledUsername, setUncontrolledUsername] = useState("");
   const username = controlledUsername ?? uncontrolledUsername;
   const setUsername = onUsernameChange ?? setUncontrolledUsername;
-  const [isResearching, setIsResearching] = useState(false);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [result, setResult] = useState<InstagramUsernameResearchResponse | null>(
     null,
   );
 
+  const isResearching = isStarting || Boolean(runId);
+
+  useInstagramResearchPolling({
+    runId,
+    enabled: Boolean(runId),
+    onUpdate: (run) => {
+      if (run.status === "PROCESSING") {
+        return;
+      }
+
+      setRunId(null);
+      setIsStarting(false);
+
+      if (run.status === "FAILED") {
+        setError(
+          messageForInstagramResearchCode(run.errorCode, t, {
+            invalidKey: "invalidUsername",
+          }),
+        );
+        return;
+      }
+
+      if (!isUsernameResult(run.result)) {
+        setError(t("error"));
+        return;
+      }
+
+      setResult(run.result);
+      if (run.result.research.outcome === "PROFILE_PRIVATE") {
+        setInfo(t("private"));
+      } else if (run.result.research.outcome === "FOUND") {
+        setInfo(t("found"));
+        onFound?.(run.result);
+      }
+    },
+  });
+
   async function handleResearch() {
-    setIsResearching(true);
+    setIsStarting(true);
     setError(null);
     setInfo(null);
     setResult(null);
+    setRunId(null);
 
     try {
-      const response = await researchInstagramUsername(username.trim());
-      setResult(response);
-      if (response.research.outcome === "PROFILE_PRIVATE") {
-        setInfo(t("private"));
-      } else if (response.research.outcome === "FOUND") {
-        setInfo(t("found"));
-        onFound?.(response);
-      }
+      const run = await startInstagramUsernameResearch(username.trim());
+      setRunId(run.id);
     } catch (researchError) {
-      if (isApiError(researchError)) {
-        const code = researchError.code;
-        if (code === "PROFILE_NOT_FOUND" || researchError.status === 404) {
-          setError(t("notFound"));
-        } else if (
-          code === "INCOMPLETE_RESPONSE" ||
-          researchError.status === 422
-        ) {
-          setError(t("incomplete"));
-        } else if (code === "PROVIDER_TIMEOUT" || researchError.status === 504) {
-          setError(t("timeout"));
-        } else if (code === "NOT_CONFIGURED" || researchError.status === 503) {
-          setError(t("notConfigured"));
-        } else if (researchError.status === 400) {
-          setError(t("invalidUsername"));
-        } else {
-          setError(getApiErrorMessage(researchError, t("error")));
-        }
-      } else {
-        setError(getApiErrorMessage(researchError, t("error")));
-      }
-    } finally {
-      setIsResearching(false);
+      setError(
+        messageForInstagramResearchError(researchError, t, {
+          invalidKey: "invalidUsername",
+        }),
+      );
+      setIsStarting(false);
     }
   }
 
