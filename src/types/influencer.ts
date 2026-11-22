@@ -228,6 +228,28 @@ export type InstagramUsernameResearchResponse = {
   provider: Record<string, unknown>;
 };
 
+export type InstagramResearchRunStatus =
+  | "PROCESSING"
+  | "COMPLETED"
+  | "FAILED";
+
+export type InstagramResearchRunMode = "USERNAME" | "INFLUENCER";
+
+/** Durable BullMQ run for Instagram research (poll via GET). */
+export type InstagramResearchRun = {
+  id: string;
+  status: InstagramResearchRunStatus;
+  mode: InstagramResearchRunMode;
+  username: string | null;
+  handleNormalized: string | null;
+  influencerId: string | null;
+  result: InstagramUsernameResearchResponse | InstagramResearchResponse | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /** Field keys used by InfluencerFieldProvenance (backend contract). */
 export const INFLUENCER_FIELD_KEYS = {
   NAME: "name",

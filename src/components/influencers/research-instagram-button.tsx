@@ -1,12 +1,22 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { researchInfluencerInstagram } from "@/services/influencers.service";
-import { getApiErrorMessage, isApiError } from "@/types/api-error";
-import type { InstagramResearchResponse } from "@/types/influencer";
+import { useInstagramResearchPolling } from "@/hooks/use-instagram-research-polling";
+import {
+  messageForInstagramResearchCode,
+  messageForInstagramResearchError,
+} from "@/lib/instagram-research-error";
+import {
+  getActiveInfluencerInstagramResearch,
+  startInfluencerInstagramResearch,
+} from "@/services/influencers.service";
+import type {
+  InstagramResearchResponse,
+  InstagramResearchRun,
+} from "@/types/influencer";
 
 type ResearchInstagramButtonProps = {
   influencerId: string;
@@ -14,23 +24,81 @@ type ResearchInstagramButtonProps = {
   onSuccess?: (result: InstagramResearchResponse) => void;
 };
 
+function isInfluencerResult(
+  result: InstagramResearchRun["result"],
+): result is InstagramResearchResponse {
+  return Boolean(result && "influencer" in result && "research" in result);
+}
+
 export function ResearchInstagramButton({
   influencerId,
   disabled = false,
   onSuccess,
 }: ResearchInstagramButtonProps) {
   const t = useTranslations("InfluencerDetail.instagramResearch");
-  const [isResearching, setIsResearching] = useState(false);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
+  const [isResuming, setIsResuming] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
-  async function handleResearch() {
-    setIsResearching(true);
-    setError(null);
-    setInfo(null);
+  const isResearching = isStarting || isResuming || Boolean(runId);
 
-    try {
-      const result = await researchInfluencerInstagram(influencerId);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resumeActiveRun() {
+      setIsResuming(true);
+      try {
+        const active = await getActiveInfluencerInstagramResearch(influencerId);
+        if (cancelled) {
+          return;
+        }
+        if (active?.status === "PROCESSING") {
+          setRunId(active.id);
+        }
+      } catch {
+        // Ignore resume failures; user can still start research.
+      } finally {
+        if (!cancelled) {
+          setIsResuming(false);
+        }
+      }
+    }
+
+    void resumeActiveRun();
+    return () => {
+      cancelled = true;
+    };
+  }, [influencerId]);
+
+  useInstagramResearchPolling({
+    runId,
+    enabled: Boolean(runId),
+    onUpdate: (run) => {
+      if (run.status === "PROCESSING") {
+        return;
+      }
+
+      setRunId(null);
+      setIsStarting(false);
+      setIsResuming(false);
+
+      if (run.status === "FAILED") {
+        setError(
+          messageForInstagramResearchCode(run.errorCode, t, {
+            invalidKey: "invalidHandle",
+          }),
+        );
+        return;
+      }
+
+      if (!isInfluencerResult(run.result)) {
+        setError(t("error"));
+        return;
+      }
+
+      const result = run.result;
       if (result.research.outcome === "PROFILE_PRIVATE") {
         setInfo(t("private"));
       } else if (result.research.outcome === "NO_CHANGES") {
@@ -43,29 +111,25 @@ export function ResearchInstagramButton({
         );
       }
       onSuccess?.(result);
+    },
+  });
+
+  async function handleResearch() {
+    setIsStarting(true);
+    setError(null);
+    setInfo(null);
+
+    try {
+      // Idempotent: if a PROCESSING run exists, Nest returns it and we keep polling.
+      const run = await startInfluencerInstagramResearch(influencerId);
+      setRunId(run.id);
     } catch (researchError) {
-      if (isApiError(researchError)) {
-        const code = researchError.code;
-        if (code === "PROFILE_NOT_FOUND" || researchError.status === 404) {
-          setError(t("notFound"));
-        } else if (code === "INCOMPLETE_RESPONSE" || researchError.status === 422) {
-          setError(t("incomplete"));
-        } else if (code === "PROVIDER_TIMEOUT" || researchError.status === 504) {
-          setError(t("timeout"));
-        } else if (code === "NOT_CONFIGURED" || researchError.status === 503) {
-          setError(t("notConfigured"));
-        } else if (code === "INSTAGRAM_DUPLICATE" || researchError.status === 409) {
-          setError(t("duplicate"));
-        } else if (researchError.status === 400) {
-          setError(t("invalidHandle"));
-        } else {
-          setError(getApiErrorMessage(researchError, t("error")));
-        }
-      } else {
-        setError(getApiErrorMessage(researchError, t("error")));
-      }
-    } finally {
-      setIsResearching(false);
+      setError(
+        messageForInstagramResearchError(researchError, t, {
+          invalidKey: "invalidHandle",
+        }),
+      );
+      setIsStarting(false);
     }
   }
 

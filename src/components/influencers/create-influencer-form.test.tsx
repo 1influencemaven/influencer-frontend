@@ -8,8 +8,9 @@ import userEvent from "@testing-library/user-event";
 import { CreateInfluencerForm } from "@/components/influencers/create-influencer-form";
 import {
   createInfluencer,
+  getInstagramResearchRun,
   listInfluencerManagers,
-  researchInstagramUsername,
+  startInstagramUsernameResearch,
 } from "@/services/influencers.service";
 import { createQueryWrapper } from "@/test-utils/query-wrapper";
 
@@ -72,6 +73,8 @@ const lookupMessages = {
   timeout: "Timeout.",
   notConfigured: "Not configured.",
   invalidUsername: "Invalid.",
+  inProgress: "In progress.",
+  duplicate: "Duplicate.",
   error: "Error.",
   previewAccount: "Account",
   previewName: "Display name",
@@ -136,12 +139,14 @@ jest.mock("../../i18n/navigation", () => ({
 jest.mock("../../services/influencers.service", () => ({
   createInfluencer: jest.fn(),
   listInfluencerManagers: jest.fn(),
-  researchInstagramUsername: jest.fn(),
+  startInstagramUsernameResearch: jest.fn(),
+  getInstagramResearchRun: jest.fn(),
 }));
 
 const mockedCreateInfluencer = jest.mocked(createInfluencer);
 const mockedListManagers = jest.mocked(listInfluencerManagers);
-const mockedResearchUsername = jest.mocked(researchInstagramUsername);
+const mockedStartResearch = jest.mocked(startInstagramUsernameResearch);
+const mockedGetResearchRun = jest.mocked(getInstagramResearchRun);
 
 describe("CreateInfluencerForm", () => {
   beforeEach(() => {
@@ -272,15 +277,15 @@ describe("CreateInfluencerForm", () => {
     const user = userEvent.setup();
     const { Wrapper } = createQueryWrapper();
 
-    mockedResearchUsername.mockResolvedValue({
+    const usernameResult = {
       research: {
-        outcome: "FOUND",
+        outcome: "FOUND" as const,
         queriedUsername: "pixel.vnzla",
         handleNormalized: "pixel.vnzla",
         profileUrl: "https://www.instagram.com/pixel.vnzla/",
         source: "brightdata:instagram:gd_x",
         fetchedAt: "2026-11-13T20:00:00.000Z",
-        persisted: false,
+        persisted: false as const,
       },
       normalized: {
         account: "pixel.vnzla",
@@ -299,6 +304,32 @@ describe("CreateInfluencerForm", () => {
         postHashtags: ["dancehall"],
       },
       provider: { account: "pixel.vnzla", followers: 10232 },
+    };
+    mockedStartResearch.mockResolvedValue({
+      id: "run-create-1",
+      status: "PROCESSING",
+      mode: "USERNAME",
+      username: "pixel.vnzla",
+      handleNormalized: "pixel.vnzla",
+      influencerId: null,
+      result: null,
+      errorCode: null,
+      errorMessage: null,
+      createdAt: "2026-11-13T20:00:00.000Z",
+      updatedAt: "2026-11-13T20:00:00.000Z",
+    });
+    mockedGetResearchRun.mockResolvedValue({
+      id: "run-create-1",
+      status: "COMPLETED",
+      mode: "USERNAME",
+      username: "pixel.vnzla",
+      handleNormalized: "pixel.vnzla",
+      influencerId: null,
+      result: usernameResult,
+      errorCode: null,
+      errorMessage: null,
+      createdAt: "2026-11-13T20:00:00.000Z",
+      updatedAt: "2026-11-13T20:00:00.000Z",
     });
 
     mockedCreateInfluencer.mockResolvedValue({

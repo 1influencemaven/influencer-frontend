@@ -277,6 +277,8 @@
       "timeout": "La investigación de Instagram agotó el tiempo. Inténtalo más tarde.",
       "notConfigured": "Bright Data no está configurado en el servidor.",
       "invalidUsername": "Introduce un username de Instagram válido.",
+      "inProgress": "Ya hay una investigación en curso para este username.",
+      "duplicate": "Esa cuenta de Instagram pertenece a otro talento.",
       "error": "No se pudo investigar Instagram. Inténtalo de nuevo.",
       "previewAccount": "Cuenta",
       "previewName": "Nombre visible",
@@ -442,6 +444,7 @@
       "notConfigured": "Bright Data no está configurado en el servidor.",
       "duplicate": "Esa cuenta de Instagram pertenece a otro talento.",
       "invalidHandle": "Este talento no tiene un handle de Instagram válido.",
+      "inProgress": "Ya hay una investigación en curso para este talento.",
       "error": "No se pudo investigar Instagram. Inténtalo de nuevo."
     }
   },
