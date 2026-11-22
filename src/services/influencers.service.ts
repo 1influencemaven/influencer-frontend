@@ -5,8 +5,7 @@ import type {
   Influencer,
   InfluencerManager,
   InfluencersQueryParams,
-  InstagramResearchResponse,
-  InstagramUsernameResearchResponse,
+  InstagramResearchRun,
   PaginatedInfluencersResponse,
   UpdateInfluencerPayload,
 } from "@/types/influencer";
@@ -129,28 +128,43 @@ export async function deleteInfluencer(
   return data;
 }
 
-/** Align with Nest Bright Data scraper poll window (default 120s) + buffer. */
-const INSTAGRAM_RESEARCH_TIMEOUT_MS = 150_000;
-
-export async function researchInfluencerInstagram(
+/** Enqueue Instagram research for an existing talent (202 + PROCESSING run). */
+export async function startInfluencerInstagramResearch(
   id: string,
-): Promise<InstagramResearchResponse> {
-  const { data } = await apiClient.post<InstagramResearchResponse>(
+): Promise<InstagramResearchRun> {
+  const { data } = await apiClient.post<InstagramResearchRun>(
     `${INFLUENCERS_PATH}/${id}/instagram-research`,
-    undefined,
-    { timeout: INSTAGRAM_RESEARCH_TIMEOUT_MS },
   );
   return data;
 }
 
-/** Phase 1: lookup by username — does not create/update influencers. */
-export async function researchInstagramUsername(
+/** Enqueue username lookup — does not create/update influencers. */
+export async function startInstagramUsernameResearch(
   username: string,
-): Promise<InstagramUsernameResearchResponse> {
-  const { data } = await apiClient.post<InstagramUsernameResearchResponse>(
+): Promise<InstagramResearchRun> {
+  const { data } = await apiClient.post<InstagramResearchRun>(
     `${INFLUENCERS_PATH}/instagram-research`,
     { username },
-    { timeout: INSTAGRAM_RESEARCH_TIMEOUT_MS },
+  );
+  return data;
+}
+
+/** Poll durable Instagram research run status. */
+export async function getInstagramResearchRun(
+  runId: string,
+): Promise<InstagramResearchRun> {
+  const { data } = await apiClient.get<InstagramResearchRun>(
+    `${INFLUENCERS_PATH}/instagram-research/runs/${runId}`,
+  );
+  return data;
+}
+
+/** Active PROCESSING run for a talent, or null. */
+export async function getActiveInfluencerInstagramResearch(
+  influencerId: string,
+): Promise<InstagramResearchRun | null> {
+  const { data } = await apiClient.get<InstagramResearchRun | null>(
+    `${INFLUENCERS_PATH}/${influencerId}/instagram-research/active`,
   );
   return data;
 }
@@ -162,6 +176,8 @@ export const influencersService = {
   createInfluencer,
   updateInfluencer,
   deleteInfluencer,
-  researchInfluencerInstagram,
-  researchInstagramUsername,
+  startInfluencerInstagramResearch,
+  startInstagramUsernameResearch,
+  getInstagramResearchRun,
+  getActiveInfluencerInstagramResearch,
 };
