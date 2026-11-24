@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
+import { ContactTierBadge } from "@/components/lead-discovery/contact-tier-badge";
 import type { Lead } from "@/types/lead-discovery";
 
 type BrandPeopleLeadsPanelProps = {
@@ -77,7 +78,13 @@ export function BrandPeopleLeadsPanel({
                       {lead.title}
                     </span>
                   ) : null}
-                  <Badge variant="secondary">{t(`status.${lead.status}`)}</Badge>
+                  <ContactTierBadge tier={lead.contactTier} />
+                  {lead.source === "saleshandy-lead-finder" ? (
+                    <Badge variant="outline">{t("sourceSaleshandy")}</Badge>
+                  ) : null}
+                  <Badge variant="secondary">
+                    {t(`status.${lead.status}`)}
+                  </Badge>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                   {linkedin ? (
@@ -95,12 +102,20 @@ export function BrandPeopleLeadsPanel({
                     </span>
                   )}
                   {lead.email ? (
-                    <a
-                      href={`mailto:${lead.email}`}
-                      className="text-primary underline-offset-4 hover:underline"
-                    >
-                      {lead.email}
-                    </a>
+                    <span className="inline-flex items-center gap-1">
+                      <a
+                        href={`mailto:${lead.email}`}
+                        className="text-primary underline-offset-4 hover:underline"
+                      >
+                        {lead.email}
+                      </a>
+                      {lead.emailConfidence === "VALID" ||
+                      lead.emailConfidence === "PROBABLE" ? (
+                        <span className="text-muted-foreground">
+                          · {t(`verification.${lead.emailConfidence}`)}
+                        </span>
+                      ) : null}
+                    </span>
                   ) : (
                     <span className="text-muted-foreground">
                       {t("noEmail")}
@@ -113,5 +128,72 @@ export function BrandPeopleLeadsPanel({
         </ul>
       ) : null}
     </section>
+  );
+}
+
+/** Tier 1 leads (verified nominal email), compact — shown beside brand inboxes. */
+export function ConfirmedContactsList({
+  leads,
+  emptyLabel,
+}: {
+  leads: Lead[];
+  emptyLabel: string;
+}) {
+  const t = useTranslations("LeadDiscovery.peopleLeads");
+  if (leads.length === 0) {
+    return <p className="text-xs text-muted-foreground">{emptyLabel}</p>;
+  }
+  return (
+    <ul className="space-y-2">
+      {leads.map((lead) => {
+        const linkedin = isHttpUrl(lead.profileUrl) ? lead.profileUrl : null;
+        return (
+          <li
+            key={lead.id}
+            className="rounded-md border border-border bg-background p-3 text-sm"
+          >
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span className="font-medium text-foreground">
+                {lead.contactName}
+              </span>
+              {lead.title ? (
+                <span className="text-xs text-muted-foreground">
+                  {lead.title}
+                </span>
+              ) : null}
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+              {lead.email ? (
+                <a
+                  href={`mailto:${lead.email}`}
+                  className="break-all font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {lead.email}
+                </a>
+              ) : null}
+              {lead.emailConfidence === "VALID" ||
+              lead.emailConfidence === "PROBABLE" ? (
+                <Badge variant="default">
+                  {t(`verification.${lead.emailConfidence}`)}
+                </Badge>
+              ) : null}
+              {lead.source === "saleshandy-lead-finder" ? (
+                <Badge variant="outline">{t("sourceSaleshandy")}</Badge>
+              ) : null}
+              {linkedin ? (
+                <a
+                  href={linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  {t("linkedin")}
+                </a>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

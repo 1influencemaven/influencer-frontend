@@ -17,7 +17,11 @@ import type {
   BrandCandidate,
   UpdateBrandCandidateStatusPayload,
 } from "@/types/brand-discovery";
-import { getBrandDeepResearch } from "@/types/brand-discovery";
+import {
+  getBrandDeepResearch,
+  hasCreatorProgram,
+  isKnownBrandSeed,
+} from "@/types/brand-discovery";
 
 type BrandCandidateAccordionProps = {
   candidates: BrandCandidate[];
@@ -75,6 +79,12 @@ export function BrandCandidateAccordion({
                   <Badge variant="outline">
                     {t(`evidenceStatus.${candidate.evidenceStatus}`)}
                   </Badge>
+                ) : null}
+                {hasCreatorProgram(candidate.metadata) ? (
+                  <Badge variant="default">{t("signals.creatorProgram")}</Badge>
+                ) : null}
+                {isKnownBrandSeed(candidate.metadata) ? (
+                  <Badge variant="outline">{t("signals.knownBrand")}</Badge>
                 ) : null}
                 {deepResearch ? (
                   <Badge variant="secondary">

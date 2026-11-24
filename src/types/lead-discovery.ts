@@ -97,6 +97,9 @@ export type AgencyContactCommercial = {
   researchOperation: "FIND_AGENCY_EMAILS" | "FIND_AGENCY_PEOPLE";
 };
 
+/** Enrichment strategy tiers (backend-derived). GENERIC = info@/hello@ kept as fallback. */
+export type ContactTier = "TIER_1" | "TIER_2" | "TIER_3" | "GENERIC" | "REJECTED";
+
 /** ADR-0016/0018 — brand inbox without a person. Not a Lead. */
 export type BrandBusinessContact = {
   id: string;
@@ -107,6 +110,7 @@ export type BrandBusinessContact = {
   commercialRelevance: CommercialRelevance;
   /** Prefer this for commercial badge; OTHER ≠ General. */
   commercialCoverageTier?: CommercialCoverageTier;
+  contactTier?: ContactTier;
   source: ContactChannelSource;
   sourceUrl: string | null;
   evidences: BrandBusinessContactEvidence[];
@@ -479,6 +483,8 @@ export type Lead = {
   emailConfidence: LeadEmailConfidence;
   isGeneric: boolean;
   profileUrl: string | null;
+  /** Strategy tier; list is sorted Tier 1 first by the API. */
+  contactTier?: ContactTier;
   providerId: string;
   sourceOptionId: string | null;
   fitReason: string | null;
