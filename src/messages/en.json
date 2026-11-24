@@ -738,6 +738,10 @@
         "sponsorship": "Sponsorship",
         "ugc": "UGC"
       }
+    },
+    "signals": {
+      "creatorProgram": "Creator program",
+      "knownBrand": "From brand base"
     }
   },
   "LeadDiscovery": {

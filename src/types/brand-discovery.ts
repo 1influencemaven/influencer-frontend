@@ -180,3 +180,22 @@ export function getBrandDeepResearch(
   }
   return deep;
 }
+
+/** plan_v3 2A: found on a creator/ambassador program page (budget signal). */
+export function hasCreatorProgram(metadata: BrandCandidate["metadata"]): boolean {
+  return Boolean(
+    metadata &&
+      typeof metadata === "object" &&
+      (metadata as { creatorProgram?: unknown }).creatorProgram === true,
+  );
+}
+
+/** Suggested from the shared brand base (seed), not from this run's SERP. */
+export function isKnownBrandSeed(metadata: BrandCandidate["metadata"]): boolean {
+  return Boolean(
+    metadata &&
+      typeof metadata === "object" &&
+      (metadata as { groundingSource?: unknown }).groundingSource ===
+        "SEED_EVIDENCE",
+  );
+}
