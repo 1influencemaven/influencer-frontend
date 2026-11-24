@@ -59,7 +59,8 @@
     "creators": "Influencers",
     "brandDiscovery": "Marcas",
     "users": "Usuarios",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "emailAccounts": "Correos"
   },
   "Theme": {
     "label": "Tema",
@@ -1011,6 +1012,225 @@
       "TIER_3": "Tier 3 · Solo LinkedIn/DM",
       "GENERIC": "Genérico · respaldo",
       "REJECTED": "Descartado"
+    }
+  },
+  "EmailAccounts": {
+    "eyebrow": "Saleshandy",
+    "title": "Cuentas de correo",
+    "description": "Buzones remitentes conectados a Saleshandy: estado, salud, cuotas y configuración de envío.",
+    "stats": {
+      "total": "Total",
+      "connected": "Conectadas",
+      "disconnected": "Desconectadas",
+      "paused": "Pausadas"
+    },
+    "status": {
+      "CONNECTED": "Conectada",
+      "DISCONNECTED": "Desconectada",
+      "PAUSED": "Pausada"
+    },
+    "type": {
+      "GMAIL": "Gmail",
+      "MICROSOFT": "Microsoft",
+      "SMTP_IMAP": "SMTP / IMAP"
+    },
+    "encryption": {
+      "ssl": "SSL",
+      "tls": "TLS",
+      "none": "Ninguno"
+    },
+    "toolbar": {
+      "search": "Buscar",
+      "searchPlaceholder": "Buscar por correo o nombre…",
+      "refresh": "Actualizar",
+      "new": "Nuevo"
+    },
+    "filters": {
+      "status": "Estado",
+      "provider": "Proveedor",
+      "sequence": "Secuencia",
+      "client": "Cliente",
+      "any": "Cualquiera",
+      "noOptions": "Sin opciones",
+      "clear": "Limpiar filtros"
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "createdAt": "Fecha de creación",
+      "healthScore": "Health score",
+      "remainingQuota": "Cuota disponible",
+      "client": "Cliente",
+      "desc": "Descendente",
+      "asc": "Ascendente"
+    },
+    "table": {
+      "columns": {
+        "sender": "Remitente",
+        "status": "Estado",
+        "health": "Health",
+        "quota": "Cuota hoy",
+        "sequences": "Secuencias",
+        "provider": "Proveedor",
+        "client": "Cliente"
+      },
+      "selectAll": "Seleccionar todas",
+      "select": "Seleccionar {email}",
+      "default": "Cuenta predeterminada",
+      "empty": "Aún no hay cuentas de correo",
+      "emptyHint": "Conecta tu primer buzón con el botón Nuevo.",
+      "emptyFiltered": "Ninguna cuenta coincide",
+      "emptyFilteredHint": "Prueba con otros filtros o búsqueda.",
+      "errorTitle": "No se pudieron cargar las cuentas",
+      "loadError": "Error al consultar Saleshandy.",
+      "retry": "Reintentar"
+    },
+    "pagination": {
+      "summary": "Página {page} de {totalPages} · {total} cuentas",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "selection": {
+      "count": "{count, plural, one {# seleccionada} other {# seleccionadas}}",
+      "clear": "Quitar selección"
+    },
+    "actions": {
+      "reconnect": "Reconectar",
+      "editSettings": "Editar configuración"
+    },
+    "reconnect": {
+      "title": "{count, plural, one {¿Reconectar # cuenta?} other {¿Reconectar # cuentas?}}",
+      "description": "Saleshandy intentará restablecer la conexión. El proceso es asíncrono: verás el resultado y el reporte en Procesos recientes.",
+      "more": "y {count} más",
+      "confirm": "Reconectar"
+    },
+    "peek": {
+      "status": "Estado",
+      "health": "Health score",
+      "provider": "Proveedor",
+      "type": "Tipo",
+      "default": "Predeterminada",
+      "client": "Cliente",
+      "addedBy": "Añadida por",
+      "createdAt": "Creada",
+      "sequences": "Secuencias",
+      "sendingSettings": "Configuración de envío",
+      "availableQuota": "Cuota disponible",
+      "maxSendingLimit": "Límite máximo",
+      "intervalValue": "{min}s – {max}s",
+      "rampUp": "Ramp-up",
+      "rampUpValue": "Desde {initial}/día, +{percent}% hasta {limit}",
+      "rampUpOff": "Desactivado",
+      "noSignature": "Sin firma",
+      "yes": "Sí",
+      "no": "No"
+    },
+    "fields": {
+      "provider": "Proveedor",
+      "firstName": "Nombre del remitente",
+      "lastName": "Apellido del remitente",
+      "fromName": "Nombre visible (From)",
+      "fromNamePlaceholder": "Nombre Apellido",
+      "smtp": "SMTP (envío)",
+      "imap": "IMAP (recepción)",
+      "emailAddress": "Correo",
+      "userName": "Usuario",
+      "password": "Contraseña",
+      "host": "Host",
+      "port": "Puerto",
+      "encryption": "Cifrado",
+      "sameCredentials": "IMAP usa el mismo correo, usuario y contraseña que SMTP",
+      "dailyQuota": "Cuota diaria",
+      "interval": "Intervalo entre envíos",
+      "bcc": "BCC",
+      "signature": "Firma HTML"
+    },
+    "validation": {
+      "required": "Obligatorio",
+      "email": "Correo no válido",
+      "port": "Puerto entre 1 y 65535",
+      "sslOrTls": "La conexión individual requiere SSL o TLS"
+    },
+    "connect": {
+      "title": "Conectar cuentas de correo",
+      "description": "Las contraseñas solo se envían a Saleshandy; Influence Maven no las guarda.",
+      "single": {
+        "tab": "Individual",
+        "title": "Conectar una cuenta",
+        "hint": "Verifica SMTP e IMAP al momento",
+        "submit": "Conectar y verificar",
+        "verifying": "Verificando…",
+        "verifiedTitle": "Cuenta conectada y verificada",
+        "verifiedHint": "Ya está disponible como remitente.",
+        "pendingTitle": "Cuenta registrada, pendiente de verificación",
+        "pendingHint": "Saleshandy guardó la cuenta pero la conexión falló. Corrige los datos y reconéctala.",
+        "checkOk": "conectó correctamente",
+        "checkFailed": "no se pudo verificar"
+      },
+      "multiple": {
+        "tab": "Varias cuentas",
+        "title": "Conectar varias cuentas",
+        "hint": "Formulario repetible, proceso asíncrono",
+        "account": "Cuenta {number}",
+        "duplicate": "Duplicar configuración",
+        "remove": "Quitar",
+        "add": "Añadir otra cuenta",
+        "submit": "{count, plural, one {Conectar # cuenta} other {Conectar # cuentas}}",
+        "fixErrors": "{count, plural, one {Revisa # cuenta con errores} other {Revisa # cuentas con errores}}"
+      },
+      "csv": {
+        "tab": "Importar CSV",
+        "title": "Importar desde CSV",
+        "hint": "Plantilla descargable, decenas de cuentas",
+        "instructions": "Descarga la plantilla, completa una fila por cuenta y súbela. Se valida antes de enviar.",
+        "template": "Descargar plantilla",
+        "choose": "Elegir archivo CSV",
+        "sender": "Remitente",
+        "lineError": "Línea {line}: {message}",
+        "tooMany": "Máximo {max} cuentas por importación"
+      },
+      "processingTitle": "{count, plural, one {Conectando # cuenta…} other {Conectando # cuentas…}}",
+      "processingHint": "Saleshandy procesa la solicitud en segundo plano. No están conectadas todavía: el resultado y el reporte CSV aparecerán en Procesos recientes.",
+      "error": "No se pudo completar la conexión.",
+      "cancel": "Cancelar",
+      "another": "Conectar otra",
+      "done": "Listo"
+    },
+    "bulk": {
+      "title": "{count, plural, one {Editar # cuenta} other {Editar # cuentas}}",
+      "description": "Activa solo los campos que quieres cambiar. Lo que no actives se mantiene en cada cuenta.",
+      "nameWarning": "Se aplicará el mismo nombre a todas las cuentas seleccionadas. Si no lo activas, cada cuenta conserva el suyo.",
+      "nameKeep": "Si no lo activas, se conserva el actual.",
+      "min": "Mínimo (s)",
+      "max": "Máximo (s)",
+      "secondsHint": "En segundos.",
+      "rampUpInitial": "Límite inicial/día",
+      "rampUpPercent": "Incremento %",
+      "clearHint": "Déjalo vacío para borrarlo.",
+      "chooseClient": "Elegir cliente",
+      "nothingSelected": "Activa al menos un campo.",
+      "intervalError": "El mínimo no puede ser mayor que el máximo.",
+      "error": "No se pudo actualizar la configuración.",
+      "submit": "{count, plural, =0 {Guardar cambios} one {Guardar # cambio} other {Guardar # cambios}}"
+    },
+    "jobs": {
+      "title": "Procesos recientes",
+      "type": {
+        "CONNECT": "{count, plural, one {Conexión de # cuenta} other {Conexión de # cuentas}}",
+        "RECONNECT": "{count, plural, one {Reconexión de # cuenta} other {Reconexión de # cuentas}}"
+      },
+      "status": {
+        "PROCESSING": "En proceso",
+        "COMPLETED": "Completado",
+        "FAILED": "Falló"
+      },
+      "report": "Reporte CSV",
+      "noReport": "Sin reporte"
+    },
+    "notices": {
+      "jobStarted": "{count, plural, one {Proceso iniciado para # cuenta. Sigue el avance en Procesos recientes.} other {Proceso iniciado para # cuentas. Sigue el avance en Procesos recientes.}}",
+      "updated": "{count, plural, one {Configuración actualizada en # cuenta.} other {Configuración actualizada en # cuentas.}}",
+      "reconnectError": "No se pudo iniciar la reconexión.",
+      "dismiss": "Cerrar"
     }
   }
 }

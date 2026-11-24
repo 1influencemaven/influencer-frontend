@@ -59,7 +59,8 @@
     "creators": "Influencers",
     "brandDiscovery": "Brands",
     "users": "Users",
-    "settings": "Settings"
+    "settings": "Settings",
+    "emailAccounts": "Email accounts"
   },
   "Theme": {
     "label": "Theme",
@@ -1011,6 +1012,225 @@
       "TIER_3": "Tier 3 · LinkedIn/DM only",
       "GENERIC": "Generic · fallback",
       "REJECTED": "Rejected"
+    }
+  },
+  "EmailAccounts": {
+    "eyebrow": "Saleshandy",
+    "title": "Email accounts",
+    "description": "Sender mailboxes connected to Saleshandy: status, health, quotas and sending settings.",
+    "stats": {
+      "total": "Total",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "paused": "Paused"
+    },
+    "status": {
+      "CONNECTED": "Connected",
+      "DISCONNECTED": "Disconnected",
+      "PAUSED": "Paused"
+    },
+    "type": {
+      "GMAIL": "Gmail",
+      "MICROSOFT": "Microsoft",
+      "SMTP_IMAP": "SMTP / IMAP"
+    },
+    "encryption": {
+      "ssl": "SSL",
+      "tls": "TLS",
+      "none": "None"
+    },
+    "toolbar": {
+      "search": "Search",
+      "searchPlaceholder": "Search by email or name…",
+      "refresh": "Refresh",
+      "new": "New"
+    },
+    "filters": {
+      "status": "Status",
+      "provider": "Provider",
+      "sequence": "Sequence",
+      "client": "Client",
+      "any": "Any",
+      "noOptions": "No options",
+      "clear": "Clear filters"
+    },
+    "sort": {
+      "label": "Sort by",
+      "createdAt": "Created date",
+      "healthScore": "Health score",
+      "remainingQuota": "Remaining quota",
+      "client": "Client",
+      "desc": "Descending",
+      "asc": "Ascending"
+    },
+    "table": {
+      "columns": {
+        "sender": "Sender",
+        "status": "Status",
+        "health": "Health",
+        "quota": "Quota today",
+        "sequences": "Sequences",
+        "provider": "Provider",
+        "client": "Client"
+      },
+      "selectAll": "Select all",
+      "select": "Select {email}",
+      "default": "Default account",
+      "empty": "No email accounts yet",
+      "emptyHint": "Connect your first mailbox with the New button.",
+      "emptyFiltered": "No accounts match",
+      "emptyFilteredHint": "Try other filters or search terms.",
+      "errorTitle": "Could not load accounts",
+      "loadError": "Saleshandy request failed.",
+      "retry": "Retry"
+    },
+    "pagination": {
+      "summary": "Page {page} of {totalPages} · {total} accounts",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "selection": {
+      "count": "{count} selected",
+      "clear": "Clear selection"
+    },
+    "actions": {
+      "reconnect": "Reconnect",
+      "editSettings": "Edit settings"
+    },
+    "reconnect": {
+      "title": "{count, plural, one {Reconnect # account?} other {Reconnect # accounts?}}",
+      "description": "Saleshandy will try to restore the connection. It runs in the background: the result and report show up in Recent processes.",
+      "more": "and {count} more",
+      "confirm": "Reconnect"
+    },
+    "peek": {
+      "status": "Status",
+      "health": "Health score",
+      "provider": "Provider",
+      "type": "Type",
+      "default": "Default",
+      "client": "Client",
+      "addedBy": "Added by",
+      "createdAt": "Created",
+      "sequences": "Sequences",
+      "sendingSettings": "Sending settings",
+      "availableQuota": "Available quota",
+      "maxSendingLimit": "Max limit",
+      "intervalValue": "{min}s – {max}s",
+      "rampUp": "Ramp-up",
+      "rampUpValue": "From {initial}/day, +{percent}% up to {limit}",
+      "rampUpOff": "Off",
+      "noSignature": "No signature",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "fields": {
+      "provider": "Provider",
+      "firstName": "Sender first name",
+      "lastName": "Sender last name",
+      "fromName": "Display name (From)",
+      "fromNamePlaceholder": "First Last",
+      "smtp": "SMTP (sending)",
+      "imap": "IMAP (receiving)",
+      "emailAddress": "Email",
+      "userName": "Username",
+      "password": "Password",
+      "host": "Host",
+      "port": "Port",
+      "encryption": "Encryption",
+      "sameCredentials": "IMAP uses the same email, username and password as SMTP",
+      "dailyQuota": "Daily quota",
+      "interval": "Sending interval",
+      "bcc": "BCC",
+      "signature": "HTML signature"
+    },
+    "validation": {
+      "required": "Required",
+      "email": "Invalid email",
+      "port": "Port between 1 and 65535",
+      "sslOrTls": "Single connect requires SSL or TLS"
+    },
+    "connect": {
+      "title": "Connect email accounts",
+      "description": "Passwords are only sent to Saleshandy; Influence Maven never stores them.",
+      "single": {
+        "tab": "Single",
+        "title": "Connect one account",
+        "hint": "Verifies SMTP and IMAP right away",
+        "submit": "Connect and verify",
+        "verifying": "Verifying…",
+        "verifiedTitle": "Account connected and verified",
+        "verifiedHint": "It is ready to send.",
+        "pendingTitle": "Account saved, verification pending",
+        "pendingHint": "Saleshandy saved the account but the connection failed. Fix the settings and reconnect it.",
+        "checkOk": "connected successfully",
+        "checkFailed": "could not be verified"
+      },
+      "multiple": {
+        "tab": "Multiple",
+        "title": "Connect several accounts",
+        "hint": "Repeatable form, runs in the background",
+        "account": "Account {number}",
+        "duplicate": "Duplicate settings",
+        "remove": "Remove",
+        "add": "Add another account",
+        "submit": "{count, plural, one {Connect # account} other {Connect # accounts}}",
+        "fixErrors": "{count, plural, one {Fix # account with errors} other {Fix # accounts with errors}}"
+      },
+      "csv": {
+        "tab": "Import CSV",
+        "title": "Import from CSV",
+        "hint": "Downloadable template, dozens of accounts",
+        "instructions": "Download the template, fill one row per account and upload it. It is validated before sending.",
+        "template": "Download template",
+        "choose": "Choose CSV file",
+        "sender": "Sender",
+        "lineError": "Line {line}: {message}",
+        "tooMany": "Up to {max} accounts per import"
+      },
+      "processingTitle": "{count, plural, one {Connecting # account…} other {Connecting # accounts…}}",
+      "processingHint": "Saleshandy is processing the request in the background. They are not connected yet: the result and CSV report will appear in Recent processes.",
+      "error": "The connection could not be completed.",
+      "cancel": "Cancel",
+      "another": "Connect another",
+      "done": "Done"
+    },
+    "bulk": {
+      "title": "{count, plural, one {Edit # account} other {Edit # accounts}}",
+      "description": "Turn on only the fields you want to change. Everything else stays as it is on each account.",
+      "nameWarning": "The same name will be applied to every selected account. Leave it off to keep each account's own name.",
+      "nameKeep": "Leave it off to keep the current one.",
+      "min": "Minimum (s)",
+      "max": "Maximum (s)",
+      "secondsHint": "In seconds.",
+      "rampUpInitial": "Initial limit/day",
+      "rampUpPercent": "Increase %",
+      "clearHint": "Leave empty to clear it.",
+      "chooseClient": "Choose client",
+      "nothingSelected": "Turn on at least one field.",
+      "intervalError": "Minimum cannot be greater than maximum.",
+      "error": "Settings could not be updated.",
+      "submit": "{count, plural, =0 {Save changes} one {Save # change} other {Save # changes}}"
+    },
+    "jobs": {
+      "title": "Recent processes",
+      "type": {
+        "CONNECT": "{count, plural, one {Connecting # account} other {Connecting # accounts}}",
+        "RECONNECT": "{count, plural, one {Reconnecting # account} other {Reconnecting # accounts}}"
+      },
+      "status": {
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed"
+      },
+      "report": "CSV report",
+      "noReport": "No report"
+    },
+    "notices": {
+      "jobStarted": "{count, plural, one {Process started for # account. Follow it in Recent processes.} other {Process started for # accounts. Follow it in Recent processes.}}",
+      "updated": "{count, plural, one {Settings updated on # account.} other {Settings updated on # accounts.}}",
+      "reconnectError": "Reconnect could not be started.",
+      "dismiss": "Dismiss"
     }
   }
 }
