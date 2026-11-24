@@ -778,7 +778,10 @@
         "agenciesExecuted": "Agency discovery (track 2C) ran for this Lead Discovery execution.",
         "agenciesResults": "Track 2C found {count} agency association(s). Agency contacts for this influencer are listed below.",
         "agenciesNoMatches": "Track 2C ran with no agency matches. Brand contact results are unchanged.",
-        "agenciesFailed": "Track 2C failed (provider/search). Brand contact results are unchanged."
+        "agenciesFailed": "Track 2C failed (provider/search). Brand contact results are unchanged.",
+        "confirmedTitle": "Confirmed (Tier 1)",
+        "confirmedDescription": "People with a verified nominal email (Saleshandy). First in line for the daily batch of 20.",
+        "confirmedEmpty": "No verified nominal emails for this brand yet."
       },
       "relevance": {
         "HIGH": "High — partnerships/creators",
@@ -840,7 +843,7 @@
       }
     },
     "peopleLeads": {
-      "title": "People (LinkedIn)",
+      "title": "Other people (LinkedIn)",
       "description": "Brand people: Saleshandy (verified email) and LinkedIn. Sorted by tier: Tier 1 first.",
       "loading": "Loading people…",
       "empty": "No people for this brand yet. Run a contact search to attempt 2A and 2B together.",

@@ -778,7 +778,10 @@
         "agenciesExecuted": "El descubrimiento de agencias (track 2C) se ejecutó en esta Lead Discovery.",
         "agenciesResults": "El track 2C encontró {count} asociación(es) de agencia. Los contactos de agencia de este influencer aparecen abajo.",
         "agenciesNoMatches": "El track 2C se ejecutó sin coincidencias. Los contactos de marca no cambian.",
-        "agenciesFailed": "El track 2C falló (proveedor/búsqueda). Los contactos de marca no cambian."
+        "agenciesFailed": "El track 2C falló (proveedor/búsqueda). Los contactos de marca no cambian.",
+        "confirmedTitle": "Confirmados (Tier 1)",
+        "confirmedDescription": "Personas con correo nominal verificado (Saleshandy). Prioridad para el lote de 20.",
+        "confirmedEmpty": "Aún no hay correos nominales verificados para esta marca."
       },
       "relevance": {
         "HIGH": "Alta — partnerships/creators",
@@ -840,7 +843,7 @@
       }
     },
     "peopleLeads": {
-      "title": "Personas (LinkedIn)",
+      "title": "Otras personas (LinkedIn)",
       "description": "Personas de la marca: Saleshandy (correo verificado) y LinkedIn. Ordenadas por tier: Tier 1 primero.",
       "loading": "Cargando personas…",
       "empty": "Aún no hay personas para esta marca. Lanza una búsqueda de contactos para intentar 2A y 2B juntos.",

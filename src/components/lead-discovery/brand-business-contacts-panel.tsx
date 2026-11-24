@@ -5,7 +5,10 @@ import { useTranslations } from "next-intl";
 
 import { AgencyContactsPanel } from "@/components/lead-discovery/agency-contacts-panel";
 import { BbcRunStatusBanner } from "@/components/lead-discovery/bbc-run-status-banner";
-import { BrandPeopleLeadsPanel } from "@/components/lead-discovery/brand-people-leads-panel";
+import {
+  BrandPeopleLeadsPanel,
+  ConfirmedContactsList,
+} from "@/components/lead-discovery/brand-people-leads-panel";
 import { Badge } from "@/components/ui/badge";
 import { ContactTierBadge } from "@/components/lead-discovery/contact-tier-badge";
 import { Button } from "@/components/ui/button";
@@ -160,6 +163,15 @@ export function BrandBusinessContactsPanel({
     () => contacts.filter((c) => !c.isGeneric),
     [contacts],
   );
+  // Tier 1 people sit beside the brand inboxes; the rest stay in the people panel.
+  const confirmedLeads = useMemo(
+    () => leads.filter((lead) => lead.contactTier === "TIER_1"),
+    [leads],
+  );
+  const otherLeads = useMemo(
+    () => leads.filter((lead) => lead.contactTier !== "TIER_1"),
+    [leads],
+  );
 
   const emptyMessageKey =
     uiState.kind === "provider_failure"
@@ -174,6 +186,7 @@ export function BrandBusinessContactsPanel({
     !loading &&
     !error &&
     contacts.length === 0 &&
+    confirmedLeads.length === 0 &&
     uiState.kind !== "processing" &&
     uiState.kind !== "partial_while_processing";
 
@@ -230,159 +243,171 @@ export function BrandBusinessContactsPanel({
 
   return (
     <>
-    <section
-      className="mt-4 space-y-3 rounded-md border border-border bg-muted/30 p-3"
-      aria-labelledby={`bbc-title-${brandCandidateId}`}
-    >
-      <div className="space-y-1">
-        <h4
-          id={`bbc-title-${brandCandidateId}`}
-          className="text-sm font-medium"
-        >
-          {t("title")}
-        </h4>
-        <p className="text-xs text-muted-foreground">{t("description")}</p>
-      </div>
-
-      {bbcV1Active ? (
-        <div
-          className="space-y-1 rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground"
-          role="status"
-        >
-          <p>{tBbc("activeBanner")}</p>
-          {showMastraEngine ? <p>{tBbc("engineMastra")}</p> : null}
+      <section
+        className="mt-4 space-y-3 rounded-md border border-border bg-muted/30 p-3"
+        aria-labelledby={`bbc-title-${brandCandidateId}`}
+      >
+        <div className="space-y-1">
+          <h4
+            id={`bbc-title-${brandCandidateId}`}
+            className="text-sm font-medium"
+          >
+            {t("title")}
+          </h4>
+          <p className="text-xs text-muted-foreground">{t("description")}</p>
         </div>
-      ) : null}
 
-      {error ? (
-        <div className="space-y-2" role="alert">
-          <p className="text-sm text-destructive">{error}</p>
-          <Button type="button" size="sm" variant="outline" onClick={refresh}>
-            {t("retry")}
-          </Button>
-        </div>
-      ) : null}
+        {bbcV1Active ? (
+          <div
+            className="space-y-1 rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground"
+            role="status"
+          >
+            <p>{tBbc("activeBanner")}</p>
+            {showMastraEngine ? <p>{tBbc("engineMastra")}</p> : null}
+          </div>
+        ) : null}
 
-      <BbcRunStatusBanner
-        state={uiState}
-        pollError={pollError}
-        runs={runs}
-      />
+        {error ? (
+          <div className="space-y-2" role="alert">
+            <p className="text-sm text-destructive">{error}</p>
+            <Button type="button" size="sm" variant="outline" onClick={refresh}>
+              {t("retry")}
+            </Button>
+          </div>
+        ) : null}
 
-      {bbcV1Active ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            disabled={
-              searching ||
-              hasProcessing ||
-              loadingMeta ||
-              !canSearch ||
-              loading
+        <BbcRunStatusBanner state={uiState} pollError={pollError} runs={runs} />
+
+        {bbcV1Active ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              disabled={
+                searching ||
+                hasProcessing ||
+                loadingMeta ||
+                !canSearch ||
+                loading
+              }
+              onClick={() => void startSearch()}
+            >
+              {searching || hasProcessing
+                ? tBbc("searching")
+                : tBbc("searchAction")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={loading || searching}
+              onClick={refresh}
+            >
+              {tBbc("refresh")}
+            </Button>
+          </div>
+        ) : null}
+
+        {loading ? (
+          <p className="text-xs text-muted-foreground">{t("loading")}</p>
+        ) : null}
+
+        {showEmpty ? (
+          <p
+            className={`text-xs ${
+              uiState.kind === "provider_failure" || uiState.kind === "failed"
+                ? "text-destructive"
+                : "text-muted-foreground"
+            }`}
+            role={
+              uiState.kind === "provider_failure" || uiState.kind === "failed"
+                ? "alert"
+                : undefined
             }
-            onClick={() => void startSearch()}
           >
-            {searching || hasProcessing
-              ? tBbc("searching")
-              : tBbc("searchAction")}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={loading || searching}
-            onClick={refresh}
-          >
-            {tBbc("refresh")}
-          </Button>
-        </div>
-      ) : null}
+            {t(emptyMessageKey)}
+          </p>
+        ) : null}
 
-      {loading ? (
-        <p className="text-xs text-muted-foreground">{t("loading")}</p>
-      ) : null}
+        {!loading && (contacts.length > 0 || confirmedLeads.length > 0) ? (
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="min-w-0 space-y-2">
+                <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t("sections.confirmedTitle")}
+                </h5>
+                <p className="text-xs text-muted-foreground">
+                  {t("sections.confirmedDescription")}
+                </p>
+                <ConfirmedContactsList
+                  leads={confirmedLeads}
+                  emptyLabel={t("sections.confirmedEmpty")}
+                />
+              </div>
+              <div className="min-w-0 space-y-2">
+                <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t("sections.genericTitle")}
+                </h5>
+                <p className="text-xs text-muted-foreground">
+                  {t("sections.genericDescription")}
+                </p>
+                <ContactList
+                  contacts={genericContacts}
+                  emptyLabel={t("sections.genericEmpty")}
+                  t={t}
+                />
+              </div>
+            </div>
+            {otherContacts.length > 0 ? (
+              <div className="space-y-2">
+                <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t("sections.otherTitle")}
+                </h5>
+                <p className="text-xs text-muted-foreground">
+                  {t("sections.otherDescription")}
+                </p>
+                <ContactList
+                  contacts={otherContacts}
+                  emptyLabel={t("sections.otherEmpty")}
+                  t={t}
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
-      {showEmpty ? (
-        <p
-          className={`text-xs ${
-            uiState.kind === "provider_failure" || uiState.kind === "failed"
-              ? "text-destructive"
-              : "text-muted-foreground"
-          }`}
-          role={
-            uiState.kind === "provider_failure" || uiState.kind === "failed"
-              ? "alert"
-              : undefined
-          }
-        >
-          {t(emptyMessageKey)}
-        </p>
-      ) : null}
-
-      {!loading && contacts.length > 0 ? (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t("sections.genericTitle")}
-            </h5>
-            <p className="text-xs text-muted-foreground">
-              {t("sections.genericDescription")}
-            </p>
-            <ContactList
-              contacts={genericContacts}
-              emptyLabel={t("sections.genericEmpty")}
-              t={t}
+        {!loading ? (
+          <div className="space-y-3 border-t border-border pt-3">
+            <div className="space-y-1">
+              <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t("sections.agenciesTitle")}
+              </h5>
+              <p className="text-xs text-muted-foreground">
+                {track2CStatus.kind === "results"
+                  ? t("sections.agenciesResults", {
+                      count: track2CStatus.count,
+                    })
+                  : track2CStatus.kind === "no_matches"
+                    ? t("sections.agenciesNoMatches")
+                    : track2CStatus.kind === "failed"
+                      ? t("sections.agenciesFailed")
+                      : track2CStatus.kind === "executed_unknown"
+                        ? t("sections.agenciesExecuted")
+                        : t("sections.agenciesPending")}
+              </p>
+            </div>
+            <AgencyContactsPanel
+              influencerId={influencerId}
+              pollWhile={hasProcessing}
             />
           </div>
-          <div className="space-y-2">
-            <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t("sections.otherTitle")}
-            </h5>
-            <p className="text-xs text-muted-foreground">
-              {t("sections.otherDescription")}
-            </p>
-            <ContactList
-              contacts={otherContacts}
-              emptyLabel={t("sections.otherEmpty")}
-              t={t}
-            />
-          </div>
-        </div>
-      ) : null}
-
-      {!loading ? (
-        <div className="space-y-3 border-t border-border pt-3">
-          <div className="space-y-1">
-            <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t("sections.agenciesTitle")}
-            </h5>
-            <p className="text-xs text-muted-foreground">
-              {track2CStatus.kind === "results"
-                ? t("sections.agenciesResults", {
-                    count: track2CStatus.count,
-                  })
-                : track2CStatus.kind === "no_matches"
-                  ? t("sections.agenciesNoMatches")
-                  : track2CStatus.kind === "failed"
-                    ? t("sections.agenciesFailed")
-                    : track2CStatus.kind === "executed_unknown"
-                      ? t("sections.agenciesExecuted")
-                      : t("sections.agenciesPending")}
-            </p>
-          </div>
-          <AgencyContactsPanel
-            influencerId={influencerId}
-            pollWhile={hasProcessing}
-          />
-        </div>
-      ) : null}
-    </section>
-    <BrandPeopleLeadsPanel
-      brandCandidateId={brandCandidateId}
-      leads={leads}
-      loading={loading}
-    />
+        ) : null}
+      </section>
+      <BrandPeopleLeadsPanel
+        brandCandidateId={brandCandidateId}
+        leads={otherLeads}
+        loading={loading}
+      />
     </>
   );
 }
