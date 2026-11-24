@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
+import { ContactTierBadge } from "@/components/lead-discovery/contact-tier-badge";
 import type { Lead } from "@/types/lead-discovery";
 
 type BrandPeopleLeadsPanelProps = {
@@ -77,6 +78,10 @@ export function BrandPeopleLeadsPanel({
                       {lead.title}
                     </span>
                   ) : null}
+                  <ContactTierBadge tier={lead.contactTier} />
+                  {lead.source === "saleshandy-lead-finder" ? (
+                    <Badge variant="outline">{t("sourceSaleshandy")}</Badge>
+                  ) : null}
                   <Badge variant="secondary">{t(`status.${lead.status}`)}</Badge>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -95,12 +100,20 @@ export function BrandPeopleLeadsPanel({
                     </span>
                   )}
                   {lead.email ? (
-                    <a
-                      href={`mailto:${lead.email}`}
-                      className="text-primary underline-offset-4 hover:underline"
-                    >
-                      {lead.email}
-                    </a>
+                    <span className="inline-flex items-center gap-1">
+                      <a
+                        href={`mailto:${lead.email}`}
+                        className="text-primary underline-offset-4 hover:underline"
+                      >
+                        {lead.email}
+                      </a>
+                      {lead.emailConfidence === "VALID" ||
+                      lead.emailConfidence === "PROBABLE" ? (
+                        <span className="text-muted-foreground">
+                          · {t(`verification.${lead.emailConfidence}`)}
+                        </span>
+                      ) : null}
+                    </span>
                   ) : (
                     <span className="text-muted-foreground">
                       {t("noEmail")}

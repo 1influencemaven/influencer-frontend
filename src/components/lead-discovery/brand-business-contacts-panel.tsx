@@ -7,6 +7,7 @@ import { AgencyContactsPanel } from "@/components/lead-discovery/agency-contacts
 import { BbcRunStatusBanner } from "@/components/lead-discovery/bbc-run-status-banner";
 import { BrandPeopleLeadsPanel } from "@/components/lead-discovery/brand-people-leads-panel";
 import { Badge } from "@/components/ui/badge";
+import { ContactTierBadge } from "@/components/lead-discovery/contact-tier-badge";
 import { Button } from "@/components/ui/button";
 import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
 import {
@@ -79,6 +80,7 @@ function ContactList({
               >
                 {contact.email}
               </a>
+              <ContactTierBadge tier={contact.contactTier} />
               {contact.label ? (
                 <Badge variant="outline">{contact.label}</Badge>
               ) : null}

@@ -841,7 +841,7 @@
     },
     "peopleLeads": {
       "title": "Personas (LinkedIn)",
-      "description": "Personas encontradas en LinkedIn para esta marca (track 2B), con email si salió del scrape, web de marca o OCR.",
+      "description": "Personas de la marca: Saleshandy (correo verificado) y LinkedIn. Ordenadas por tier: Tier 1 primero.",
       "loading": "Cargando personas…",
       "empty": "Aún no hay personas para esta marca. Lanza una búsqueda de contactos para intentar 2A y 2B juntos.",
       "linkedin": "LinkedIn",
@@ -852,7 +852,12 @@
         "APPROVED": "Aprobado",
         "DISCARDED": "Descartado",
         "DUPLICATE": "Duplicado"
-      }
+      },
+      "verification": {
+        "VALID": "Verificado",
+        "PROBABLE": "Catch-all"
+      },
+      "sourceSaleshandy": "Saleshandy"
     },
     "panelTitle": "Leads",
     "panelDescription": "Descubre personas relevantes y sus canales de contacto. Revisa, aprueba y opcionalmente elige una para outreach futuro (sin enviar email).",
@@ -992,6 +997,13 @@
       "DOUBTFUL": "Dudoso",
       "INVALID": "Inválido",
       "UNKNOWN": "Desconocido"
+    },
+    "contactTier": {
+      "TIER_1": "Tier 1 · Nominal verificado",
+      "TIER_2": "Tier 2 · Buzón de área",
+      "TIER_3": "Tier 3 · Solo LinkedIn/DM",
+      "GENERIC": "Genérico · respaldo",
+      "REJECTED": "Descartado"
     }
   }
 }

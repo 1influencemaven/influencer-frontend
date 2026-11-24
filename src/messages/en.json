@@ -841,7 +841,7 @@
     },
     "peopleLeads": {
       "title": "People (LinkedIn)",
-      "description": "People found on LinkedIn for this brand (track 2B), with email when scrape, brand-web PEE, or OCR found one.",
+      "description": "Brand people: Saleshandy (verified email) and LinkedIn. Sorted by tier: Tier 1 first.",
       "loading": "Loading people…",
       "empty": "No people for this brand yet. Run a contact search to attempt 2A and 2B together.",
       "linkedin": "LinkedIn",
@@ -852,7 +852,12 @@
         "APPROVED": "Approved",
         "DISCARDED": "Discarded",
         "DUPLICATE": "Duplicate"
-      }
+      },
+      "verification": {
+        "VALID": "Verified",
+        "PROBABLE": "Catch-all"
+      },
+      "sourceSaleshandy": "Saleshandy"
     },
     "panelTitle": "Leads",
     "panelDescription": "Discover relevant people and their contact channels. Review, approve, and optionally select one for future outreach (no email is sent).",
@@ -992,6 +997,13 @@
       "DOUBTFUL": "Doubtful",
       "INVALID": "Invalid",
       "UNKNOWN": "Unknown"
+    },
+    "contactTier": {
+      "TIER_1": "Tier 1 · Verified nominal",
+      "TIER_2": "Tier 2 · Area mailbox",
+      "TIER_3": "Tier 3 · LinkedIn/DM only",
+      "GENERIC": "Generic · fallback",
+      "REJECTED": "Rejected"
     }
   }
 }
