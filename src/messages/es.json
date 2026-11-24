@@ -59,8 +59,7 @@
     "creators": "Influencers",
     "brandDiscovery": "Marcas",
     "users": "Usuarios",
-    "settings": "Configuración",
-    "emailAccounts": "Correos"
+    "settings": "Configuración"
   },
   "Theme": {
     "label": "Tema",
@@ -1043,7 +1042,9 @@
       "search": "Buscar",
       "searchPlaceholder": "Buscar por correo o nombre…",
       "refresh": "Actualizar",
-      "new": "Nuevo"
+      "new": "Nuevo",
+      "connect": "Conectar cuenta",
+      "filters": "Filtros"
     },
     "filters": {
       "status": "Estado",
@@ -1052,7 +1053,9 @@
       "client": "Cliente",
       "any": "Cualquiera",
       "noOptions": "Sin opciones",
-      "clear": "Limpiar filtros"
+      "clear": "Limpiar filtros",
+      "all": "Todas",
+      "remove": "Quitar filtro {filter}"
     },
     "sort": {
       "label": "Ordenar por",
@@ -1068,7 +1071,7 @@
         "sender": "Remitente",
         "status": "Estado",
         "health": "Health",
-        "quota": "Cuota hoy",
+        "quota": "Enviados hoy",
         "sequences": "Secuencias",
         "provider": "Proveedor",
         "client": "Cliente"
@@ -1082,7 +1085,9 @@
       "emptyFilteredHint": "Prueba con otros filtros o búsqueda.",
       "errorTitle": "No se pudieron cargar las cuentas",
       "loadError": "Error al consultar Saleshandy.",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "sequencesCount": "{count, plural, one {# secuencia} other {# secuencias}}",
+      "rowActions": "Acciones"
     },
     "pagination": {
       "summary": "Página {page} de {totalPages} · {total} cuentas",
@@ -1095,7 +1100,8 @@
     },
     "actions": {
       "reconnect": "Reconectar",
-      "editSettings": "Editar configuración"
+      "editSettings": "Editar configuración",
+      "view": "Ver detalle"
     },
     "reconnect": {
       "title": "{count, plural, one {¿Reconectar # cuenta?} other {¿Reconectar # cuentas?}}",
@@ -1232,5 +1238,15 @@
       "reconnectError": "No se pudo iniciar la reconexión.",
       "dismiss": "Cerrar"
     }
+  },
+  "Campaigns": {
+    "title": "Campañas",
+    "description": "Gestiona el envío de outreach: buzones remitentes, secuencias y prospectos.",
+    "tabs": {
+      "emailAccounts": "Cuentas de correo",
+      "sequences": "Secuencias",
+      "prospects": "Prospectos"
+    },
+    "soon": "Pronto"
   }
 }

@@ -1,6 +1,5 @@
 import {
   LayoutDashboard,
-  Mail,
   Megaphone,
   Search,
   Settings,
@@ -18,7 +17,6 @@ export type DashboardNavItem = {
     | "campaigns"
     | "creators"
     | "brandDiscovery"
-    | "emailAccounts"
     | "users"
     | "settings";
   icon: LucideIcon;
@@ -48,12 +46,6 @@ export const dashboardNavItems: DashboardNavItem[] = [
     href: "/dashboard/brand-discovery",
     labelKey: "brandDiscovery",
     icon: Search,
-    roles: ["USER", "ADMIN"],
-  },
-  {
-    href: "/dashboard/email-accounts",
-    labelKey: "emailAccounts",
-    icon: Mail,
     roles: ["USER", "ADMIN"],
   },
   {

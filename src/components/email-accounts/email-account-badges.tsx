@@ -90,3 +90,39 @@ export function providerLabel(provider: string | null | undefined): string {
   };
   return labels[provider] ?? provider;
 }
+
+/** Saleshandy-style health score: colored ring with the number inside. */
+export function HealthScoreCircle({ score }: { score: number | null }) {
+  if (score === null) return <span className="text-xs text-muted-foreground">—</span>;
+  const value = Math.max(0, Math.min(100, score));
+  const color =
+    value >= 80 ? "var(--notion-green)" : value >= 50 ? "var(--notion-sky)" : "var(--destructive)";
+  return (
+    <span
+      className="inline-grid size-9 place-items-center rounded-full text-[11px] font-semibold tabular-nums"
+      style={{
+        background: `conic-gradient(${color} ${value * 3.6}deg, var(--muted) 0deg)`,
+      }}
+      title={`${value}/100`}
+    >
+      <span className="grid size-7 place-items-center rounded-full bg-card">{value}</span>
+    </span>
+  );
+}
+
+/** Initials avatar used in the accounts list. */
+export function SenderAvatar({ name, email }: { name: string; email: string }) {
+  const source = name.trim() || email;
+  const initials =
+    source
+      .split(/[\s@._-]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "?";
+  return (
+    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+      {initials}
+    </span>
+  );
+}

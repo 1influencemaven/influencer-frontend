@@ -59,8 +59,7 @@
     "creators": "Influencers",
     "brandDiscovery": "Brands",
     "users": "Users",
-    "settings": "Settings",
-    "emailAccounts": "Email accounts"
+    "settings": "Settings"
   },
   "Theme": {
     "label": "Theme",
@@ -1043,7 +1042,9 @@
       "search": "Search",
       "searchPlaceholder": "Search by email or name…",
       "refresh": "Refresh",
-      "new": "New"
+      "new": "New",
+      "connect": "Connect account",
+      "filters": "Filters"
     },
     "filters": {
       "status": "Status",
@@ -1052,7 +1053,9 @@
       "client": "Client",
       "any": "Any",
       "noOptions": "No options",
-      "clear": "Clear filters"
+      "clear": "Clear filters",
+      "all": "All",
+      "remove": "Remove filter {filter}"
     },
     "sort": {
       "label": "Sort by",
@@ -1068,7 +1071,7 @@
         "sender": "Sender",
         "status": "Status",
         "health": "Health",
-        "quota": "Quota today",
+        "quota": "Sent today",
         "sequences": "Sequences",
         "provider": "Provider",
         "client": "Client"
@@ -1082,7 +1085,9 @@
       "emptyFilteredHint": "Try other filters or search terms.",
       "errorTitle": "Could not load accounts",
       "loadError": "Saleshandy request failed.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "sequencesCount": "{count, plural, one {# sequence} other {# sequences}}",
+      "rowActions": "Actions"
     },
     "pagination": {
       "summary": "Page {page} of {totalPages} · {total} accounts",
@@ -1095,7 +1100,8 @@
     },
     "actions": {
       "reconnect": "Reconnect",
-      "editSettings": "Edit settings"
+      "editSettings": "Edit settings",
+      "view": "View details"
     },
     "reconnect": {
       "title": "{count, plural, one {Reconnect # account?} other {Reconnect # accounts?}}",
@@ -1232,5 +1238,15 @@
       "reconnectError": "Reconnect could not be started.",
       "dismiss": "Dismiss"
     }
+  },
+  "Campaigns": {
+    "title": "Campaigns",
+    "description": "Manage outreach sending: sender mailboxes, sequences and prospects.",
+    "tabs": {
+      "emailAccounts": "Email accounts",
+      "sequences": "Sequences",
+      "prospects": "Prospects"
+    },
+    "soon": "Soon"
   }
 }
