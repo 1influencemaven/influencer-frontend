@@ -742,6 +742,18 @@
     "signals": {
       "creatorProgram": "Creator program",
       "knownBrand": "From brand base"
+    },
+    "runErrors": {
+      "aiTimeout": "The AI took longer than expected and the search was cancelled. You can retry it; previous brands are kept.",
+      "aiFailed": "The AI service could not finish the search. Try again in a few minutes.",
+      "searchProvider": "The external search provider had a temporary outage. Try again in a few minutes.",
+      "noResults": "No new brands matched the current profile. Try widening sectors or markets in the IBP.",
+      "inProgress": "A search is already running for this talent.",
+      "generic": "The search could not be completed. You can retry it.",
+      "technical": "Technical detail",
+      "retry": "Retry",
+      "retrying": "Retrying…",
+      "processingHint": "Running for this talent"
     }
   },
   "LeadDiscovery": {

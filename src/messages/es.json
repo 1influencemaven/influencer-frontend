@@ -742,6 +742,18 @@
     "signals": {
       "creatorProgram": "Programa de creadores",
       "knownBrand": "De la base de marcas"
+    },
+    "runErrors": {
+      "aiTimeout": "La IA tardó más de lo esperado y la búsqueda se canceló. Puedes reintentarla; tus marcas anteriores no se pierden.",
+      "aiFailed": "El servicio de IA no pudo completar la búsqueda. Reintenta en unos minutos.",
+      "searchProvider": "El buscador externo tuvo una interrupción temporal. Reintenta en unos minutos.",
+      "noResults": "No encontramos marcas nuevas con el perfil actual. Prueba ampliar sectores o mercados en el IBP.",
+      "inProgress": "Ya hay una búsqueda en curso para este talento.",
+      "generic": "La búsqueda no se pudo completar. Puedes reintentarla.",
+      "technical": "Detalle técnico",
+      "retry": "Reintentar",
+      "retrying": "Reintentando…",
+      "processingHint": "En curso para este talento"
     }
   },
   "LeadDiscovery": {

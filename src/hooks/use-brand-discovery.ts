@@ -168,6 +168,11 @@ export function useBrandDiscovery() {
   }, [refreshResults]);
 
   const hasProcessing = runs.some((run) => run.status === "PROCESSING");
+  /** The backend only blocks a new search for talents with a run in progress. */
+  const processingInfluencerIds = new Set(
+    runs.filter((run) => run.status === "PROCESSING").map((run) => run.influencerId),
+  );
+  const selectionHasProcessing = [...selectedIds].some((id) => processingInfluencerIds.has(id));
 
   useEffect(() => {
     if (!hasProcessing) {
@@ -248,6 +253,25 @@ export function useBrandDiscovery() {
     }
   }, [limit, refreshResults, selectedIds]);
 
+  const [retryingInfluencerId, setRetryingInfluencerId] = useState<string | null>(null);
+
+  /** Re-runs Brand Discovery for one talent (e.g. from a failed run row). */
+  const retrySearch = useCallback(
+    async (influencerId: string) => {
+      setRetryingInfluencerId(influencerId);
+      setError(null);
+      try {
+        await searchBrands([influencerId], limit);
+        await refreshResults();
+      } catch (err) {
+        setError(getApiErrorMessage(err));
+      } finally {
+        setRetryingInfluencerId(null);
+      }
+    },
+    [limit, refreshResults],
+  );
+
   const updateStatus = useCallback(
     async (id: string, payload: UpdateBrandCandidateStatusPayload) => {
       setUpdatingId(id);
@@ -294,6 +318,10 @@ export function useBrandDiscovery() {
     deletingId,
     error,
     hasProcessing,
+    processingInfluencerIds,
+    selectionHasProcessing,
+    retryingInfluencerId,
+    retrySearch,
     toggleInfluencer,
     selectAll,
     clearSelection,

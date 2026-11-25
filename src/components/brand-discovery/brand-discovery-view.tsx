@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useBrandDiscovery } from "@/hooks/use-brand-discovery";
+import { classifyDiscoveryError } from "@/lib/discovery-error";
 
 const BRAND_LIMIT_OPTIONS = Array.from({ length: 20 }, (_, i) => i + 1);
 
@@ -33,7 +34,10 @@ export function BrandDiscoveryView() {
     updatingId,
     deletingId,
     error,
-    hasProcessing,
+    processingInfluencerIds,
+    selectionHasProcessing,
+    retryingInfluencerId,
+    retrySearch,
     toggleInfluencer,
     selectAll,
     clearSelection,
@@ -67,7 +71,7 @@ export function BrandDiscoveryView() {
                 id="brand-discovery-limit"
                 className="h-9 min-w-16 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
                 value={limit}
-                disabled={searching || hasProcessing}
+                disabled={searching}
                 onChange={(event) => setLimit(Number(event.target.value))}
                 title={t("limitHint")}
                 aria-description={t("limitHint")}
@@ -100,9 +104,10 @@ export function BrandDiscoveryView() {
             <Button
               type="button"
               onClick={() => void startSearch()}
-              disabled={selectedIds.size === 0 || searching || hasProcessing}
+              disabled={selectedIds.size === 0 || searching || selectionHasProcessing}
+              title={selectionHasProcessing ? t("runErrors.inProgress") : undefined}
             >
-              {searching || hasProcessing ? t("searching") : t("searchAction")}
+              {searching || selectionHasProcessing ? t("searching") : t("searchAction")}
             </Button>
           </div>
         </div>
@@ -198,10 +203,39 @@ export function BrandDiscoveryView() {
                       {t("runMetaQueries")}: {queries.join(" · ")}
                     </p>
                   ) : null}
-                  {run.errorMessage ? (
-                    <p className="w-full text-xs text-destructive">
-                      {run.errorMessage}
-                    </p>
+                  {run.status === "FAILED" ? (
+                    <div className="flex w-full flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <p className="text-xs text-destructive">
+                          {t(`runErrors.${classifyDiscoveryError(run.errorMessage)}`)}
+                        </p>
+                        {run.errorMessage ? (
+                          <details className="text-xs text-muted-foreground">
+                            <summary className="cursor-pointer select-none">
+                              {t("runErrors.technical")}
+                            </summary>
+                            <p className="mt-1 break-words font-mono">{run.errorMessage}</p>
+                          </details>
+                        ) : null}
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2 text-xs"
+                        disabled={
+                          retryingInfluencerId !== null ||
+                          processingInfluencerIds.has(run.influencerId)
+                        }
+                        onClick={() => void retrySearch(run.influencerId)}
+                      >
+                        {retryingInfluencerId === run.influencerId
+                          ? t("runErrors.retrying")
+                          : processingInfluencerIds.has(run.influencerId)
+                            ? t("runErrors.processingHint")
+                            : t("runErrors.retry")}
+                      </Button>
+                    </div>
                   ) : null}
                 </li>
               );
