@@ -52,6 +52,7 @@ function useUpdateSchemaMessages() {
       managerIdInvalid: t("managerIdInvalid"),
       tiktokMax: t("tiktokMax"),
       youtubeMax: t("youtubeMax"),
+      countryRequired: t("countryRequired"),
       countryLength: t("countryLength"),
       countryInvalid: t("countryInvalid"),
       languageLength: t("languageLength"),
