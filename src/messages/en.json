@@ -754,7 +754,8 @@
       "retry": "Retry",
       "retrying": "Retrying…",
       "processingHint": "Running for this talent"
-    }
+    },
+    "changeDecision": "Change decision:"
   },
   "LeadDiscovery": {
     "businessContacts": {

@@ -754,7 +754,8 @@
       "retry": "Reintentar",
       "retrying": "Reintentando…",
       "processingHint": "En curso para este talento"
-    }
+    },
+    "changeDecision": "Cambiar decisión:"
   },
   "LeadDiscovery": {
     "businessContacts": {

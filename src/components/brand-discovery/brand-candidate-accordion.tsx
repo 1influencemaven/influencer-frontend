@@ -139,42 +139,55 @@ export function BrandCandidateAccordion({
                   ) : null}
                 </div>
                 <div className="flex flex-col items-start gap-2">
-                  {candidate.status === "UNDER_REVIEW" ? (
+                  {/* Decisions are reversible: offer every status except the current one. */}
+                  <div className="flex flex-col items-start gap-1.5">
+                    {candidate.status !== "UNDER_REVIEW" ? (
+                      <span className="text-xs text-muted-foreground">
+                        {t("changeDecision")}
+                      </span>
+                    ) : null}
                     <div className="flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        disabled={isBusy}
-                        onClick={() =>
-                          onUpdateStatus(candidate.id, { status: "APPROVED" })
-                        }
-                      >
-                        {t("approve")}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        disabled={isBusy}
-                        onClick={() =>
-                          onUpdateStatus(candidate.id, { status: "POSTPONED" })
-                        }
-                      >
-                        {t("postpone")}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        disabled={isBusy}
-                        onClick={() =>
-                          onUpdateStatus(candidate.id, { status: "REJECTED" })
-                        }
-                      >
-                        {t("reject")}
-                      </Button>
+                      {candidate.status !== "APPROVED" ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={candidate.status === "UNDER_REVIEW" ? "default" : "outline"}
+                          disabled={isBusy}
+                          onClick={() =>
+                            onUpdateStatus(candidate.id, { status: "APPROVED" })
+                          }
+                        >
+                          {t("approve")}
+                        </Button>
+                      ) : null}
+                      {candidate.status !== "POSTPONED" ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={isBusy}
+                          onClick={() =>
+                            onUpdateStatus(candidate.id, { status: "POSTPONED" })
+                          }
+                        >
+                          {t("postpone")}
+                        </Button>
+                      ) : null}
+                      {candidate.status !== "REJECTED" ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={candidate.status === "UNDER_REVIEW" ? "destructive" : "outline"}
+                          disabled={isBusy}
+                          onClick={() =>
+                            onUpdateStatus(candidate.id, { status: "REJECTED" })
+                          }
+                        >
+                          {t("reject")}
+                        </Button>
+                      ) : null}
                     </div>
-                  ) : null}
+                  </div>
                   {onDelete ? (
                     isPendingDelete ? (
                       <div className="flex flex-col gap-2">
