@@ -14,6 +14,18 @@ jest.mock("../../hooks/use-bbc-discovery", () => ({
   useBbcDiscovery: jest.fn(),
 }));
 
+jest.mock("../../i18n/navigation", () => ({
+  Link: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
+jest.mock("./lead-outreach-actions", () => ({
+  LeadOutreachActions: () => null,
+}));
+
 jest.mock("./agency-contacts-panel", () => ({
   AgencyContactsPanel: ({
     influencerId,

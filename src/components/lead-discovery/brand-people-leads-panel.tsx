@@ -4,12 +4,16 @@ import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { ContactTierBadge } from "@/components/lead-discovery/contact-tier-badge";
+import { CopyEmailButton } from "@/components/lead-discovery/copy-email-button";
+import { LeadOutreachActions } from "@/components/lead-discovery/lead-outreach-actions";
 import type { Lead } from "@/types/lead-discovery";
 
 type BrandPeopleLeadsPanelProps = {
   brandCandidateId: string;
   leads: Lead[];
   loading: boolean;
+  /** Called after select/unselect so the parent refreshes leads. */
+  onLeadsChanged?: () => void;
 };
 
 function isHttpUrl(value: string | null | undefined): value is string {
@@ -32,6 +36,7 @@ export function BrandPeopleLeadsPanel({
   brandCandidateId,
   leads,
   loading,
+  onLeadsChanged,
 }: BrandPeopleLeadsPanelProps) {
   const t = useTranslations("LeadDiscovery.peopleLeads");
 
@@ -109,6 +114,7 @@ export function BrandPeopleLeadsPanel({
                       >
                         {lead.email}
                       </a>
+                      <CopyEmailButton email={lead.email} />
                       {lead.emailConfidence === "VALID" ||
                       lead.emailConfidence === "PROBABLE" ? (
                         <span className="text-muted-foreground">
@@ -121,6 +127,9 @@ export function BrandPeopleLeadsPanel({
                       {t("noEmail")}
                     </span>
                   )}
+                </div>
+                <div className="mt-2">
+                  <LeadOutreachActions lead={lead} onChanged={onLeadsChanged} />
                 </div>
               </li>
             );
@@ -135,9 +144,11 @@ export function BrandPeopleLeadsPanel({
 export function ConfirmedContactsList({
   leads,
   emptyLabel,
+  onLeadsChanged,
 }: {
   leads: Lead[];
   emptyLabel: string;
+  onLeadsChanged?: () => void;
 }) {
   const t = useTranslations("LeadDiscovery.peopleLeads");
   if (leads.length === 0) {
@@ -150,7 +161,9 @@ export function ConfirmedContactsList({
         return (
           <li
             key={lead.id}
-            className="rounded-md border border-border bg-background p-3 text-sm"
+            className={`rounded-md border bg-background p-3 text-sm ${
+              lead.selectedForOutreach ? "border-notion-green/40 ring-1 ring-notion-green/20" : "border-border"
+            }`}
           >
             <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
               <span className="font-medium text-foreground">
@@ -171,6 +184,7 @@ export function ConfirmedContactsList({
                   {lead.email}
                 </a>
               ) : null}
+              {lead.email ? <CopyEmailButton email={lead.email} /> : null}
               {lead.emailConfidence === "VALID" ||
               lead.emailConfidence === "PROBABLE" ? (
                 <Badge variant="default">
@@ -190,6 +204,9 @@ export function ConfirmedContactsList({
                   {t("linkedin")}
                 </a>
               ) : null}
+            </div>
+            <div className="mt-2">
+              <LeadOutreachActions lead={lead} onChanged={onLeadsChanged} />
             </div>
           </li>
         );

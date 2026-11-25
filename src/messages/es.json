@@ -864,7 +864,8 @@
         "VALID": "Verificado",
         "PROBABLE": "Catch-all"
       },
-      "sourceSaleshandy": "Saleshandy"
+      "sourceSaleshandy": "Saleshandy",
+      "viewDetail": "Ver detalle"
     },
     "panelTitle": "Leads",
     "panelDescription": "Descubre personas relevantes y sus canales de contacto. Revisa, aprueba y opcionalmente elige una para outreach futuro (sin enviar email).",

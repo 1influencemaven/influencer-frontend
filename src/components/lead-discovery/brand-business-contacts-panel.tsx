@@ -11,6 +11,7 @@ import {
 } from "@/components/lead-discovery/brand-people-leads-panel";
 import { Badge } from "@/components/ui/badge";
 import { ContactTierBadge } from "@/components/lead-discovery/contact-tier-badge";
+import { CopyEmailButton } from "@/components/lead-discovery/copy-email-button";
 import { Button } from "@/components/ui/button";
 import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
 import {
@@ -83,6 +84,7 @@ function ContactList({
               >
                 {contact.email}
               </a>
+              <CopyEmailButton email={contact.email} />
               <ContactTierBadge tier={contact.contactTier} />
               {contact.label ? (
                 <Badge variant="outline">{contact.label}</Badge>
@@ -340,6 +342,7 @@ export function BrandBusinessContactsPanel({
                   {t("sections.confirmedDescription")}
                 </p>
                 <ConfirmedContactsList
+                  onLeadsChanged={() => void refresh()}
                   leads={confirmedLeads}
                   emptyLabel={t("sections.confirmedEmpty")}
                 />
@@ -406,6 +409,7 @@ export function BrandBusinessContactsPanel({
       <BrandPeopleLeadsPanel
         brandCandidateId={brandCandidateId}
         leads={otherLeads}
+        onLeadsChanged={() => void refresh()}
         loading={loading}
       />
     </>
