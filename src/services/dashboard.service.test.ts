@@ -2,57 +2,53 @@
  * @jest-environment node
  */
 
-jest.mock("./influencers.service", () => ({
-  listInfluencers: jest.fn(),
+jest.mock("../lib/api/client", () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
+  },
 }));
 
-import { listInfluencers } from "@/services/influencers.service";
-import { getDashboardMetrics } from "@/services/dashboard.service";
+import apiClient from "@/lib/api/client";
+import { getDashboardStats } from "@/services/dashboard.service";
+import { createAxiosResponse } from "@/services/service-test-utils";
+import type { DashboardStats } from "@/types/dashboard";
 
-const mockedListInfluencers = jest.mocked(listInfluencers);
+const mockedApiClient = jest.mocked(apiClient);
+
+const sampleStats: DashboardStats = {
+  metrics: {
+    talentsActiveIbp: 4,
+    talentsNeedingIbp: 2,
+    brandsUnderReview: 7,
+    approvedWithoutContacts: 1,
+    readyContacts: 12,
+    emailAccountsConnected: 3,
+    emailAccountsDisconnected: 1,
+  },
+  attention: [
+    {
+      id: "brands-under-review",
+      type: "BRANDS_UNDER_REVIEW",
+      title: "Brands awaiting review",
+      count: 7,
+      href: "/dashboard/brand-discovery",
+    },
+  ],
+};
 
 describe("dashboard.service", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("aggregates influencer totals and leaves placeholders null", async () => {
-    mockedListInfluencers
-      .mockResolvedValueOnce({
-        data: [],
-        meta: { page: 1, limit: 1, total: 12, totalPages: 12 },
-      })
-      .mockResolvedValueOnce({
-        data: [],
-        meta: { page: 1, limit: 1, total: 5, totalPages: 5 },
-      });
+  it("fetches dashboard stats from /dashboard/stats", async () => {
+    mockedApiClient.get.mockResolvedValue(createAxiosResponse(sampleStats));
 
-    await expect(getDashboardMetrics()).resolves.toEqual({
-      totalInfluencers: 12,
-      activeInfluencers: 5,
-      brandsFound: null,
-      activeCampaigns: null,
-    });
-
-    expect(mockedListInfluencers).toHaveBeenNthCalledWith(1, {
-      page: 1,
-      limit: 1,
-    });
-    expect(mockedListInfluencers).toHaveBeenNthCalledWith(2, {
-      page: 1,
-      limit: 1,
-      ibpStatus: "ACTIVE",
-    });
-  });
-
-  it("returns null metrics when requests fail", async () => {
-    mockedListInfluencers.mockRejectedValue(new Error("network"));
-
-    await expect(getDashboardMetrics()).resolves.toEqual({
-      totalInfluencers: null,
-      activeInfluencers: null,
-      brandsFound: null,
-      activeCampaigns: null,
-    });
+    await expect(getDashboardStats()).resolves.toEqual(sampleStats);
+    expect(mockedApiClient.get).toHaveBeenCalledWith("/dashboard/stats");
   });
 });
