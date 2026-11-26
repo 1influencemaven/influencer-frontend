@@ -1,9 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { BrandCandidateAccordion } from "@/components/brand-discovery/brand-candidate-accordion";
 import { BrandCandidateStatusFilter } from "@/components/brand-discovery/brand-candidate-status-filter";
+import { IbpStatusBadge } from "@/components/influencers/ibp-status-badge";
+import { InfluencersTableFilters } from "@/components/influencers/influencers-table-filters";
+import { InfluencersTablePagination } from "@/components/influencers/influencers-table-pagination";
 import {
   Accordion,
   AccordionContent,
@@ -13,20 +18,51 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useBrandDiscovery } from "@/hooks/use-brand-discovery";
+import { Link } from "@/i18n/navigation";
+import type { InfluencerSortBy } from "@/types/influencer";
 
 const BRAND_LIMIT_OPTIONS = Array.from({ length: 20 }, (_, i) => i + 1);
 
+function SortIcon({
+  column,
+  sortBy,
+  sortOrder,
+}: {
+  column: InfluencerSortBy;
+  sortBy: InfluencerSortBy;
+  sortOrder: "asc" | "desc";
+}) {
+  if (sortBy !== column) {
+    return <ArrowUpDown className="size-3.5 opacity-50" aria-hidden />;
+  }
+
+  return sortOrder === "asc" ? (
+    <ArrowUp className="size-3.5" aria-hidden />
+  ) : (
+    <ArrowDown className="size-3.5" aria-hidden />
+  );
+}
+
 export function BrandDiscoveryView() {
   const t = useTranslations("BrandDiscovery");
+  const tInfluencers = useTranslations("Influencers");
   const {
-    influencers,
+    influencersList,
     selectedIds,
-    viewInfluencerIds,
-    influencersWithBrands,
-    candidatesByViewedInfluencer,
-    runs,
-    loadingInfluencers,
+    allSelectedHaveActiveIbp,
+    canSearchBrands,
+    brandCountByInfluencerId,
+    candidatesBySelectedInfluencer,
     searching,
     limit,
     setLimit,
@@ -35,16 +71,65 @@ export function BrandDiscoveryView() {
     error,
     hasProcessing,
     toggleInfluencer,
-    selectAll,
+    selectAllOnPage,
     clearSelection,
-    toggleViewInfluencer,
-    selectAllView,
-    clearViewSelection,
     setInfluencerStatusFilter,
     startSearch,
     updateStatus,
     deleteCandidate,
   } = useBrandDiscovery();
+
+  const {
+    state,
+    data,
+    isLoading,
+    setPage,
+    setLimit: setPageSize,
+    setFilters,
+    toggleSort,
+    refetch,
+  } = influencersList;
+
+  const [searchInput, setSearchInput] = useState(state.filters.search);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      if (searchInput !== state.filters.search) {
+        setFilters({ search: searchInput });
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [searchInput, state.filters.search, setFilters]);
+
+  const influencers = data?.data ?? [];
+  const showEmptyState = !isLoading && !error && influencers.length === 0;
+  const allOnPageSelected =
+    influencers.length > 0 &&
+    influencers.every((influencer) => selectedIds.has(influencer.id));
+
+  function renderSortableHead(
+    column: InfluencerSortBy,
+    label: string,
+    className?: string,
+  ) {
+    return (
+      <TableHead className={className}>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 text-xs font-medium tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
+          onClick={() => toggleSort(column)}
+        >
+          {label}
+          <SortIcon
+            column={column}
+            sortBy={state.sortBy}
+            sortOrder={state.sortOrder}
+          />
+        </button>
+      </TableHead>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-10">
@@ -83,8 +168,8 @@ export function BrandDiscoveryView() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={selectAll}
-              disabled={loadingInfluencers || influencers.length === 0}
+              onClick={selectAllOnPage}
+              disabled={isLoading || influencers.length === 0 || allOnPageSelected}
             >
               {t("selectAll")}
             </Button>
@@ -100,12 +185,23 @@ export function BrandDiscoveryView() {
             <Button
               type="button"
               onClick={() => void startSearch()}
-              disabled={selectedIds.size === 0 || searching || hasProcessing}
+              disabled={!canSearchBrands}
+              title={
+                selectedIds.size > 0 && !allSelectedHaveActiveIbp
+                  ? t("searchRequiresActiveIbp")
+                  : undefined
+              }
             >
               {searching || hasProcessing ? t("searching") : t("searchAction")}
             </Button>
           </div>
         </div>
+
+        {selectedIds.size > 0 && !allSelectedHaveActiveIbp ? (
+          <p className="text-sm text-muted-foreground">
+            {t("searchRequiresActiveIbp")}
+          </p>
+        ) : null}
 
         {error ? (
           <p className="text-sm text-destructive" role="alert">
@@ -113,162 +209,134 @@ export function BrandDiscoveryView() {
           </p>
         ) : null}
 
-        {loadingInfluencers ? (
-          <p className="text-sm text-muted-foreground">{t("loadingInfluencers")}</p>
-        ) : influencers.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("emptyInfluencers")}</p>
-        ) : (
-          <ul className="divide-y divide-border rounded-lg border border-border">
-            {influencers.map((influencer) => {
-              const checked = selectedIds.has(influencer.id);
-              return (
-                <li key={influencer.id}>
-                  <label className="flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-accent/40">
-                    <input
-                      type="checkbox"
-                      className="size-4 rounded border-input"
-                      checked={checked}
-                      onChange={() => toggleInfluencer(influencer.id)}
-                    />
-                    <span className="flex-1 text-sm font-medium">
-                      {influencer.name}
-                    </span>
-                    {influencer.niche ? (
-                      <span className="text-xs text-muted-foreground">
-                        {influencer.niche}
-                      </span>
-                    ) : null}
-                    <Badge variant="secondary">{t("ibpActive")}</Badge>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+        <InfluencersTableFilters
+          filters={{ ...state.filters, search: searchInput }}
+          onFiltersChange={(filters) => {
+            if (filters.search !== undefined) {
+              setSearchInput(filters.search);
+              return;
+            }
+            setFilters(filters);
+          }}
+          disabled={isLoading}
+        />
 
-      <section className="space-y-4">
-        <div className="space-y-1">
-          <h2 className="text-lg font-semibold tracking-tight">
-            {t("runsTitle")}
-          </h2>
-          <p className="text-sm text-muted-foreground">{t("runsDescription")}</p>
-        </div>
-        {runs.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("emptyRuns")}</p>
-        ) : (
-          <ul className="space-y-2">
-            {runs.slice(0, 10).map((run) => {
-              const meta = run.searchMetadata;
-              const queries = meta?.queries?.filter(Boolean) ?? [];
-              return (
-                <li
-                  key={run.id}
-                  className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2 text-sm"
-                >
-                  <span className="font-medium">{run.influencer.name}</span>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{run.source}</Badge>
-                    <Badge
-                      variant={
-                        run.status === "FAILED"
-                          ? "destructive"
-                          : run.status === "COMPLETED"
-                            ? "secondary"
-                            : "default"
-                      }
-                    >
-                      {t(`runStatus.${run.status}`)}
-                    </Badge>
-                  </div>
-                  {meta && run.status === "COMPLETED" ? (
-                    <p className="w-full text-xs text-muted-foreground">
-                      {t("runMetaSummary", {
-                        hits: meta.searchHitsCount ?? 0,
-                        persisted: meta.persistedCount ?? 0,
-                        afterFilters: meta.afterHardFiltersCount ?? 0,
-                      })}
-                      {meta.skippedPersistReason === "NO_SERP_HITS"
-                        ? ` · ${t("runMetaNoSerp")}`
-                        : null}
-                    </p>
-                  ) : null}
-                  {queries.length > 0 ? (
-                    <p className="w-full text-xs text-muted-foreground">
-                      {t("runMetaQueries")}: {queries.join(" · ")}
-                    </p>
-                  ) : null}
-                  {run.errorMessage ? (
-                    <p className="w-full text-xs text-destructive">
-                      {run.errorMessage}
-                    </p>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+        {showEmptyState ? (
+          <section className="rounded-xl border border-dashed border-border bg-muted/40 p-6">
+            <p className="text-sm text-muted-foreground">{t("emptyInfluencers")}</p>
+          </section>
+        ) : null}
 
-      <section className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold tracking-tight">
-              {t("viewTitle")}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {t("viewDescription")}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={selectAllView}
-              disabled={influencersWithBrands.length === 0}
-            >
-              {t("selectAllView")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={clearViewSelection}
-              disabled={viewInfluencerIds.size === 0}
-            >
-              {t("clearViewSelection")}
-            </Button>
-          </div>
-        </div>
+        {!showEmptyState ? (
+          <section className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <Table>
+              <TableHeader className="bg-muted/40">
+                <TableRow className="hover:bg-muted/40">
+                  <TableHead className="w-12 px-4">
+                    <span className="sr-only">{t("selectColumn")}</span>
+                  </TableHead>
+                  {renderSortableHead("name", tInfluencers("columns.name"), "px-4")}
+                  <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {tInfluencers("columns.instagram")}
+                  </TableHead>
+                  <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {tInfluencers("columns.ibpStatus")}
+                  </TableHead>
+                  <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {t("columns.brands")}
+                  </TableHead>
+                  <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {tInfluencers("columns.niches")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading
+                  ? Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={`skeleton-${index}`}>
+                        {Array.from({ length: 6 }).map((__, cellIndex) => (
+                          <TableCell key={cellIndex} className="px-4">
+                            <Skeleton className="h-4 w-full" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  : influencers.map((influencer) => {
+                      const brandCount =
+                        brandCountByInfluencerId.get(influencer.id) ?? 0;
+                      const checked = selectedIds.has(influencer.id);
+                      const ibpStatus =
+                        influencer.idealBrandProfile?.status ?? null;
 
-        {influencersWithBrands.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("emptyResults")}</p>
-        ) : (
-          <ul className="divide-y divide-border rounded-lg border border-border">
-            {influencersWithBrands.map((influencer) => {
-              const checked = viewInfluencerIds.has(influencer.id);
-              return (
-                <li key={influencer.id}>
-                  <label className="flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-accent/40">
-                    <input
-                      type="checkbox"
-                      className="size-4 rounded border-input"
-                      checked={checked}
-                      onChange={() => toggleViewInfluencer(influencer.id)}
-                    />
-                    <span className="flex-1 text-sm font-medium">
-                      {influencer.name}
-                    </span>
-                    <Badge variant="secondary">
-                      {t("brandCount", { count: influencer.count })}
-                    </Badge>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                      return (
+                        <TableRow key={influencer.id}>
+                          <TableCell className="px-4">
+                            <input
+                              type="checkbox"
+                              className="size-4 rounded border-input"
+                              checked={checked}
+                              onChange={() =>
+                                toggleInfluencer(influencer.id, ibpStatus)
+                              }
+                              aria-label={t("selectInfluencer", {
+                                name: influencer.name,
+                              })}
+                            />
+                          </TableCell>
+                          <TableCell className="px-4 text-sm font-medium">
+                            <Link
+                              href={`/dashboard/creators/${influencer.id}`}
+                              className="hover:text-primary hover:underline"
+                            >
+                              {influencer.name}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="px-4 text-sm text-muted-foreground">
+                            {influencer.instagram ?? "—"}
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <IbpStatusBadge status={ibpStatus} />
+                          </TableCell>
+                          <TableCell className="px-4">
+                            {brandCount > 0 ? (
+                              <Badge variant="secondary">
+                                {t("brandCount", { count: brandCount })}
+                              </Badge>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">
+                                {t("noBrands")}
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell className="px-4 text-sm text-muted-foreground">
+                            {influencer.niches?.length
+                              ? influencer.niches.join(", ")
+                              : (influencer.niche ?? "—")}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+              </TableBody>
+            </Table>
+
+            {data ? (
+              <div className="border-t border-border px-4 py-4">
+                <InfluencersTablePagination
+                  meta={data.meta}
+                  onPageChange={setPage}
+                  onLimitChange={setPageSize}
+                  disabled={isLoading}
+                />
+              </div>
+            ) : null}
+          </section>
+        ) : null}
+
+        {error && influencers.length === 0 && !isLoading ? (
+          <Button variant="outline" onClick={() => void refetch()}>
+            {tInfluencers("retry")}
+          </Button>
+        ) : null}
       </section>
 
       <section className="space-y-4">
@@ -281,22 +349,24 @@ export function BrandDiscoveryView() {
           </p>
         </div>
 
-        {viewInfluencerIds.size === 0 ? (
+        {selectedIds.size === 0 ? (
           <p className="text-sm text-muted-foreground">{t("emptyViewSelection")}</p>
-        ) : candidatesByViewedInfluencer.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("emptyResults")}</p>
+        ) : candidatesBySelectedInfluencer.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            {t("emptySelectedNoBrands")}
+          </p>
         ) : (
           <Accordion
             type="multiple"
             className="w-full rounded-lg border border-border px-3"
           >
-            {candidatesByViewedInfluencer.map(([influencerId, group]) => (
+            {candidatesBySelectedInfluencer.map(([influencerId, group]) => (
               <AccordionItem key={influencerId} value={influencerId}>
                 <AccordionTrigger className="hover:no-underline">
                   <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-left">
                     <span className="font-medium">{group.influencerName}</span>
                     <Badge variant="secondary">
-                      {t("brandCount", { count: group.items.length })}
+                      {t("brandCount", { count: group.totalCount })}
                     </Badge>
                   </span>
                 </AccordionTrigger>

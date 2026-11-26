@@ -36,14 +36,21 @@ const DEFAULT_STATE: InfluencersListState = {
   filters: DEFAULT_FILTERS,
 };
 
+export type InfluencersListBaseParams = Pick<
+  InfluencersQueryParams,
+  "ibpStatus"
+>;
+
 export function buildInfluencersQueryParams(
   state: InfluencersListState,
+  baseParams?: InfluencersListBaseParams,
 ): InfluencersQueryParams {
   const params: InfluencersQueryParams = {
     page: state.page,
     limit: state.limit,
     sortBy: state.sortBy,
     sortOrder: state.sortOrder,
+    ...baseParams,
   };
 
   if (state.filters.search.trim()) {
@@ -55,12 +62,32 @@ export function buildInfluencersQueryParams(
 
 type UseInfluencersListOptions = {
   loadErrorMessage: string;
+  baseParams?: InfluencersListBaseParams;
+  initialState?: Partial<
+    Omit<InfluencersListState, "filters"> & {
+      filters?: Partial<InfluencersListFilters>;
+    }
+  >;
 };
 
-export function useInfluencersList({ loadErrorMessage }: UseInfluencersListOptions) {
-  const [state, setState] = useState<InfluencersListState>(DEFAULT_STATE);
+export function useInfluencersList({
+  loadErrorMessage,
+  baseParams,
+  initialState,
+}: UseInfluencersListOptions) {
+  const [state, setState] = useState<InfluencersListState>(() => ({
+    ...DEFAULT_STATE,
+    ...initialState,
+    filters: {
+      ...DEFAULT_FILTERS,
+      ...initialState?.filters,
+    },
+  }));
   const queryClient = useQueryClient();
-  const queryParams = useMemo(() => buildInfluencersQueryParams(state), [state]);
+  const queryParams = useMemo(
+    () => buildInfluencersQueryParams(state, baseParams),
+    [state, baseParams],
+  );
 
   const query = useQuery({
     queryKey: influencerKeys.list(queryParams),
@@ -136,6 +163,6 @@ export function useInfluencersList({ loadErrorMessage }: UseInfluencersListOptio
     setFilters,
     toggleSort,
     removeInfluencer,
-    refetch: () => query.refetch(),
+    refetch: query.refetch,
   };
 }
