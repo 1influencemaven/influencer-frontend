@@ -6,9 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { influencerKeys } from "@/lib/influencer-query-keys";
 import { listInfluencers } from "@/services/influencers.service";
 import { getApiErrorMessage } from "@/types/api-error";
-import type { IbpStatus } from "@/types/ideal-brand-profile";
 import type {
-  InfluencerQuarter,
   InfluencerSortBy,
   InfluencersQueryParams,
   SortOrder,
@@ -16,14 +14,6 @@ import type {
 
 export type InfluencersListFilters = {
   search: string;
-  country: string;
-  language: string;
-  niche: string;
-  niches: string;
-  managerId: string;
-  year: string;
-  quarter: InfluencerQuarter | "";
-  ibpStatus: IbpStatus | "";
 };
 
 export type InfluencersListState = {
@@ -36,14 +26,6 @@ export type InfluencersListState = {
 
 const DEFAULT_FILTERS: InfluencersListFilters = {
   search: "",
-  country: "",
-  language: "",
-  niche: "",
-  niches: "",
-  managerId: "",
-  year: "",
-  quarter: "",
-  ibpStatus: "",
 };
 
 const DEFAULT_STATE: InfluencersListState = {
@@ -54,53 +36,25 @@ const DEFAULT_STATE: InfluencersListState = {
   filters: DEFAULT_FILTERS,
 };
 
+export type InfluencersListBaseParams = Pick<
+  InfluencersQueryParams,
+  "ibpStatus"
+>;
+
 export function buildInfluencersQueryParams(
   state: InfluencersListState,
+  baseParams?: InfluencersListBaseParams,
 ): InfluencersQueryParams {
   const params: InfluencersQueryParams = {
     page: state.page,
     limit: state.limit,
     sortBy: state.sortBy,
     sortOrder: state.sortOrder,
+    ...baseParams,
   };
 
   if (state.filters.search.trim()) {
     params.search = state.filters.search.trim();
-  }
-
-  if (state.filters.country.trim()) {
-    params.country = state.filters.country.trim();
-  }
-
-  if (state.filters.language.trim()) {
-    params.language = state.filters.language.trim();
-  }
-
-  if (state.filters.niche.trim()) {
-    params.niche = state.filters.niche.trim();
-  }
-
-  if (state.filters.niches.trim()) {
-    params.niches = state.filters.niches.trim();
-  }
-
-  if (state.filters.managerId.trim()) {
-    params.managerId = state.filters.managerId.trim();
-  }
-
-  if (state.filters.year.trim()) {
-    const year = Number(state.filters.year);
-    if (Number.isInteger(year)) {
-      params.year = year;
-    }
-  }
-
-  if (state.filters.quarter) {
-    params.quarter = state.filters.quarter;
-  }
-
-  if (state.filters.ibpStatus) {
-    params.ibpStatus = state.filters.ibpStatus;
   }
 
   return params;
@@ -108,12 +62,32 @@ export function buildInfluencersQueryParams(
 
 type UseInfluencersListOptions = {
   loadErrorMessage: string;
+  baseParams?: InfluencersListBaseParams;
+  initialState?: Partial<
+    Omit<InfluencersListState, "filters"> & {
+      filters?: Partial<InfluencersListFilters>;
+    }
+  >;
 };
 
-export function useInfluencersList({ loadErrorMessage }: UseInfluencersListOptions) {
-  const [state, setState] = useState<InfluencersListState>(DEFAULT_STATE);
+export function useInfluencersList({
+  loadErrorMessage,
+  baseParams,
+  initialState,
+}: UseInfluencersListOptions) {
+  const [state, setState] = useState<InfluencersListState>(() => ({
+    ...DEFAULT_STATE,
+    ...initialState,
+    filters: {
+      ...DEFAULT_FILTERS,
+      ...initialState?.filters,
+    },
+  }));
   const queryClient = useQueryClient();
-  const queryParams = useMemo(() => buildInfluencersQueryParams(state), [state]);
+  const queryParams = useMemo(
+    () => buildInfluencersQueryParams(state, baseParams),
+    [state, baseParams],
+  );
 
   const query = useQuery({
     queryKey: influencerKeys.list(queryParams),
@@ -189,6 +163,6 @@ export function useInfluencersList({ loadErrorMessage }: UseInfluencersListOptio
     setFilters,
     toggleSort,
     removeInfluencer,
-    refetch: () => query.refetch(),
+    refetch: query.refetch,
   };
 }

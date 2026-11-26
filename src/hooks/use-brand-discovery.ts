@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
+import { useInfluencersList } from "@/hooks/use-influencers-list";
 import {
   deleteBrandCandidate,
   listBrandCandidates,
@@ -9,77 +11,62 @@ import {
   searchBrands,
   updateBrandCandidateStatus,
 } from "@/services/brand-discovery.service";
-import { listInfluencers } from "@/services/influencers.service";
 import { getApiErrorMessage } from "@/types/api-error";
 import type {
   BrandCandidate,
-  BrandDiscoveryRun,
   UpdateBrandCandidateStatusPayload,
 } from "@/types/brand-discovery";
 import type { BrandCandidateStatusFilterValue } from "@/types/brand-discovery-filter";
-import type { Influencer } from "@/types/influencer";
 
 const POLL_INTERVAL_MS = 2500;
 
-export type InfluencerWithBrands = {
-  id: string;
-  name: string;
-  count: number;
-};
-
-function filterCandidatesByStatus(
-  items: BrandCandidate[],
-  statusFilter: BrandCandidateStatusFilterValue,
-): BrandCandidate[] {
-  if (statusFilter === "ALL") {
-    return items;
-  }
-  return items.filter((item) => item.status === statusFilter);
-}
-
 export function useBrandDiscovery() {
-  const [influencers, setInfluencers] = useState<Influencer[]>([]);
+  const t = useTranslations("BrandDiscovery");
+  const influencersList = useInfluencersList({
+    loadErrorMessage: t("loadInfluencersError"),
+    initialState: {
+      sortBy: "name",
+      sortOrder: "asc",
+      limit: 20,
+    },
+  });
+  const { refetch: refetchInfluencers } = influencersList;
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [viewInfluencerIds, setViewInfluencerIds] = useState<Set<string>>(
-    new Set(),
-  );
+  /** Remembers IBP status for selected ids across pages. */
+  const [ibpStatusById, setIbpStatusById] = useState<
+    Record<string, string | null>
+  >({});
   const [statusFilterByInfluencer, setStatusFilterByInfluencer] = useState<
     Record<string, BrandCandidateStatusFilterValue>
   >({});
-  const [runs, setRuns] = useState<BrandDiscoveryRun[]>([]);
   const [candidates, setCandidates] = useState<BrandCandidate[]>([]);
-  const [loadingInfluencers, setLoadingInfluencers] = useState(true);
   const [searching, setSearching] = useState(false);
+  const [hasProcessing, setHasProcessing] = useState(false);
   const [limit, setLimit] = useState(20);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const influencersWithBrands = useMemo(() => {
-    const map = new Map<string, InfluencerWithBrands>();
+  const brandCountByInfluencerId = useMemo(() => {
+    const map = new Map<string, number>();
     for (const candidate of candidates) {
-      const existing = map.get(candidate.influencerId);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        map.set(candidate.influencerId, {
-          id: candidate.influencerId,
-          name: candidate.influencer.name,
-          count: 1,
-        });
-      }
+      map.set(
+        candidate.influencerId,
+        (map.get(candidate.influencerId) ?? 0) + 1,
+      );
     }
-    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+    return map;
   }, [candidates]);
 
-  const candidatesByViewedInfluencer = useMemo(() => {
+  const candidatesBySelectedInfluencer = useMemo(() => {
     const map = new Map<
       string,
       { influencerName: string; items: BrandCandidate[] }
     >();
 
     for (const candidate of candidates) {
-      if (!viewInfluencerIds.has(candidate.influencerId)) {
+      if (!selectedIds.has(candidate.influencerId)) {
         continue;
       }
       const existing = map.get(candidate.influencerId);
@@ -93,58 +80,38 @@ export function useBrandDiscovery() {
       }
     }
 
-    return [...map.entries()].map(([influencerId, group]) => {
-      const statusFilter = statusFilterByInfluencer[influencerId] ?? "ALL";
-      return [
-        influencerId,
-        {
-          influencerName: group.influencerName,
-          items: filterCandidatesByStatus(group.items, statusFilter),
-          statusFilter,
-          totalCount: group.items.length,
-        },
-      ] as const;
-    });
-  }, [candidates, viewInfluencerIds, statusFilterByInfluencer]);
+    return [...map.entries()]
+      .map(([influencerId, group]) => {
+        const statusFilter = statusFilterByInfluencer[influencerId] ?? "ALL";
+        const items =
+          statusFilter === "ALL"
+            ? group.items
+            : group.items.filter((item) => item.status === statusFilter);
+        return [
+          influencerId,
+          {
+            influencerName: group.influencerName,
+            items,
+            statusFilter,
+            totalCount: group.items.length,
+          },
+        ] as const;
+      })
+      .sort((a, b) =>
+        a[1].influencerName.localeCompare(b[1].influencerName),
+      );
+  }, [candidates, selectedIds, statusFilterByInfluencer]);
 
-  const loadInfluencers = useCallback(async () => {
-    setLoadingInfluencers(true);
-    setError(null);
-    try {
-      const response = await listInfluencers({
-        page: 1,
-        limit: 100,
-        ibpStatus: "ACTIVE",
-        sortBy: "name",
-        sortOrder: "asc",
-      });
-      setInfluencers(response.data);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoadingInfluencers(false);
-    }
-  }, []);
-
-  const refreshResults = useCallback(async () => {
+  const refreshCandidates = useCallback(async () => {
     try {
       const [nextRuns, nextCandidates] = await Promise.all([
         listBrandDiscoveryRuns(),
         listBrandCandidates(),
       ]);
-      setRuns(nextRuns);
+      setHasProcessing(nextRuns.some((run) => run.status === "PROCESSING"));
       setCandidates(nextCandidates);
 
       const validIds = new Set(nextCandidates.map((c) => c.influencerId));
-      setViewInfluencerIds((prev) => {
-        const next = new Set<string>();
-        for (const id of prev) {
-          if (validIds.has(id)) {
-            next.add(id);
-          }
-        }
-        return next;
-      });
       setStatusFilterByInfluencer((prev) => {
         const next: Record<string, BrandCandidateStatusFilterValue> = {};
         for (const [id, value] of Object.entries(prev)) {
@@ -155,19 +122,13 @@ export function useBrandDiscovery() {
         return next;
       });
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setActionError(getApiErrorMessage(err));
     }
   }, []);
 
   useEffect(() => {
-    void loadInfluencers();
-  }, [loadInfluencers]);
-
-  useEffect(() => {
-    void refreshResults();
-  }, [refreshResults]);
-
-  const hasProcessing = runs.some((run) => run.status === "PROCESSING");
+    void refreshCandidates();
+  }, [refreshCandidates]);
 
   useEffect(() => {
     if (!hasProcessing) {
@@ -175,50 +136,80 @@ export function useBrandDiscovery() {
     }
 
     const timer = window.setInterval(() => {
-      void refreshResults();
+      void refreshCandidates();
     }, POLL_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, [hasProcessing, refreshResults]);
+  }, [hasProcessing, refreshCandidates]);
 
-  const toggleInfluencer = useCallback((id: string) => {
+  const pageInfluencers = influencersList.data?.data ?? [];
+
+  useEffect(() => {
+    const rows = influencersList.data?.data;
+    if (!rows?.length) {
+      return;
+    }
+    setIbpStatusById((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const influencer of rows) {
+        const status = influencer.idealBrandProfile?.status ?? null;
+        if (next[influencer.id] !== status) {
+          next[influencer.id] = status;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [influencersList.data]);
+
+  const selectedWithActiveIbp = useMemo(() => {
+    return [...selectedIds].filter((id) => ibpStatusById[id] === "ACTIVE");
+  }, [selectedIds, ibpStatusById]);
+
+  /** Search only when every selected influencer has ACTIVE IBP. */
+  const allSelectedHaveActiveIbp =
+    selectedIds.size > 0 &&
+    selectedWithActiveIbp.length === selectedIds.size;
+
+  const canSearchBrands =
+    allSelectedHaveActiveIbp && !searching && !hasProcessing;
+
+  const toggleInfluencer = useCallback(
+    (id: string, ibpStatus: string | null = null) => {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+        return next;
+      });
+      setIbpStatusById((prev) => ({ ...prev, [id]: ibpStatus }));
+    },
+    [],
+  );
+
+  const selectAllOnPage = useCallback(() => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
+      for (const influencer of pageInfluencers) {
+        next.add(influencer.id);
       }
       return next;
     });
-  }, []);
-
-  const selectAll = useCallback(() => {
-    setSelectedIds(new Set(influencers.map((item) => item.id)));
-  }, [influencers]);
+    setIbpStatusById((prev) => {
+      const next = { ...prev };
+      for (const influencer of pageInfluencers) {
+        next[influencer.id] = influencer.idealBrandProfile?.status ?? null;
+      }
+      return next;
+    });
+  }, [pageInfluencers]);
 
   const clearSelection = useCallback(() => {
     setSelectedIds(new Set());
-  }, []);
-
-  const toggleViewInfluencer = useCallback((id: string) => {
-    setViewInfluencerIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }, []);
-
-  const selectAllView = useCallback(() => {
-    setViewInfluencerIds(new Set(influencersWithBrands.map((item) => item.id)));
-  }, [influencersWithBrands]);
-
-  const clearViewSelection = useCallback(() => {
-    setViewInfluencerIds(new Set());
   }, []);
 
   const setInfluencerStatusFilter = useCallback(
@@ -232,33 +223,43 @@ export function useBrandDiscovery() {
   );
 
   const startSearch = useCallback(async () => {
-    if (selectedIds.size === 0) {
+    if (
+      selectedIds.size === 0 ||
+      selectedWithActiveIbp.length !== selectedIds.size
+    ) {
       return;
     }
 
     setSearching(true);
-    setError(null);
+    setActionError(null);
     try {
       await searchBrands([...selectedIds], limit);
-      await refreshResults();
+      await refreshCandidates();
+      await refetchInfluencers();
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setActionError(getApiErrorMessage(err));
     } finally {
       setSearching(false);
     }
-  }, [limit, refreshResults, selectedIds]);
+  }, [
+    limit,
+    refreshCandidates,
+    selectedIds,
+    selectedWithActiveIbp.length,
+    refetchInfluencers,
+  ]);
 
   const updateStatus = useCallback(
     async (id: string, payload: UpdateBrandCandidateStatusPayload) => {
       setUpdatingId(id);
-      setError(null);
+      setActionError(null);
       try {
         const updated = await updateBrandCandidateStatus(id, payload);
         setCandidates((prev) =>
           prev.map((item) => (item.id === id ? updated : item)),
         );
       } catch (err) {
-        setError(getApiErrorMessage(err));
+        setActionError(getApiErrorMessage(err));
       } finally {
         setUpdatingId(null);
       }
@@ -268,25 +269,27 @@ export function useBrandDiscovery() {
 
   const deleteCandidate = useCallback(async (id: string) => {
     setDeletingId(id);
-    setError(null);
+    setActionError(null);
     try {
       await deleteBrandCandidate(id);
       setCandidates((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
-      setError(getApiErrorMessage(err, "Could not delete brand"));
+      setActionError(getApiErrorMessage(err, t("deleteError")));
     } finally {
       setDeletingId(null);
     }
-  }, []);
+  }, [t]);
+
+  const error = actionError ?? influencersList.error;
 
   return {
-    influencers,
+    influencersList,
     selectedIds,
-    viewInfluencerIds,
-    influencersWithBrands,
-    candidatesByViewedInfluencer,
-    runs,
-    loadingInfluencers,
+    selectedWithActiveIbp,
+    allSelectedHaveActiveIbp,
+    canSearchBrands,
+    brandCountByInfluencerId,
+    candidatesBySelectedInfluencer,
     searching,
     limit,
     setLimit,
@@ -295,15 +298,12 @@ export function useBrandDiscovery() {
     error,
     hasProcessing,
     toggleInfluencer,
-    selectAll,
+    selectAllOnPage,
     clearSelection,
-    toggleViewInfluencer,
-    selectAllView,
-    clearViewSelection,
     setInfluencerStatusFilter,
     startSearch,
     updateStatus,
     deleteCandidate,
-    refreshResults,
+    refreshCandidates,
   };
 }

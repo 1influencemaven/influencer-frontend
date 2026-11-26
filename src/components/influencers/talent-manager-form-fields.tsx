@@ -3,7 +3,7 @@
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
-import { CountrySelect } from "@/components/forms/country-select";
+import { CountryMultiSelect } from "@/components/forms/country-multi-select";
 import { TagsInput } from "@/components/forms/tags-input";
 import { TextFormField } from "@/components/forms/text-form-field";
 import { QuartersPicker } from "@/components/influencers/quarters-picker";
@@ -21,7 +21,7 @@ export type TalentManagerFieldLabels = {
   instagramPlaceholder: string;
   country: string;
   countryPlaceholder: string;
-  countrySearchPlaceholder: string;
+  countryHint?: string;
   niches: string;
   nichesPlaceholder: string;
   nichesHint: string;
@@ -41,7 +41,7 @@ export type TalentManagerFieldLabels = {
 type LockedFields = {
   name?: boolean;
   instagram?: boolean;
-  country?: boolean;
+  countries?: boolean;
   niches?: boolean;
   managerId?: boolean;
   outgoingEmail?: boolean;
@@ -111,21 +111,21 @@ export function TalentManagerFormFields<TFieldValues extends FieldValues>({
       {showCountry ? (
         <Controller
           control={control}
-          name={"country" as FieldPath<TFieldValues>}
+          name={"countries" as FieldPath<TFieldValues>}
           render={({ field, fieldState }) => (
             <div className="space-y-1">
-              <CountrySelect
+              <CountryMultiSelect
                 label={labels.country}
                 placeholder={labels.countryPlaceholder}
-                searchPlaceholder={labels.countrySearchPlaceholder}
-                value={(field.value as string | undefined) ?? ""}
+                hint={labels.countryHint}
+                value={(field.value as string[] | undefined) ?? []}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                disabled={disabled || lockedFields.country}
+                disabled={disabled || lockedFields.countries}
                 error={fieldState.error?.message}
                 locale={locale}
               />
-              {lockedFields.country ? (
+              {lockedFields.countries ? (
                 <p className="text-xs text-muted-foreground">
                   {labels.externalLockedHint}
                 </p>

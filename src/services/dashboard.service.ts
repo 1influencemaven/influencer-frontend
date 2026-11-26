@@ -1,35 +1,11 @@
-import { listInfluencers } from "@/services/influencers.service";
+import apiClient from "@/lib/api/client";
+import type { DashboardStats } from "@/types/dashboard";
 
-export type DashboardMetrics = {
-  totalInfluencers: number | null;
-  activeInfluencers: number | null;
-  brandsFound: number | null;
-  activeCampaigns: number | null;
-};
-
-export async function getDashboardMetrics(): Promise<DashboardMetrics> {
-  try {
-    const [totalResponse, activeResponse] = await Promise.all([
-      listInfluencers({ page: 1, limit: 1 }),
-      listInfluencers({ page: 1, limit: 1, ibpStatus: "ACTIVE" }),
-    ]);
-
-    return {
-      totalInfluencers: totalResponse.meta.total,
-      activeInfluencers: activeResponse.meta.total,
-      brandsFound: null,
-      activeCampaigns: null,
-    };
-  } catch {
-    return {
-      totalInfluencers: null,
-      activeInfluencers: null,
-      brandsFound: null,
-      activeCampaigns: null,
-    };
-  }
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const { data } = await apiClient.get<DashboardStats>("/dashboard/stats");
+  return data;
 }
 
 export const dashboardService = {
-  getDashboardMetrics,
+  getDashboardStats,
 };

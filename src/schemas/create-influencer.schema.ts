@@ -52,11 +52,29 @@ export function createCreateInfluencerSchema(
       .string()
       .min(1, messages.instagramRequired)
       .max(100, messages.instagramMax),
-    country: z
-      .string()
+    countries: z
+      .array(
+        z
+          .string()
+          .trim()
+          .transform((value) => value.toUpperCase())
+          .refine((value) => isIsoCountryCode(value), messages.countryInvalid),
+      )
       .min(1, messages.countryRequired)
-      .transform((value) => value.trim().toUpperCase())
-      .refine((value) => isIsoCountryCode(value), messages.countryInvalid),
+      .max(30)
+      .superRefine((items, ctx) => {
+        const seen = new Set<string>();
+        for (const code of items) {
+          if (seen.has(code)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: messages.countryInvalid,
+            });
+            return;
+          }
+          seen.add(code);
+        }
+      }),
     niches: z
       .array(
         z
@@ -121,7 +139,7 @@ export function toCreateInfluencerPayload(
   const payload: CreateInfluencerPayload = {
     name: values.name.trim(),
     instagram: values.instagram.trim(),
-    country: values.country.trim().toUpperCase(),
+    countries: values.countries.map((code) => code.trim().toUpperCase()),
     managerId: values.managerId.trim(),
   };
 

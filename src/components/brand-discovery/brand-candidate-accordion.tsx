@@ -96,7 +96,98 @@ export function BrandCandidateAccordion({
               </span>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-3">
+                {candidate.status === "UNDER_REVIEW" || onDelete ? (
+                  isPendingDelete ? (
+                    <div className="flex flex-col gap-2">
+                      <p className="max-w-xs text-sm text-muted-foreground">
+                        {t("deleteConfirm")}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={isBusy}
+                          onClick={() => setPendingDeleteId(null)}
+                        >
+                          {t("deleteCancel")}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="destructive"
+                          disabled={isBusy}
+                          onClick={() => {
+                            onDelete?.(candidate.id);
+                            setPendingDeleteId(null);
+                          }}
+                        >
+                          {deletingId === candidate.id
+                            ? t("deleting")
+                            : t("deleteConfirmAction")}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {candidate.status === "UNDER_REVIEW" ? (
+                        <>
+                          <Button
+                            type="button"
+                            size="sm"
+                            disabled={isBusy}
+                            onClick={() =>
+                              onUpdateStatus(candidate.id, {
+                                status: "APPROVED",
+                              })
+                            }
+                          >
+                            {t("approve")}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            disabled={isBusy}
+                            onClick={() =>
+                              onUpdateStatus(candidate.id, {
+                                status: "POSTPONED",
+                              })
+                            }
+                          >
+                            {t("postpone")}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="destructive"
+                            disabled={isBusy}
+                            onClick={() =>
+                              onUpdateStatus(candidate.id, {
+                                status: "REJECTED",
+                              })
+                            }
+                          >
+                            {t("reject")}
+                          </Button>
+                        </>
+                      ) : null}
+                      {onDelete ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="destructive"
+                          disabled={isBusy}
+                          onClick={() => setPendingDeleteId(candidate.id)}
+                        >
+                          {t("delete")}
+                        </Button>
+                      ) : null}
+                    </div>
+                  )
+                ) : null}
+
                 <div className="space-y-2">
                   <a
                     href={candidate.website}
@@ -136,88 +227,6 @@ export function BrandCandidateAccordion({
                   ) : null}
                   {deepResearch ? (
                     <BrandDeepResearchPanel research={deepResearch} />
-                  ) : null}
-                </div>
-                <div className="flex flex-col items-start gap-2">
-                  {candidate.status === "UNDER_REVIEW" ? (
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        disabled={isBusy}
-                        onClick={() =>
-                          onUpdateStatus(candidate.id, { status: "APPROVED" })
-                        }
-                      >
-                        {t("approve")}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        disabled={isBusy}
-                        onClick={() =>
-                          onUpdateStatus(candidate.id, { status: "POSTPONED" })
-                        }
-                      >
-                        {t("postpone")}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        disabled={isBusy}
-                        onClick={() =>
-                          onUpdateStatus(candidate.id, { status: "REJECTED" })
-                        }
-                      >
-                        {t("reject")}
-                      </Button>
-                    </div>
-                  ) : null}
-                  {onDelete ? (
-                    isPendingDelete ? (
-                      <div className="flex flex-col gap-2">
-                        <p className="max-w-xs text-sm text-muted-foreground">
-                          {t("deleteConfirm")}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            disabled={isBusy}
-                            onClick={() => setPendingDeleteId(null)}
-                          >
-                            {t("deleteCancel")}
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="destructive"
-                            disabled={isBusy}
-                            onClick={() => {
-                              onDelete(candidate.id);
-                              setPendingDeleteId(null);
-                            }}
-                          >
-                            {deletingId === candidate.id
-                              ? t("deleting")
-                              : t("deleteConfirmAction")}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        disabled={isBusy}
-                        onClick={() => setPendingDeleteId(candidate.id)}
-                      >
-                        {t("delete")}
-                      </Button>
-                    )
                   ) : null}
                 </div>
               </div>

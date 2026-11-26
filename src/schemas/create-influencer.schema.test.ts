@@ -33,7 +33,7 @@ describe("create-influencer.schema", () => {
     const result = schema.safeParse({
       name: "Laura Martinez",
       instagram: "@laura",
-      country: "CO",
+      countries: ["CO"],
       niches: ["Fitness", "Lifestyle"],
       quarters: [
         { year: 2026, quarter: "Q1" },
@@ -44,7 +44,7 @@ describe("create-influencer.schema", () => {
     });
 
     expectParseSuccess(result);
-    expect(result.data.country).toBe("CO");
+    expect(result.data.countries).toEqual(["CO"]);
     expect(result.data.niches).toEqual(["Fitness", "Lifestyle"]);
     expect(result.data.quarters).toHaveLength(2);
   });
@@ -55,8 +55,9 @@ describe("create-influencer.schema", () => {
         name: "Laura Martinez",
         instagram: "@laura",
         managerId: VALID_MANAGER_ID,
+        countries: [],
       }),
-      "country",
+      "countries",
     );
   });
 
@@ -65,10 +66,10 @@ describe("create-influencer.schema", () => {
       schema.safeParse({
         name: "Laura Martinez",
         instagram: "@laura",
-        country: "XX",
+        countries: ["XX"],
         managerId: VALID_MANAGER_ID,
       }),
-      "country",
+      "countries",
       messages.countryInvalid,
     );
   });
@@ -124,7 +125,7 @@ describe("create-influencer.schema", () => {
         schema.safeParse({
           name: "Laura Martinez",
           instagram: "@laura",
-          country: "ES",
+          countries: ["ES"],
           managerId: VALID_MANAGER_ID,
         }),
       );
@@ -174,7 +175,7 @@ describe("create-influencer.schema", () => {
     const values = {
       name: "Laura Martinez",
       instagram: "@laura",
-      country: "CO",
+      countries: ["CO"],
       niches: ["Fitness"],
       quarters: [{ year: 2026, quarter: "Q2" as const }],
       managerId: VALID_MANAGER_ID,
@@ -186,7 +187,7 @@ describe("create-influencer.schema", () => {
     expect(payload).toEqual({
       name: "Laura Martinez",
       instagram: "@laura",
-      country: "CO",
+      countries: ["CO"],
       niches: ["Fitness"],
       quarters: [{ year: 2026, quarter: "Q2" }],
       managerId: VALID_MANAGER_ID,
@@ -200,7 +201,7 @@ describe("create-influencer.schema", () => {
     const values = {
       name: "PIXEL SPARTAN",
       instagram: "@pixel.vnzla",
-      country: "VE",
+      countries: ["VE"],
       niches: [],
       quarters: [],
       managerId: VALID_MANAGER_ID,

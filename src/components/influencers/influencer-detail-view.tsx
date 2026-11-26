@@ -352,8 +352,12 @@ export function InfluencerDetailView({ influencerId }: InfluencerDetailViewProps
           <CardContent className="grid gap-4 pb-5 sm:grid-cols-2">
             <DetailField
               label={t("fields.country")}
-              value={formatValue(influencer.country)}
-              originLabel={originLabel("country")}
+              value={
+                influencer.countries?.length
+                  ? influencer.countries.join(", ")
+                  : formatValue(null)
+              }
+              originLabel={originLabel("countries")}
             />
             <DetailField
               label={t("fields.language")}

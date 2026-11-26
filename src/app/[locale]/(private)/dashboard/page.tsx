@@ -1,16 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { AdminInsights } from "@/components/dashboard/admin-insights";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardMetricsSection } from "@/components/dashboard/dashboard-metrics-section";
+import { DashboardQuickActions } from "@/components/dashboard/dashboard-quick-actions";
 import { UserSummaryCard } from "@/components/dashboard/user-summary-card";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { routing, type AppLocale } from "@/i18n/routing";
 
 type DashboardPageProps = {
@@ -29,13 +22,14 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   return (
     <>
-      <DashboardHeader
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        description={t("description")}
-      />
-
-      <UserSummaryCard />
+      <div className="flex flex-col gap-4">
+        <DashboardHeader
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          description={t("description")}
+        />
+        <DashboardQuickActions />
+      </div>
 
       <section className="space-y-4">
         <div className="space-y-1">
@@ -49,21 +43,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
         <DashboardMetricsSection />
       </section>
 
-      <Card className="gap-0 border-dashed border-border/80 bg-muted/30 py-0 shadow-none">
-        <CardHeader className="gap-1 py-5">
-          <CardTitle className="text-base font-semibold">
-            {t("workspaceTitle")}
-          </CardTitle>
-          <CardDescription>{t("welcome")}</CardDescription>
-        </CardHeader>
-        <CardContent className="pb-5">
-          <p className="text-sm text-muted-foreground">
-            {t("workspaceDescription")}
-          </p>
-        </CardContent>
-      </Card>
-
-      <AdminInsights />
+      <UserSummaryCard />
     </>
   );
 }

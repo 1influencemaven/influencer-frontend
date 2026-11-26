@@ -21,7 +21,6 @@ const createMessages = {
   instagramPlaceholder: "@laura",
   countryLocationLabel: "Country where the talent is located",
   countrySelectPlaceholder: "Select a country",
-  countrySearchPlaceholder: "Search country…",
   nichesLabel: "Niches",
   nichesPlaceholder: "Add niche",
   nichesHint: "Press Enter",
@@ -213,7 +212,7 @@ describe("CreateInfluencerForm", () => {
       instagramNormalized: "laura",
       tiktok: null,
       youtube: null,
-      country: "CO",
+      countries: ["CO"],
       language: null,
       niche: null,
       subNiche: null,
@@ -239,7 +238,6 @@ describe("CreateInfluencerForm", () => {
 
     await user.type(screen.getByLabelText("Talent"), "Laura Martinez");
     await user.type(screen.getByLabelText("Instagram username"), "@laura");
-    await user.type(screen.getByLabelText("Search country…"), "Colom");
     await user.selectOptions(
       screen.getByLabelText("Country where the talent is located"),
       "CO",
@@ -260,7 +258,7 @@ describe("CreateInfluencerForm", () => {
         expect.objectContaining({
           name: "Laura Martinez",
           instagram: "@laura",
-          country: "CO",
+          countries: ["CO"],
           niches: ["Fitness"],
           outgoingEmail: "out@agency.com",
           managerId: "550e8400-e29b-41d4-a716-446655440000",
@@ -339,7 +337,7 @@ describe("CreateInfluencerForm", () => {
       instagramNormalized: "pixel.vnzla",
       tiktok: null,
       youtube: null,
-      country: "VE",
+      countries: ["VE"],
       language: null,
       niche: null,
       subNiche: null,
@@ -390,7 +388,7 @@ describe("CreateInfluencerForm", () => {
         expect.objectContaining({
           name: "PIXEL SPARTAN",
           instagram: "@pixel.vnzla",
-          country: "VE",
+          countries: ["VE"],
           managerId: "550e8400-e29b-41d4-a716-446655440000",
           instagramResearch: expect.objectContaining({
             source: "brightdata:instagram:gd_x",
