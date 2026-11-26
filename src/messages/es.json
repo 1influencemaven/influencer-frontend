@@ -501,6 +501,12 @@
       "alreadyProcessing": "Ya hay una generación en curso."
     },
     "form": {
+      "viewTitle": "Criterios de marca ideal",
+      "viewDescription": "Resultado generado por la IA. Usa editar para ajustar los valores.",
+      "editTitle": "Editar criterios de marca ideal",
+      "edit": "Editar",
+      "cancel": "Cancelar",
+      "emptyValue": "Sin datos",
       "targetSectors": "Sectores objetivo",
       "excludedSectors": "Sectores excluidos",
       "brandSize": "Tamaño de marca",

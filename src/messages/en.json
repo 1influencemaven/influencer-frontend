@@ -501,6 +501,12 @@
       "alreadyProcessing": "Generation is already in progress."
     },
     "form": {
+      "viewTitle": "Ideal brand criteria",
+      "viewDescription": "AI-generated result. Use edit to adjust the values.",
+      "editTitle": "Edit ideal brand criteria",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "emptyValue": "No data",
       "targetSectors": "Target sectors",
       "excludedSectors": "Excluded sectors",
       "brandSize": "Brand size",
