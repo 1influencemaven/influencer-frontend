@@ -1,6 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { AdminInsights } from "@/components/dashboard/admin-insights";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardMetricsSection } from "@/components/dashboard/dashboard-metrics-section";
 import { DashboardQuickActions } from "@/components/dashboard/dashboard-quick-actions";
@@ -23,7 +22,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           eyebrow={t("eyebrow")}
           title={t("title")}
@@ -45,8 +44,6 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       </section>
 
       <UserSummaryCard />
-
-      <AdminInsights />
     </>
   );
 }
