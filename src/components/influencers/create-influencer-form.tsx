@@ -75,7 +75,7 @@ export function CreateInfluencerForm() {
     defaultValues: {
       name: "",
       instagram: "",
-      country: "",
+      countries: [],
       niches: [],
       quarters: [],
       managerId: "",
@@ -102,7 +102,7 @@ export function CreateInfluencerForm() {
       instagramPlaceholder: t("instagramPlaceholder"),
       country: t("countryLocationLabel"),
       countryPlaceholder: t("countrySelectPlaceholder"),
-      countrySearchPlaceholder: t("countrySearchPlaceholder"),
+      countryHint: t("countryHint"),
       niches: t("nichesLabel"),
       nichesPlaceholder: t("nichesPlaceholder"),
       nichesHint: t("nichesHint"),

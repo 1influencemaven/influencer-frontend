@@ -149,7 +149,7 @@ const influencer = {
   instagramNormalized: "laura",
   tiktok: null,
   youtube: null,
-  country: "ES",
+  countries: ["ES"],
   language: "es",
   niche: "Fitness",
   subNiche: null,
