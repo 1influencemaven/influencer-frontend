@@ -8,7 +8,6 @@ import userEvent from "@testing-library/user-event";
 import { InfluencersTable } from "@/components/influencers/influencers-table";
 import {
   deleteInfluencer,
-  listInfluencerManagers,
   listInfluencers,
 } from "@/services/influencers.service";
 import { createQueryWrapper } from "@/test-utils/query-wrapper";
@@ -27,26 +26,9 @@ const influencersMessages = {
   deleteError: "Could not delete the influencer.",
   deleteNotFound: "The influencer was not found.",
   filters: {
-    search: "Search",
-    searchPlaceholder: "Search...",
-    ibpStatus: "Ideal profile status",
-    allStatuses: "All statuses",
-    country: "Country",
-    countryPlaceholder: "ES",
-    language: "Language",
-    languagePlaceholder: "es",
-    niche: "Niche",
-    nichePlaceholder: "Fitness",
-    niches: "Niches",
-    nichesPlaceholder: "Fitness",
-    manager: "Manager",
-    allManagers: "All managers",
-    year: "Year",
-    yearPlaceholder: "2026",
-    quarter: "Quarter",
-    allQuarters: "All",
-    exactMatchHint: "Exact match required.",
-    clear: "Clear filters",
+    search: "Name or Instagram",
+    searchPlaceholder: "Search by name or Instagram…",
+    clear: "Clear",
   },
   pagination: {
     summary: "Page 1 of 1 · 1 influencers",
@@ -134,12 +116,10 @@ jest.mock("../../i18n/navigation", () => ({
 
 jest.mock("../../services/influencers.service", () => ({
   listInfluencers: jest.fn(),
-  listInfluencerManagers: jest.fn(),
   deleteInfluencer: jest.fn(),
 }));
 
 const mockedListInfluencers = jest.mocked(listInfluencers);
-const mockedListManagers = jest.mocked(listInfluencerManagers);
 const mockedDeleteInfluencer = jest.mocked(deleteInfluencer);
 
 const influencer = {
@@ -175,14 +155,6 @@ const influencer = {
 describe("InfluencersTable", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedListManagers.mockResolvedValue([
-      {
-        id: "mgr-1",
-        name: "Ana Manager",
-        email: "ana@example.com",
-        role: "ADMIN",
-      },
-    ]);
   });
 
   it("renders empty state when there are no influencers", async () => {
@@ -199,7 +171,7 @@ describe("InfluencersTable", () => {
     });
   });
 
-  it("renders catalog rows with niches and manager filters", async () => {
+  it("renders catalog rows and filters by name or Instagram", async () => {
     const user = userEvent.setup();
 
     mockedListInfluencers.mockResolvedValue({
@@ -220,15 +192,14 @@ describe("InfluencersTable", () => {
       expect(screen.getAllByText("Ana Manager").length).toBeGreaterThan(0);
     });
 
-    await waitFor(() => {
-      expect(screen.getByLabelText("Manager")).toBeInTheDocument();
-    });
-
-    await user.selectOptions(screen.getByLabelText("Manager"), "mgr-1");
+    await user.type(
+      screen.getByLabelText("Name or Instagram"),
+      "laura",
+    );
 
     await waitFor(() => {
       expect(mockedListInfluencers).toHaveBeenCalledWith(
-        expect.objectContaining({ managerId: "mgr-1" }),
+        expect.objectContaining({ search: "laura" }),
       );
     });
 

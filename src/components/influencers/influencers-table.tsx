@@ -186,7 +186,7 @@ export function InfluencersTable() {
                   {t("columns.instagram")}
                 </TableHead>
                 <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("columns.niches")}
+                  {t("columns.actions")}
                 </TableHead>
                 <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   {t("columns.manager")}
@@ -199,8 +199,8 @@ export function InfluencersTable() {
                   t("columns.createdAt"),
                   "px-4",
                 )}
-                <TableHead className="px-4 text-right text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("columns.actions")}
+                <TableHead className="px-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  {t("columns.niches")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -234,25 +234,9 @@ export function InfluencersTable() {
                         <TableCell className="px-4 text-sm text-muted-foreground">
                           {influencer.instagram ?? "—"}
                         </TableCell>
-                        <TableCell className="px-4 text-sm text-muted-foreground">
-                          {influencer.niches?.length
-                            ? influencer.niches.join(", ")
-                            : (influencer.niche ?? "—")}
-                        </TableCell>
-                        <TableCell className="px-4 text-sm text-muted-foreground">
-                          {influencer.manager?.name ?? "—"}
-                        </TableCell>
                         <TableCell className="px-4">
-                          <IbpStatusBadge
-                            status={influencer.idealBrandProfile?.status ?? null}
-                          />
-                        </TableCell>
-                        <TableCell className="px-4 text-sm text-muted-foreground">
-                          {formatCreatedAt(influencer.createdAt, locale)}
-                        </TableCell>
-                        <TableCell className="px-4 text-right">
                           {isPendingDelete ? (
-                            <div className="flex flex-col items-end gap-2 sm:flex-row sm:justify-end">
+                            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
                               <span className="text-xs text-muted-foreground">
                                 {t("deleteConfirm")}
                               </span>
@@ -280,7 +264,7 @@ export function InfluencersTable() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex justify-end gap-2">
+                            <div className="flex gap-2">
                               <Button asChild variant="outline" size="sm">
                                 <Link href={`/dashboard/creators/${influencer.id}`}>
                                   {t("viewAction")}
@@ -303,6 +287,22 @@ export function InfluencersTable() {
                               </Button>
                             </div>
                           )}
+                        </TableCell>
+                        <TableCell className="px-4 text-sm text-muted-foreground">
+                          {influencer.manager?.name ?? "—"}
+                        </TableCell>
+                        <TableCell className="px-4">
+                          <IbpStatusBadge
+                            status={influencer.idealBrandProfile?.status ?? null}
+                          />
+                        </TableCell>
+                        <TableCell className="px-4 text-sm text-muted-foreground">
+                          {formatCreatedAt(influencer.createdAt, locale)}
+                        </TableCell>
+                        <TableCell className="px-4 text-sm text-muted-foreground">
+                          {influencer.niches?.length
+                            ? influencer.niches.join(", ")
+                            : (influencer.niche ?? "—")}
                         </TableCell>
                       </TableRow>
                     );
