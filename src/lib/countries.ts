@@ -1,7 +1,7 @@
 import isoCountryCodes from "@/lib/iso-country-codes.generated.json";
 
 export type CountryOption = {
-  /** ISO 3166-1 alpha-2 (persisted on Influencer.country). */
+  /** ISO 3166-1 alpha-2 (persisted on Influencer.countries). */
   code: string;
   /** Localized display name for the current UI locale. */
   label: string;

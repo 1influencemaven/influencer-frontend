@@ -75,16 +75,17 @@ export function createUpdateInfluencerSchema(
       (value) => !value || value.length <= 255,
       messages.youtubeMax,
     ),
-    country: optionalString
-      .transform((value) => (value ? value.trim().toUpperCase() : value))
-      .refine(
-        (value) => !value || value.length === 2,
-        messages.countryLength,
+    countries: z
+      .array(
+        z
+          .string()
+          .trim()
+          .transform((value) => value.toUpperCase())
+          .refine((value) => isIsoCountryCode(value), messages.countryInvalid),
       )
-      .refine(
-        (value) => !value || isIsoCountryCode(value),
-        messages.countryInvalid,
-      ),
+      .min(1, messages.countryRequired)
+      .max(30)
+      .optional(),
     language: optionalString.refine(
       (value) => !value || value.length === 2,
       messages.languageLength,
@@ -148,7 +149,6 @@ const optionalStringFields = [
   "instagram",
   "tiktok",
   "youtube",
-  "country",
   "language",
   "niche",
   "subNiche",
@@ -183,6 +183,12 @@ export function toUpdateInfluencerPayload(
     if (typeof value === "string" && value.trim()) {
       payload[field] = value.trim();
     }
+  }
+
+  if (values.countries !== undefined && !locked.has("countries")) {
+    payload.countries = values.countries
+      .map((code) => code.trim().toUpperCase())
+      .filter(Boolean);
   }
 
   if (values.niches !== undefined && !locked.has("niches")) {

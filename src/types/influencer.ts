@@ -84,7 +84,7 @@ export type Influencer = {
   instagramNormalized?: string | null;
   tiktok: string | null;
   youtube: string | null;
-  country: string | null;
+  countries: string[];
   language: string | null;
   niche: string | null;
   subNiche: string | null;
@@ -137,8 +137,8 @@ export type InfluencersQueryParams = {
 export type CreateInfluencerPayload = {
   name: string;
   instagram: string;
-  /** ISO 3166-1 alpha-2 — país donde se encuentra el talento (obligatorio en alta). */
-  country: string;
+  /** ISO 3166-1 alpha-2 — países donde se encuentra el talento (≥1 en alta). */
+  countries: string[];
   niches?: string[];
   quarters?: QuarterAssignmentInput[];
   managerId?: string;
@@ -256,7 +256,7 @@ export const INFLUENCER_FIELD_KEYS = {
   INSTAGRAM: "instagram",
   TIKTOK: "tiktok",
   YOUTUBE: "youtube",
-  COUNTRY: "country",
+  COUNTRIES: "countries",
   LANGUAGE: "language",
   NICHE: "niche",
   SUB_NICHE: "subNiche",

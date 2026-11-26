@@ -32,7 +32,7 @@ const influencer = {
   instagramNormalized: "laura",
   tiktok: null,
   youtube: null,
-  country: "ES",
+  countries: ["ES"],
   language: "es",
   niche: "Fitness",
   subNiche: null,
@@ -119,7 +119,7 @@ describe("influencers.service", () => {
         createInfluencer({
           name: "Laura Martinez",
           instagram: "@laura",
-          country: "ES",
+          countries: ["ES"],
           niches: ["Fitness"],
           outgoingEmail: "out@agency.com",
         }),
@@ -128,7 +128,7 @@ describe("influencers.service", () => {
       expect(mockedApiClient.post).toHaveBeenCalledWith("/influencers", {
         name: "Laura Martinez",
         instagram: "@laura",
-        country: "ES",
+        countries: ["ES"],
         niches: ["Fitness"],
         outgoingEmail: "out@agency.com",
       });
