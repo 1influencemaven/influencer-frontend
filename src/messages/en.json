@@ -803,7 +803,7 @@
     },
     "agencyContacts": {
       "contactsTitle": "Agency contacts",
-      "contactsDescription": "Commercial mailboxes and people found for agencies linked to this influencer (track 2C). Read-only — not brand business contacts or person leads.",
+      "contactsDescription": "Commercial mailboxes and people found for agencies linked to this influencer (track 2C). Not brand business contacts or person leads; approve them to add them to Prospects.",
       "loading": "Loading agency contacts…",
       "empty": "No visible agency contacts yet for this influencer.",
       "missingInfluencer": "Influencer context is required to load agency contacts.",
@@ -1393,6 +1393,203 @@
       "disabled": "Field “{label}” disabled.",
       "statusError": "Couldn't change the field status.",
       "dismiss": "Dismiss"
+    }
+  },
+  "Prospects": {
+    "title": "Prospects",
+    "description": "Outreach-ready contacts per talent: the ones you approve in contact discovery (people, brand emails and agencies) and the ones you import from CSV.",
+    "tabs": {
+      "all": "All",
+      "PERSON": "People",
+      "MAILBOX": "Mailboxes",
+      "archived": "Archived"
+    },
+    "toolbar": {
+      "import": "Import CSV",
+      "search": "Search prospects",
+      "searchPlaceholder": "Search by email, name, company or domain",
+      "filters": "Filters"
+    },
+    "filters": {
+      "source": "Source",
+      "allSources": "All sources",
+      "clear": "Clear filters"
+    },
+    "sort": {
+      "title": "Sort by",
+      "createdAt": "Date added",
+      "email": "Email",
+      "company": "Company",
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "source": {
+      "LEAD": "Found person",
+      "BRAND_CONTACT": "Brand email",
+      "AGENCY_CONTACT": "Agency",
+      "CSV": "CSV",
+      "MANUAL": "Manual",
+      "SALESHANDY": "Saleshandy"
+    },
+    "kind": {
+      "person": "Person",
+      "mailbox": "Mailbox",
+      "generic": "Generic"
+    },
+    "relevance": {
+      "HIGH": "High",
+      "NEUTRAL": "Medium",
+      "LOW": "Low",
+      "UNKNOWN": "Unclassified"
+    },
+    "talent": {
+      "all": "All talents",
+      "choose": "Choose a talent"
+    },
+    "table": {
+      "columns": {
+        "contact": "Contact",
+        "company": "Company",
+        "jobTitle": "Job title",
+        "talent": "Talent",
+        "source": "Source",
+        "tags": "Tags",
+        "added": "Added"
+      },
+      "errorTitle": "We couldn't load the prospects",
+      "loadError": "Failed to load prospects.",
+      "retry": "Retry",
+      "emptyTitle": "No prospects yet",
+      "emptyHint": "Approve contacts in a brand's contact discovery or import a CSV.",
+      "noMatches": "No prospects match",
+      "noMatchesHint": "Try another search or clear filters."
+    },
+    "actions": {
+      "menu": "Actions",
+      "view": "View details",
+      "edit": "Edit",
+      "archive": "Archive",
+      "restore": "Restore"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "jobTitle": "Job title",
+      "company": "Company",
+      "companyDomain": "Domain",
+      "website": "Website",
+      "linkedInUrl": "LinkedIn",
+      "country": "Country",
+      "phoneNumber": "Phone",
+      "mailboxLabel": "Mailbox label",
+      "tags": "Tags"
+    },
+    "peek": {
+      "noName": "No name",
+      "customFields": "Custom fields",
+      "origin": "Origin",
+      "brand": "Brand",
+      "agency": "Agency",
+      "relevance": "Commercial relevance",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saveError": "Couldn't save the prospect.",
+      "tagsHint": "Comma separated"
+    },
+    "notices": {
+      "archived": "{email} archived.",
+      "restored": "{email} restored.",
+      "saved": "{email} updated.",
+      "error": "Couldn't update the prospect.",
+      "dismiss": "Dismiss"
+    },
+    "pagination": {
+      "summary": "Page {page} of {totalPages} · {total} prospects",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "approve": {
+      "approve": "Approve",
+      "approved": "In prospects",
+      "remove": "Remove from prospects",
+      "error": "Couldn't update",
+      "approveAll": "{count, plural, =0 {All approved} one {Approve # contact} other {Approve # contacts}}",
+      "bulkDone": "{added} added to prospects{skipped, plural, =0 {} other {, # skipped}}",
+      "skip": {
+        "NOT_FOUND": "Contact not found",
+        "NO_VALID_EMAIL": "No valid email",
+        "INFLUENCER_REQUIRED": "Talent missing",
+        "AGENCY_NOT_LINKED": "Agency not linked to the talent"
+      }
+    },
+    "csv": {
+      "title": "Import prospects from CSV",
+      "close": "Close",
+      "steps": {
+        "upload": "Upload",
+        "map": "Map columns",
+        "review": "Review",
+        "result": "Result"
+      },
+      "talent": "Talent",
+      "talentHint": "Prospects are saved for this talent.",
+      "drop": "Drop a CSV or click to choose it",
+      "dropHint": "First row with headers · up to {max} rows",
+      "rowsFound": "{count} rows · {columns} columns",
+      "mapHint": "Choose the field for each column. The Email column is required.",
+      "csvColumn": "CSV column",
+      "sample": "Sample",
+      "field": "Field",
+      "fieldFor": "Field for {column}",
+      "noHeader": "Column {n}",
+      "skipColumn": "Do not import",
+      "systemFields": "System fields",
+      "customFields": "Custom fields",
+      "conflict": {
+        "addMissingFields": {
+          "title": "Fill blanks",
+          "hint": "If the email exists, only fill empty fields."
+        },
+        "overwrite": {
+          "title": "Overwrite",
+          "hint": "If the email exists, replace with the CSV data."
+        },
+        "noUpdate": {
+          "title": "Skip existing",
+          "hint": "If the email exists, leave it untouched."
+        }
+      },
+      "tags": "Tags for the whole batch (optional)",
+      "tagsPlaceholder": "e.g. Fair 2026, VIP list",
+      "summary": "{count} rows will be imported.",
+      "invalidEmails": "{count, plural, one {# row without a valid email} other {# rows without a valid email}} (will be reported)",
+      "import": "Import {count} rows",
+      "next": "Next",
+      "back": "Back",
+      "finish": "Done",
+      "done": "Import completed",
+      "result": {
+        "created": "New",
+        "updated": "Updated",
+        "skipped": "Skipped",
+        "failed": "Failed"
+      },
+      "errorsTitle": "Rows with notes",
+      "downloadErrors": "Download CSV",
+      "errorRow": "Row {row}",
+      "reasons": {
+        "INVALID_EMAIL": "Invalid email",
+        "DUPLICATE_IN_FILE": "Duplicate email in the file"
+      },
+      "errors": {
+        "empty": "The file has no rows.",
+        "tooMany": "Import up to {max} rows at a time.",
+        "talent": "Choose a talent.",
+        "file": "Upload a CSV file.",
+        "email": "Map a column to the Email field.",
+        "duplicate": "Each field can only be used by one column.",
+        "generic": "Couldn't import the file."
+      }
     }
   }
 }

@@ -4,6 +4,10 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 import { AgencyContactsPanel } from "@/components/lead-discovery/agency-contacts-panel";
+import {
+  ApproveAllButton,
+  ApproveProspectButton,
+} from "@/components/prospects/approve-prospect-button";
 import { BbcRunStatusBanner } from "@/components/lead-discovery/bbc-run-status-banner";
 import {
   BrandPeopleLeadsPanel,
@@ -57,10 +61,12 @@ function ContactList({
   contacts,
   emptyLabel,
   t,
+  influencerId,
 }: {
   contacts: BrandBusinessContact[];
   emptyLabel: string;
   t: (key: string) => string;
+  influencerId?: string | null;
 }) {
   if (contacts.length === 0) {
     return <p className="text-xs text-muted-foreground">{emptyLabel}</p>;
@@ -95,6 +101,12 @@ function ContactList({
                   ? t(`coverageTier.${contact.commercialCoverageTier}`)
                   : t(`relevance.${contact.commercialRelevance}`)}
               </Badge>
+              <ApproveProspectButton
+                type="BRAND_CONTACT"
+                id={contact.id}
+                influencerId={influencerId}
+                className="ml-auto"
+              />
             </div>
             {snippet ? (
               <p className="mt-2 text-xs text-muted-foreground">
@@ -331,6 +343,20 @@ export function BrandBusinessContactsPanel({
 
         {!loading && (contacts.length > 0 || confirmedLeads.length > 0) ? (
           <div className="space-y-4">
+            <div className="flex justify-end">
+              <ApproveAllButton
+                influencerId={influencerId}
+                items={[
+                  ...confirmedLeads
+                    .filter((lead) => lead.email)
+                    .map((lead) => ({ type: "LEAD" as const, id: lead.id })),
+                  ...contacts.map((contact) => ({
+                    type: "BRAND_CONTACT" as const,
+                    id: contact.id,
+                  })),
+                ]}
+              />
+            </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="min-w-0 space-y-2">
                 <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -355,6 +381,7 @@ export function BrandBusinessContactsPanel({
                   contacts={genericContacts}
                   emptyLabel={t("sections.genericEmpty")}
                   t={t}
+                  influencerId={influencerId}
                 />
               </div>
             </div>
@@ -370,6 +397,7 @@ export function BrandBusinessContactsPanel({
                   contacts={otherContacts}
                   emptyLabel={t("sections.otherEmpty")}
                   t={t}
+                  influencerId={influencerId}
                 />
               </div>
             ) : null}
