@@ -1244,9 +1244,155 @@
     "description": "Gestiona el envío de outreach: buzones remitentes, secuencias y prospectos.",
     "tabs": {
       "emailAccounts": "Cuentas de correo",
+      "fields": "Campos",
       "sequences": "Secuencias",
       "prospects": "Prospectos"
     },
     "soon": "Pronto"
+  },
+  "Fields": {
+    "title": "Campos de prospecto",
+    "description": "Variables que se usan en plantillas y secuencias de Saleshandy. Los campos de sistema vienen de Saleshandy y no se pueden editar; los personalizados los crea tu equipo.",
+    "tabs": {
+      "all": "Todos",
+      "custom": "Personalizados",
+      "system": "Sistema",
+      "disabled": "Deshabilitados"
+    },
+    "toolbar": {
+      "sync": "Sincronizar con Saleshandy",
+      "add": "Agregar campo",
+      "search": "Buscar campos",
+      "searchPlaceholder": "Buscar por nombre, variable o etiqueta",
+      "filters": "Filtros"
+    },
+    "filters": {
+      "type": "Tipo",
+      "tag": "Etiqueta",
+      "noTags": "Aún no hay etiquetas",
+      "clear": "Limpiar filtros",
+      "remove": "Quitar filtro {filter}"
+    },
+    "sort": {
+      "title": "Ordenar por",
+      "label": "Nombre",
+      "fieldType": "Tipo",
+      "updatedAt": "Última actualización",
+      "asc": "Ascendente",
+      "desc": "Descendente"
+    },
+    "types": {
+      "text": "Texto",
+      "long-text": "Texto largo",
+      "number": "Número",
+      "currency": "Moneda",
+      "date": "Fecha",
+      "dropdown": "Lista desplegable"
+    },
+    "type": {
+      "optionsCount": "{count, plural, one {# opción} other {# opciones}}"
+    },
+    "origin": {
+      "SYSTEM": "Sistema",
+      "CUSTOM": "Personalizado"
+    },
+    "status": {
+      "disabled": "Deshabilitado",
+      "removed": "Eliminado en Saleshandy"
+    },
+    "table": {
+      "columns": {
+        "field": "Campo",
+        "type": "Tipo",
+        "fallback": "Texto de respaldo",
+        "tags": "Etiquetas",
+        "origin": "Origen"
+      },
+      "errorTitle": "No pudimos cargar los campos",
+      "loadError": "Error al cargar los campos.",
+      "retry": "Reintentar",
+      "emptyTitle": "Aún no hay campos",
+      "emptyHint": "Sincroniza con Saleshandy para importar los campos de tu cuenta.",
+      "noMatches": "Ningún campo coincide",
+      "noMatchesHint": "Prueba con otra búsqueda o quita filtros."
+    },
+    "actions": {
+      "menu": "Acciones",
+      "view": "Ver detalle",
+      "copyVariable": "Copiar variable",
+      "copied": "Variable copiada",
+      "edit": "Editar campo",
+      "disable": "Deshabilitar",
+      "enable": "Habilitar",
+      "systemReadonly": "Campo de sistema: solo lectura"
+    },
+    "peek": {
+      "type": "Tipo",
+      "origin": "Origen",
+      "fallback": "Texto de respaldo",
+      "tags": "Etiquetas",
+      "options": "Opciones",
+      "currency": "Moneda",
+      "notAvailable": "No disponible",
+      "metadataHint": "Este campo se creó directamente en Saleshandy; su API no expone opciones ni moneda.",
+      "integration": "Integración",
+      "saleshandyId": "ID en Saleshandy",
+      "systemMapping": "Mapeo de sistema",
+      "lastSynced": "Última sincronización",
+      "updatedAt": "Actualizado",
+      "systemNotice": "Los campos de sistema los define Saleshandy y no se pueden editar ni deshabilitar.",
+      "removedNotice": "Este campo ya no existe en Saleshandy. Se conserva aquí deshabilitado como referencia."
+    },
+    "form": {
+      "createTitle": "Agregar campo",
+      "editTitle": "Editar campo",
+      "createDescription": "El campo se crea en Saleshandy y queda disponible como variable en tus plantillas.",
+      "editDescription": "Puedes cambiar el nombre, el texto de respaldo y las etiquetas.",
+      "label": "Nombre del campo",
+      "labelPlaceholder": "Ej. Etapa del deal",
+      "variablePreview": "Variable:",
+      "variableFixed": "La variable no cambia:",
+      "type": "Tipo de campo",
+      "typeLocked": "El tipo y su configuración no se pueden cambiar después de crear el campo.",
+      "options": "Opciones",
+      "optionsPlaceholder": "Escribe una opción y pulsa Enter",
+      "optionsHint": "Pega una lista separada por comas o saltos de línea para agregar varias.",
+      "currency": "Moneda",
+      "fallback": "Texto de respaldo",
+      "fallbackPlaceholder": "Ej. allí",
+      "fallbackHint": "Se usa cuando el prospecto no tiene valor en este campo.",
+      "tags": "Etiquetas",
+      "tagsPlaceholder": "Agrega etiquetas para organizar tus campos",
+      "tagsHint": "Sirven para organizar y filtrar campos; no son etiquetas de prospectos.",
+      "tagsReplaceWarning": "Al guardar, esta lista reemplaza todas las etiquetas del campo en Saleshandy.",
+      "optional": "opcional",
+      "cancel": "Cancelar",
+      "create": "Crear campo",
+      "save": "Guardar cambios",
+      "errors": {
+        "labelRequired": "El nombre es obligatorio.",
+        "optionsRequired": "Agrega al menos una opción.",
+        "generic": "No se pudo guardar el campo."
+      }
+    },
+    "sync": {
+      "lastAt": "Sincronizado {when}",
+      "failedAt": "Falló la sincronización {when}",
+      "done": "Sincronización completa: {created} nuevos, {updated} actualizados, {deactivated} deshabilitados.",
+      "error": "No se pudo sincronizar con Saleshandy. Los datos locales no cambiaron."
+    },
+    "disable": {
+      "title": "¿Deshabilitar «{label}»?",
+      "description": "El campo seguirá existiendo en Saleshandy, pero dejará de ofrecerse en la app. Puedes volver a habilitarlo cuando quieras.",
+      "confirm": "Deshabilitar"
+    },
+    "notices": {
+      "created": "Campo «{label}» creado.",
+      "updated": "Campo «{label}» actualizado.",
+      "enabled": "Campo «{label}» habilitado.",
+      "disabled": "Campo «{label}» deshabilitado.",
+      "statusError": "No se pudo cambiar el estado del campo.",
+      "dismiss": "Cerrar"
+    }
   }
 }

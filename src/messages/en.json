@@ -1244,9 +1244,155 @@
     "description": "Manage outreach sending: sender mailboxes, sequences and prospects.",
     "tabs": {
       "emailAccounts": "Email accounts",
+      "fields": "Fields",
       "sequences": "Sequences",
       "prospects": "Prospects"
     },
     "soon": "Soon"
+  },
+  "Fields": {
+    "title": "Prospect fields",
+    "description": "Variables used in Saleshandy templates and sequences. System fields come from Saleshandy and cannot be edited; custom fields are created by your team.",
+    "tabs": {
+      "all": "All",
+      "custom": "Custom",
+      "system": "System",
+      "disabled": "Disabled"
+    },
+    "toolbar": {
+      "sync": "Sync with Saleshandy",
+      "add": "Add field",
+      "search": "Search fields",
+      "searchPlaceholder": "Search by name, variable or tag",
+      "filters": "Filters"
+    },
+    "filters": {
+      "type": "Type",
+      "tag": "Tag",
+      "noTags": "No tags yet",
+      "clear": "Clear filters",
+      "remove": "Remove filter {filter}"
+    },
+    "sort": {
+      "title": "Sort by",
+      "label": "Name",
+      "fieldType": "Type",
+      "updatedAt": "Last updated",
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "types": {
+      "text": "Text",
+      "long-text": "Long text",
+      "number": "Number",
+      "currency": "Currency",
+      "date": "Date",
+      "dropdown": "Dropdown"
+    },
+    "type": {
+      "optionsCount": "{count, plural, one {# option} other {# options}}"
+    },
+    "origin": {
+      "SYSTEM": "System",
+      "CUSTOM": "Custom"
+    },
+    "status": {
+      "disabled": "Disabled",
+      "removed": "Removed in Saleshandy"
+    },
+    "table": {
+      "columns": {
+        "field": "Field",
+        "type": "Type",
+        "fallback": "Fallback text",
+        "tags": "Tags",
+        "origin": "Origin"
+      },
+      "errorTitle": "We couldn't load the fields",
+      "loadError": "Failed to load fields.",
+      "retry": "Retry",
+      "emptyTitle": "No fields yet",
+      "emptyHint": "Sync with Saleshandy to import your account's fields.",
+      "noMatches": "No fields match",
+      "noMatchesHint": "Try another search or clear filters."
+    },
+    "actions": {
+      "menu": "Actions",
+      "view": "View details",
+      "copyVariable": "Copy variable",
+      "copied": "Variable copied",
+      "edit": "Edit field",
+      "disable": "Disable",
+      "enable": "Enable",
+      "systemReadonly": "System field: read-only"
+    },
+    "peek": {
+      "type": "Type",
+      "origin": "Origin",
+      "fallback": "Fallback text",
+      "tags": "Tags",
+      "options": "Options",
+      "currency": "Currency",
+      "notAvailable": "Not available",
+      "metadataHint": "This field was created directly in Saleshandy; its API does not expose options or currency.",
+      "integration": "Integration",
+      "saleshandyId": "Saleshandy ID",
+      "systemMapping": "System mapping",
+      "lastSynced": "Last synced",
+      "updatedAt": "Updated",
+      "systemNotice": "System fields are defined by Saleshandy and cannot be edited or disabled.",
+      "removedNotice": "This field no longer exists in Saleshandy. It is kept here, disabled, for reference."
+    },
+    "form": {
+      "createTitle": "Add field",
+      "editTitle": "Edit field",
+      "createDescription": "The field is created in Saleshandy and becomes available as a template variable.",
+      "editDescription": "You can change the name, fallback text and tags.",
+      "label": "Field name",
+      "labelPlaceholder": "e.g. Deal stage",
+      "variablePreview": "Variable:",
+      "variableFixed": "The variable stays the same:",
+      "type": "Field type",
+      "typeLocked": "The type and its settings cannot be changed after the field is created.",
+      "options": "Options",
+      "optionsPlaceholder": "Type an option and press Enter",
+      "optionsHint": "Paste a comma- or newline-separated list to add several.",
+      "currency": "Currency",
+      "fallback": "Fallback text",
+      "fallbackPlaceholder": "e.g. there",
+      "fallbackHint": "Used when the prospect has no value for this field.",
+      "tags": "Tags",
+      "tagsPlaceholder": "Add tags to organize your fields",
+      "tagsHint": "They organize and filter fields; they are not prospect tags.",
+      "tagsReplaceWarning": "On save, this list replaces all of the field's tags in Saleshandy.",
+      "optional": "optional",
+      "cancel": "Cancel",
+      "create": "Create field",
+      "save": "Save changes",
+      "errors": {
+        "labelRequired": "Name is required.",
+        "optionsRequired": "Add at least one option.",
+        "generic": "Couldn't save the field."
+      }
+    },
+    "sync": {
+      "lastAt": "Synced {when}",
+      "failedAt": "Sync failed {when}",
+      "done": "Sync complete: {created} new, {updated} updated, {deactivated} disabled.",
+      "error": "Couldn't sync with Saleshandy. Local data was not changed."
+    },
+    "disable": {
+      "title": "Disable “{label}”?",
+      "description": "The field will still exist in Saleshandy but will no longer be offered in the app. You can enable it again anytime.",
+      "confirm": "Disable"
+    },
+    "notices": {
+      "created": "Field “{label}” created.",
+      "updated": "Field “{label}” updated.",
+      "enabled": "Field “{label}” enabled.",
+      "disabled": "Field “{label}” disabled.",
+      "statusError": "Couldn't change the field status.",
+      "dismiss": "Dismiss"
+    }
   }
 }
