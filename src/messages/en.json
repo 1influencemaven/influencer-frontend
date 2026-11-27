@@ -1249,7 +1249,8 @@
       "emailAccounts": "Email accounts",
       "fields": "Fields",
       "sequences": "Sequences",
-      "prospects": "Prospects"
+      "prospects": "Prospects",
+      "templates": "Templates"
     },
     "soon": "Soon"
   },
@@ -1592,6 +1593,148 @@
         "email": "Map a column to the Email field.",
         "duplicate": "Each field can only be used by one column.",
         "generic": "Couldn't import the file."
+      }
+    }
+  },
+  "Templates": {
+    "title": "Templates",
+    "description": "Reusable emails per talent, with talent and prospect variables. Copy them into a Saleshandy sequence in one click.",
+    "sectionDescription": "Reusable emails for this talent's outreach.",
+    "tabs": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "new": "New template",
+    "chooseTalentToCreate": "Choose a talent to create a template",
+    "search": "Search templates",
+    "searchPlaceholder": "Search by name or subject",
+    "table": {
+      "columns": {
+        "name": "Name",
+        "subject": "Subject",
+        "talent": "Talent",
+        "created": "Created",
+        "updated": "Last modified"
+      },
+      "errorTitle": "We couldn't load the templates",
+      "loadError": "Failed to load templates.",
+      "retry": "Retry",
+      "emptyTitle": "No templates yet",
+      "emptyHint": "Create the first one to reuse your outreach messages.",
+      "noMatches": "No templates match",
+      "noMatchesHint": "Try another search.",
+      "issuesHint": "Has variables to review"
+    },
+    "variables": {
+      "button": "Variables",
+      "open": "Insert variable",
+      "search": "Search variable",
+      "loading": "Loading variables…",
+      "groups": {
+        "prospect": "Prospect",
+        "influencer": "Talent",
+        "custom": "Custom fields"
+      },
+      "fallback": "Fallback: “{value}”",
+      "noFallback": "No fallback"
+    },
+    "editor": {
+      "createTitle": "New template",
+      "editTitle": "Edit template",
+      "back": "Back to talent",
+      "loading": "Loading template…",
+      "loadError": "Couldn't load the template.",
+      "unsaved": "Unsaved changes",
+      "savedState": "All changes saved",
+      "newHint": "The template is saved for this talent.",
+      "name": "Template name",
+      "namePlaceholder": "e.g. First touch – beauty",
+      "subject": "Subject",
+      "subjectPlaceholder": "e.g. Collaboration with '{{Company}}'",
+      "preHeader": "Pre-header",
+      "preHeaderPlaceholder": "Text shown next to the subject in the inbox",
+      "optional": "optional",
+      "body": "Email body",
+      "bodyPlaceholder": "Write your message… use Variables to personalize it",
+      "insertVariable": "Variable",
+      "preview": "Preview",
+      "copySaleshandy": "Copy for Saleshandy",
+      "archive": "Archive",
+      "restore": "Restore",
+      "save": "Save changes",
+      "create": "Create template",
+      "archiveConfirm": "Archive this template? It will no longer be offered for new selections; you can restore it.",
+      "archivedNotice": "This template is archived and read-only. Restore it to edit.",
+      "toolbar": {
+        "label": "Formatting",
+        "bold": "Bold",
+        "italic": "Italic",
+        "underline": "Underline",
+        "bulletList": "Bulleted list",
+        "orderedList": "Numbered list",
+        "alignLeft": "Align left",
+        "alignCenter": "Center",
+        "alignRight": "Align right",
+        "link": "Link",
+        "linkUrl": "Link URL",
+        "linkApply": "Apply",
+        "clear": "Clear formatting"
+      },
+      "errors": {
+        "name": "Name is required.",
+        "subject": "Subject is required.",
+        "body": "The body can't be empty."
+      },
+      "notices": {
+        "saved": "Template saved.",
+        "noChanges": "Nothing to save.",
+        "saveError": "Couldn't save the template.",
+        "archived": "Template archived.",
+        "restored": "Template restored.",
+        "saveFirst": "Save your changes before copying.",
+        "copied": "Copied: paste it into a step of your Saleshandy sequence. Variables are already in its format ('{{First Name}}').",
+        "missingTalent": "Missing talent data: {keys}.",
+        "copyError": "Couldn't copy the template."
+      },
+      "issues": {
+        "title": "Variables",
+        "none": "All variables are valid.",
+        "saveAllowed": "You can still save; fix them before using the template in a sequence.",
+        "help": "Talent variables are filled in when copying to Saleshandy; prospect variables are replaced on each send.",
+        "codes": {
+          "MALFORMED_TOKEN": "Malformed variable",
+          "INVALID_KEY": "Invalid variable name",
+          "UNKNOWN_VARIABLE": "Unknown variable",
+          "FIELD_DISABLED": "Disabled field",
+          "FIELD_REMOVED_IN_SALESHANDY": "Field removed in Saleshandy"
+        },
+        "locations": {
+          "subject": "Subject",
+          "preHeader": "Pre-header",
+          "body": "Body"
+        },
+        "errors": "{count, plural, one {# error} other {# errors}}",
+        "warnings": "{count, plural, one {# warning} other {# warnings}}"
+      }
+    },
+    "preview": {
+      "title": "Preview",
+      "description": "How the email will look with a prospect's data. Nothing is saved.",
+      "prospect": "Prospect",
+      "noProspect": "No prospect (fallbacks only)",
+      "emptyProspects": "This talent has no prospects yet: approve them in contact discovery or import a CSV.",
+      "loading": "Generating preview…",
+      "error": "Couldn't generate the preview.",
+      "unresolved": "No value:",
+      "fallbacks": "Fallback used for:",
+      "from": "From",
+      "to": "To",
+      "subject": "Subject",
+      "preHeader": "Pre-header",
+      "noSender": "No outgoing email configured",
+      "mode": {
+        "html": "HTML",
+        "text": "Plain text"
       }
     }
   }

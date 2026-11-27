@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { IdealBrandProfileSection } from "@/components/influencers/ideal-brand-profile-section";
 import { InfluencerBrandCandidatesSection } from "@/components/influencers/influencer-brand-candidates-section";
+import { InfluencerTemplatesSection } from "@/components/templates/influencer-templates-section";
 import { IbpStatusBadge } from "@/components/influencers/ibp-status-badge";
 import { ResearchInstagramButton } from "@/components/influencers/research-instagram-button";
 import { Badge } from "@/components/ui/badge";
@@ -532,6 +533,8 @@ export function InfluencerDetailView({ influencerId }: InfluencerDetailViewProps
       />
 
       <InfluencerBrandCandidatesSection influencerId={influencer.id} />
+
+      <InfluencerTemplatesSection influencerId={influencer.id} />
     </div>
   );
 }

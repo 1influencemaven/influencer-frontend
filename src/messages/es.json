@@ -1249,7 +1249,8 @@
       "emailAccounts": "Cuentas de correo",
       "fields": "Campos",
       "sequences": "Secuencias",
-      "prospects": "Prospectos"
+      "prospects": "Prospectos",
+      "templates": "Plantillas"
     },
     "soon": "Pronto"
   },
@@ -1592,6 +1593,148 @@
         "email": "Asigna una columna al campo Email.",
         "duplicate": "Cada campo solo puede usarse en una columna.",
         "generic": "No se pudo importar el archivo."
+      }
+    }
+  },
+  "Templates": {
+    "title": "Plantillas",
+    "description": "Correos reutilizables por talento, con variables del talento y del prospecto. Cópialos a una secuencia de Saleshandy con un clic.",
+    "sectionDescription": "Correos reutilizables para el outreach de este talento.",
+    "tabs": {
+      "active": "Activas",
+      "archived": "Archivadas"
+    },
+    "new": "Nueva plantilla",
+    "chooseTalentToCreate": "Elige un talento para crear una plantilla",
+    "search": "Buscar plantillas",
+    "searchPlaceholder": "Buscar por nombre o asunto",
+    "table": {
+      "columns": {
+        "name": "Nombre",
+        "subject": "Asunto",
+        "talent": "Talento",
+        "created": "Creada",
+        "updated": "Última modificación"
+      },
+      "errorTitle": "No pudimos cargar las plantillas",
+      "loadError": "Error al cargar las plantillas.",
+      "retry": "Reintentar",
+      "emptyTitle": "Aún no hay plantillas",
+      "emptyHint": "Crea la primera para reutilizar tus mensajes comerciales.",
+      "noMatches": "Ninguna plantilla coincide",
+      "noMatchesHint": "Prueba con otra búsqueda.",
+      "issuesHint": "Tiene variables que revisar"
+    },
+    "variables": {
+      "button": "Variables",
+      "open": "Insertar variable",
+      "search": "Buscar variable",
+      "loading": "Cargando variables…",
+      "groups": {
+        "prospect": "Prospecto",
+        "influencer": "Talento",
+        "custom": "Campos personalizados"
+      },
+      "fallback": "Respaldo: “{value}”",
+      "noFallback": "Sin respaldo"
+    },
+    "editor": {
+      "createTitle": "Nueva plantilla",
+      "editTitle": "Editar plantilla",
+      "back": "Volver al talento",
+      "loading": "Cargando plantilla…",
+      "loadError": "No se pudo cargar la plantilla.",
+      "unsaved": "Cambios sin guardar",
+      "savedState": "Todo guardado",
+      "newHint": "La plantilla se guarda para este talento.",
+      "name": "Nombre de la plantilla",
+      "namePlaceholder": "Ej. Primer contacto – beauty",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Ej. Colaboración con '{{Company}}'",
+      "preHeader": "Pre-header",
+      "preHeaderPlaceholder": "Texto que se ve junto al asunto en la bandeja",
+      "optional": "opcional",
+      "body": "Cuerpo del correo",
+      "bodyPlaceholder": "Escribe tu mensaje… usa Variables para personalizarlo",
+      "insertVariable": "Variable",
+      "preview": "Vista previa",
+      "copySaleshandy": "Copiar para Saleshandy",
+      "archive": "Archivar",
+      "restore": "Restaurar",
+      "save": "Guardar cambios",
+      "create": "Crear plantilla",
+      "archiveConfirm": "¿Archivar esta plantilla? Dejará de estar disponible para nuevas selecciones; podrás restaurarla.",
+      "archivedNotice": "Esta plantilla está archivada y es de solo lectura. Restáurala para editarla.",
+      "toolbar": {
+        "label": "Formato",
+        "bold": "Negrita",
+        "italic": "Cursiva",
+        "underline": "Subrayado",
+        "bulletList": "Lista con viñetas",
+        "orderedList": "Lista numerada",
+        "alignLeft": "Alinear a la izquierda",
+        "alignCenter": "Centrar",
+        "alignRight": "Alinear a la derecha",
+        "link": "Enlace",
+        "linkUrl": "URL del enlace",
+        "linkApply": "Aplicar",
+        "clear": "Quitar formato"
+      },
+      "errors": {
+        "name": "El nombre es obligatorio.",
+        "subject": "El asunto es obligatorio.",
+        "body": "El cuerpo no puede estar vacío."
+      },
+      "notices": {
+        "saved": "Plantilla guardada.",
+        "noChanges": "No hay cambios que guardar.",
+        "saveError": "No se pudo guardar la plantilla.",
+        "archived": "Plantilla archivada.",
+        "restored": "Plantilla restaurada.",
+        "saveFirst": "Guarda los cambios antes de copiar.",
+        "copied": "Copiado: pégalo en un paso de tu secuencia en Saleshandy. Las variables ya están en su formato ('{{First Name}}').",
+        "missingTalent": "Faltan datos del talento: {keys}.",
+        "copyError": "No se pudo copiar la plantilla."
+      },
+      "issues": {
+        "title": "Variables",
+        "none": "Todas las variables son válidas.",
+        "saveAllowed": "Puedes guardar igual; corrígelas antes de usar la plantilla en una secuencia.",
+        "help": "Las variables del talento se completan al copiar a Saleshandy; las del prospecto se reemplazan en cada envío.",
+        "codes": {
+          "MALFORMED_TOKEN": "Variable mal escrita",
+          "INVALID_KEY": "Nombre de variable inválido",
+          "UNKNOWN_VARIABLE": "Variable desconocida",
+          "FIELD_DISABLED": "Campo deshabilitado",
+          "FIELD_REMOVED_IN_SALESHANDY": "Campo eliminado en Saleshandy"
+        },
+        "locations": {
+          "subject": "Asunto",
+          "preHeader": "Pre-header",
+          "body": "Cuerpo"
+        },
+        "errors": "{count, plural, one {# error} other {# errores}}",
+        "warnings": "{count, plural, one {# advertencia} other {# advertencias}}"
+      }
+    },
+    "preview": {
+      "title": "Vista previa",
+      "description": "Así se verá el correo con los datos de un prospecto. No se guarda nada.",
+      "prospect": "Prospecto",
+      "noProspect": "Sin prospecto (solo respaldos)",
+      "emptyProspects": "Este talento aún no tiene prospectos: apruébalos en la búsqueda de contactos o importa un CSV.",
+      "loading": "Generando vista previa…",
+      "error": "No se pudo generar la vista previa.",
+      "unresolved": "Sin valor:",
+      "fallbacks": "Se usó el respaldo en:",
+      "from": "De",
+      "to": "Para",
+      "subject": "Asunto",
+      "preHeader": "Pre-header",
+      "noSender": "Sin correo de salida configurado",
+      "mode": {
+        "html": "HTML",
+        "text": "Texto plano"
       }
     }
   }

@@ -1,20 +1,22 @@
 "use client";
 
-import { Braces, Mail, Send, UserRound } from "lucide-react";
+import { Braces, FileText, Mail, Send, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { EmailAccountsView } from "@/components/email-accounts/email-accounts-view";
 import { FieldsView } from "@/components/fields/fields-view";
 import { ProspectsView } from "@/components/prospects/prospects-view";
+import { TemplatesView } from "@/components/templates/templates-view";
 import { cn } from "@/lib/utils";
 
-type CampaignTab = "emailAccounts" | "fields" | "sequences" | "prospects";
+type CampaignTab = "emailAccounts" | "fields" | "prospects" | "templates" | "sequences";
 
 const TABS: Array<{ id: CampaignTab; icon: typeof Mail; available: boolean }> = [
   { id: "emailAccounts", icon: Mail, available: true },
   { id: "fields", icon: Braces, available: true },
   { id: "prospects", icon: UserRound, available: true },
+  { id: "templates", icon: FileText, available: true },
   { id: "sequences", icon: Send, available: false },
 ];
 
@@ -66,6 +68,7 @@ export function CampaignsView() {
       {tab === "emailAccounts" ? <EmailAccountsView /> : null}
       {tab === "fields" ? <FieldsView /> : null}
       {tab === "prospects" ? <ProspectsView /> : null}
+      {tab === "templates" ? <TemplatesView /> : null}
     </div>
   );
 }
