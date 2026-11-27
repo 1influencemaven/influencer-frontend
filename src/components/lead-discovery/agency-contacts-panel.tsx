@@ -4,6 +4,10 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
+import {
+  ApproveAllButton,
+  ApproveProspectButton,
+} from "@/components/prospects/approve-prospect-button";
 import { Button } from "@/components/ui/button";
 import { useAgencyContacts } from "@/hooks/use-agency-contacts";
 import type { AgencyContactCommercial } from "@/types/lead-discovery";
@@ -120,6 +124,16 @@ export function AgencyContactsPanel({
 
       {!loading && groups.length > 0 ? (
         <div className="space-y-4">
+          <div className="flex justify-end">
+            <ApproveAllButton
+              influencerId={influencerId}
+              items={contacts.map((contact) => ({
+                type: "AGENCY_CONTACT" as const,
+                id: contact.agencyContactId,
+                influencerId: influencerId ?? undefined,
+              }))}
+            />
+          </div>
           {groups.map((group) => (
             <div key={group.agencyId} className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
@@ -173,6 +187,12 @@ export function AgencyContactsPanel({
                         {contact.priority ? (
                           <Badge variant="default">{t("priority")}</Badge>
                         ) : null}
+                        <ApproveProspectButton
+                          type="AGENCY_CONTACT"
+                          id={contact.agencyContactId}
+                          influencerId={influencerId}
+                          className="ml-auto"
+                        />
                       </div>
                       {contact.displayName || contact.title ? (
                         <p className="mt-1 text-xs text-muted-foreground">

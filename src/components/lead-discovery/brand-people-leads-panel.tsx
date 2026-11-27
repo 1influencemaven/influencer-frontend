@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { ContactTierBadge } from "@/components/lead-discovery/contact-tier-badge";
+import { ApproveProspectButton } from "@/components/prospects/approve-prospect-button";
 import type { Lead } from "@/types/lead-discovery";
 
 type BrandPeopleLeadsPanelProps = {
@@ -85,6 +86,14 @@ export function BrandPeopleLeadsPanel({
                   <Badge variant="secondary">
                     {t(`status.${lead.status}`)}
                   </Badge>
+                  {lead.email ? (
+                    <ApproveProspectButton
+                      type="LEAD"
+                      id={lead.id}
+                      influencerId={lead.influencerId}
+                      className="ml-auto"
+                    />
+                  ) : null}
                 </div>
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                   {linkedin ? (
@@ -160,6 +169,14 @@ export function ConfirmedContactsList({
                 <span className="text-xs text-muted-foreground">
                   {lead.title}
                 </span>
+              ) : null}
+              {lead.email ? (
+                <ApproveProspectButton
+                  type="LEAD"
+                  id={lead.id}
+                  influencerId={lead.influencerId}
+                  className="ml-auto"
+                />
               ) : null}
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">

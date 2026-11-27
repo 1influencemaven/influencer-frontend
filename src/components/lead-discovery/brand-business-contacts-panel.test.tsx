@@ -10,6 +10,11 @@ import { useBbcDiscovery } from "@/hooks/use-bbc-discovery";
 import type { BrandBusinessContact, Lead } from "@/types/lead-discovery";
 import type { BbcUiState } from "@/lib/bbc-run-ui-state";
 
+jest.mock("../prospects/approve-prospect-button", () => ({
+  ApproveProspectButton: () => null,
+  ApproveAllButton: () => null,
+}));
+
 jest.mock("../../hooks/use-bbc-discovery", () => ({
   useBbcDiscovery: jest.fn(),
 }));

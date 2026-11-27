@@ -806,7 +806,7 @@
     },
     "agencyContacts": {
       "contactsTitle": "Contactos de agencias",
-      "contactsDescription": "Buzones y personas comerciales hallados en agencias vinculadas a este influencer (track 2C). Solo lectura — no son contactos de marca ni person leads.",
+      "contactsDescription": "Buzones y personas comerciales hallados en agencias vinculadas a este influencer (track 2C). No son contactos de marca ni person leads; apruébalos para agregarlos a Prospectos.",
       "loading": "Cargando contactos de agencias…",
       "empty": "Aún no hay contactos de agencia visibles para este influencer.",
       "missingInfluencer": "Se necesita el contexto del influencer para cargar contactos de agencia.",
@@ -1247,9 +1247,352 @@
     "description": "Gestiona el envío de outreach: buzones remitentes, secuencias y prospectos.",
     "tabs": {
       "emailAccounts": "Cuentas de correo",
+      "fields": "Campos",
       "sequences": "Secuencias",
       "prospects": "Prospectos"
     },
     "soon": "Pronto"
+  },
+  "Fields": {
+    "title": "Campos de prospecto",
+    "description": "Variables que se usan en plantillas y secuencias de Saleshandy. Los campos de sistema vienen de Saleshandy y no se pueden editar; los personalizados los crea tu equipo.",
+    "tabs": {
+      "all": "Todos",
+      "custom": "Personalizados",
+      "system": "Sistema",
+      "disabled": "Deshabilitados"
+    },
+    "toolbar": {
+      "sync": "Sincronizar con Saleshandy",
+      "add": "Agregar campo",
+      "search": "Buscar campos",
+      "searchPlaceholder": "Buscar por nombre, variable o etiqueta",
+      "filters": "Filtros"
+    },
+    "filters": {
+      "type": "Tipo",
+      "tag": "Etiqueta",
+      "noTags": "Aún no hay etiquetas",
+      "clear": "Limpiar filtros",
+      "remove": "Quitar filtro {filter}"
+    },
+    "sort": {
+      "title": "Ordenar por",
+      "label": "Nombre",
+      "fieldType": "Tipo",
+      "updatedAt": "Última actualización",
+      "asc": "Ascendente",
+      "desc": "Descendente"
+    },
+    "types": {
+      "text": "Texto",
+      "long-text": "Texto largo",
+      "number": "Número",
+      "currency": "Moneda",
+      "date": "Fecha",
+      "dropdown": "Lista desplegable"
+    },
+    "type": {
+      "optionsCount": "{count, plural, one {# opción} other {# opciones}}"
+    },
+    "origin": {
+      "SYSTEM": "Sistema",
+      "CUSTOM": "Personalizado"
+    },
+    "status": {
+      "disabled": "Deshabilitado",
+      "removed": "Eliminado en Saleshandy"
+    },
+    "table": {
+      "columns": {
+        "field": "Campo",
+        "type": "Tipo",
+        "fallback": "Texto de respaldo",
+        "tags": "Etiquetas",
+        "origin": "Origen"
+      },
+      "errorTitle": "No pudimos cargar los campos",
+      "loadError": "Error al cargar los campos.",
+      "retry": "Reintentar",
+      "emptyTitle": "Aún no hay campos",
+      "emptyHint": "Sincroniza con Saleshandy para importar los campos de tu cuenta.",
+      "noMatches": "Ningún campo coincide",
+      "noMatchesHint": "Prueba con otra búsqueda o quita filtros."
+    },
+    "actions": {
+      "menu": "Acciones",
+      "view": "Ver detalle",
+      "copyVariable": "Copiar variable",
+      "copied": "Variable copiada",
+      "edit": "Editar campo",
+      "disable": "Deshabilitar",
+      "enable": "Habilitar",
+      "systemReadonly": "Campo de sistema: solo lectura"
+    },
+    "peek": {
+      "type": "Tipo",
+      "origin": "Origen",
+      "fallback": "Texto de respaldo",
+      "tags": "Etiquetas",
+      "options": "Opciones",
+      "currency": "Moneda",
+      "notAvailable": "No disponible",
+      "metadataHint": "Este campo se creó directamente en Saleshandy; su API no expone opciones ni moneda.",
+      "integration": "Integración",
+      "saleshandyId": "ID en Saleshandy",
+      "systemMapping": "Mapeo de sistema",
+      "lastSynced": "Última sincronización",
+      "updatedAt": "Actualizado",
+      "systemNotice": "Los campos de sistema los define Saleshandy y no se pueden editar ni deshabilitar.",
+      "removedNotice": "Este campo ya no existe en Saleshandy. Se conserva aquí deshabilitado como referencia."
+    },
+    "form": {
+      "createTitle": "Agregar campo",
+      "editTitle": "Editar campo",
+      "createDescription": "El campo se crea en Saleshandy y queda disponible como variable en tus plantillas.",
+      "editDescription": "Puedes cambiar el nombre, el texto de respaldo y las etiquetas.",
+      "label": "Nombre del campo",
+      "labelPlaceholder": "Ej. Etapa del deal",
+      "variablePreview": "Variable:",
+      "variableFixed": "La variable no cambia:",
+      "type": "Tipo de campo",
+      "typeLocked": "El tipo y su configuración no se pueden cambiar después de crear el campo.",
+      "options": "Opciones",
+      "optionsPlaceholder": "Escribe una opción y pulsa Enter",
+      "optionsHint": "Pega una lista separada por comas o saltos de línea para agregar varias.",
+      "currency": "Moneda",
+      "fallback": "Texto de respaldo",
+      "fallbackPlaceholder": "Ej. allí",
+      "fallbackHint": "Se usa cuando el prospecto no tiene valor en este campo.",
+      "tags": "Etiquetas",
+      "tagsPlaceholder": "Agrega etiquetas para organizar tus campos",
+      "tagsHint": "Sirven para organizar y filtrar campos; no son etiquetas de prospectos.",
+      "tagsReplaceWarning": "Al guardar, esta lista reemplaza todas las etiquetas del campo en Saleshandy.",
+      "optional": "opcional",
+      "cancel": "Cancelar",
+      "create": "Crear campo",
+      "save": "Guardar cambios",
+      "errors": {
+        "labelRequired": "El nombre es obligatorio.",
+        "optionsRequired": "Agrega al menos una opción.",
+        "generic": "No se pudo guardar el campo."
+      }
+    },
+    "sync": {
+      "lastAt": "Sincronizado {when}",
+      "failedAt": "Falló la sincronización {when}",
+      "done": "Sincronización completa: {created} nuevos, {updated} actualizados, {deactivated} deshabilitados.",
+      "error": "No se pudo sincronizar con Saleshandy. Los datos locales no cambiaron."
+    },
+    "disable": {
+      "title": "¿Deshabilitar «{label}»?",
+      "description": "El campo seguirá existiendo en Saleshandy, pero dejará de ofrecerse en la app. Puedes volver a habilitarlo cuando quieras.",
+      "confirm": "Deshabilitar"
+    },
+    "notices": {
+      "created": "Campo «{label}» creado.",
+      "updated": "Campo «{label}» actualizado.",
+      "enabled": "Campo «{label}» habilitado.",
+      "disabled": "Campo «{label}» deshabilitado.",
+      "statusError": "No se pudo cambiar el estado del campo.",
+      "dismiss": "Cerrar"
+    }
+  },
+  "Prospects": {
+    "title": "Prospectos",
+    "description": "Contactos listos para outreach por talento: los que apruebas en la búsqueda de contactos (personas, correos de marca y agencias) y los que importas por CSV.",
+    "tabs": {
+      "all": "Todos",
+      "PERSON": "Personas",
+      "MAILBOX": "Buzones",
+      "archived": "Archivados"
+    },
+    "toolbar": {
+      "import": "Importar CSV",
+      "search": "Buscar prospectos",
+      "searchPlaceholder": "Buscar por correo, nombre, empresa o dominio",
+      "filters": "Filtros"
+    },
+    "filters": {
+      "source": "Origen",
+      "allSources": "Todos los orígenes",
+      "clear": "Limpiar filtros"
+    },
+    "sort": {
+      "title": "Ordenar por",
+      "createdAt": "Fecha de alta",
+      "email": "Correo",
+      "company": "Empresa",
+      "asc": "Ascendente",
+      "desc": "Descendente"
+    },
+    "source": {
+      "LEAD": "Persona encontrada",
+      "BRAND_CONTACT": "Correo de marca",
+      "AGENCY_CONTACT": "Agencia",
+      "CSV": "CSV",
+      "MANUAL": "Manual",
+      "SALESHANDY": "Saleshandy"
+    },
+    "kind": {
+      "person": "Persona",
+      "mailbox": "Buzón",
+      "generic": "Genérico"
+    },
+    "relevance": {
+      "HIGH": "Alta",
+      "NEUTRAL": "Media",
+      "LOW": "Baja",
+      "UNKNOWN": "Sin clasificar"
+    },
+    "talent": {
+      "all": "Todos los talentos",
+      "choose": "Elige un talento"
+    },
+    "table": {
+      "columns": {
+        "contact": "Contacto",
+        "company": "Empresa",
+        "jobTitle": "Cargo",
+        "talent": "Talento",
+        "source": "Origen",
+        "tags": "Etiquetas",
+        "added": "Agregado"
+      },
+      "errorTitle": "No pudimos cargar los prospectos",
+      "loadError": "Error al cargar los prospectos.",
+      "retry": "Reintentar",
+      "emptyTitle": "Aún no hay prospectos",
+      "emptyHint": "Aprueba contactos en la búsqueda de contactos de una marca o importa un CSV.",
+      "noMatches": "Ningún prospecto coincide",
+      "noMatchesHint": "Prueba con otra búsqueda o quita filtros."
+    },
+    "actions": {
+      "menu": "Acciones",
+      "view": "Ver detalle",
+      "edit": "Editar",
+      "archive": "Archivar",
+      "restore": "Restaurar"
+    },
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "jobTitle": "Cargo",
+      "company": "Empresa",
+      "companyDomain": "Dominio",
+      "website": "Sitio web",
+      "linkedInUrl": "LinkedIn",
+      "country": "País",
+      "phoneNumber": "Teléfono",
+      "mailboxLabel": "Etiqueta del buzón",
+      "tags": "Etiquetas"
+    },
+    "peek": {
+      "noName": "Sin nombre",
+      "customFields": "Campos personalizados",
+      "origin": "Origen",
+      "brand": "Marca",
+      "agency": "Agencia",
+      "relevance": "Relevancia comercial",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "saveError": "No se pudo guardar el prospecto.",
+      "tagsHint": "Separadas por comas"
+    },
+    "notices": {
+      "archived": "{email} archivado.",
+      "restored": "{email} restaurado.",
+      "saved": "{email} actualizado.",
+      "error": "No se pudo actualizar el prospecto.",
+      "dismiss": "Cerrar"
+    },
+    "pagination": {
+      "summary": "Página {page} de {totalPages} · {total} prospectos",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "approve": {
+      "approve": "Aprobar",
+      "approved": "En prospectos",
+      "remove": "Quitar de prospectos",
+      "error": "No se pudo actualizar",
+      "approveAll": "{count, plural, =0 {Todo aprobado} one {Aprobar # contacto} other {Aprobar # contactos}}",
+      "bulkDone": "{added} agregados a prospectos{skipped, plural, =0 {} other {, # omitidos}}",
+      "skip": {
+        "NOT_FOUND": "Contacto no encontrado",
+        "NO_VALID_EMAIL": "Sin correo válido",
+        "INFLUENCER_REQUIRED": "Falta el talento",
+        "AGENCY_NOT_LINKED": "Agencia no vinculada al talento"
+      }
+    },
+    "csv": {
+      "title": "Importar prospectos desde CSV",
+      "close": "Cerrar",
+      "steps": {
+        "upload": "Subir",
+        "map": "Mapear columnas",
+        "review": "Revisar",
+        "result": "Resultado"
+      },
+      "talent": "Talento",
+      "talentHint": "Los prospectos se guardan para este talento.",
+      "drop": "Arrastra un CSV o haz clic para elegirlo",
+      "dropHint": "Primera fila con encabezados · hasta {max} filas",
+      "rowsFound": "{count} filas · {columns} columnas",
+      "mapHint": "Indica a qué campo corresponde cada columna. La columna Email es obligatoria.",
+      "csvColumn": "Columna del CSV",
+      "sample": "Ejemplo",
+      "field": "Campo",
+      "fieldFor": "Campo para {column}",
+      "noHeader": "Columna {n}",
+      "skipColumn": "No importar",
+      "systemFields": "Campos de sistema",
+      "customFields": "Campos personalizados",
+      "conflict": {
+        "addMissingFields": {
+          "title": "Completar vacíos",
+          "hint": "Si el correo ya existe, solo rellena los campos vacíos."
+        },
+        "overwrite": {
+          "title": "Sobrescribir",
+          "hint": "Si el correo ya existe, reemplaza con los datos del CSV."
+        },
+        "noUpdate": {
+          "title": "Omitir existentes",
+          "hint": "Si el correo ya existe, no lo toca."
+        }
+      },
+      "tags": "Etiquetas para todo el lote (opcional)",
+      "tagsPlaceholder": "Ej. Feria 2026, Lista VIP",
+      "summary": "Se importarán {count} filas.",
+      "invalidEmails": "{count, plural, one {# fila sin correo válido} other {# filas sin correo válido}} (se reportarán)",
+      "import": "Importar {count} filas",
+      "next": "Siguiente",
+      "back": "Atrás",
+      "finish": "Listo",
+      "done": "Importación completada",
+      "result": {
+        "created": "Nuevos",
+        "updated": "Actualizados",
+        "skipped": "Omitidos",
+        "failed": "Con error"
+      },
+      "errorsTitle": "Filas con observaciones",
+      "downloadErrors": "Descargar CSV",
+      "errorRow": "Fila {row}",
+      "reasons": {
+        "INVALID_EMAIL": "Correo inválido",
+        "DUPLICATE_IN_FILE": "Correo repetido en el archivo"
+      },
+      "errors": {
+        "empty": "El archivo no tiene filas.",
+        "tooMany": "Importa hasta {max} filas por vez.",
+        "talent": "Elige un talento.",
+        "file": "Sube un archivo CSV.",
+        "email": "Asigna una columna al campo Email.",
+        "duplicate": "Cada campo solo puede usarse en una columna.",
+        "generic": "No se pudo importar el archivo."
+      }
+    }
   }
 }

@@ -9,6 +9,11 @@ import { AgencyContactsPanel } from "@/components/lead-discovery/agency-contacts
 import * as leadDiscoveryService from "@/services/lead-discovery.service";
 import type { AgencyContactCommercial } from "@/types/lead-discovery";
 
+jest.mock("../prospects/approve-prospect-button", () => ({
+  ApproveProspectButton: () => null,
+  ApproveAllButton: () => null,
+}));
+
 jest.mock("../../services/lead-discovery.service", () => ({
   listAgencyContacts: jest.fn(),
 }));

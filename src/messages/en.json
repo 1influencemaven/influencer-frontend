@@ -806,7 +806,7 @@
     },
     "agencyContacts": {
       "contactsTitle": "Agency contacts",
-      "contactsDescription": "Commercial mailboxes and people found for agencies linked to this influencer (track 2C). Read-only — not brand business contacts or person leads.",
+      "contactsDescription": "Commercial mailboxes and people found for agencies linked to this influencer (track 2C). Not brand business contacts or person leads; approve them to add them to Prospects.",
       "loading": "Loading agency contacts…",
       "empty": "No visible agency contacts yet for this influencer.",
       "missingInfluencer": "Influencer context is required to load agency contacts.",
@@ -1247,9 +1247,352 @@
     "description": "Manage outreach sending: sender mailboxes, sequences and prospects.",
     "tabs": {
       "emailAccounts": "Email accounts",
+      "fields": "Fields",
       "sequences": "Sequences",
       "prospects": "Prospects"
     },
     "soon": "Soon"
+  },
+  "Fields": {
+    "title": "Prospect fields",
+    "description": "Variables used in Saleshandy templates and sequences. System fields come from Saleshandy and cannot be edited; custom fields are created by your team.",
+    "tabs": {
+      "all": "All",
+      "custom": "Custom",
+      "system": "System",
+      "disabled": "Disabled"
+    },
+    "toolbar": {
+      "sync": "Sync with Saleshandy",
+      "add": "Add field",
+      "search": "Search fields",
+      "searchPlaceholder": "Search by name, variable or tag",
+      "filters": "Filters"
+    },
+    "filters": {
+      "type": "Type",
+      "tag": "Tag",
+      "noTags": "No tags yet",
+      "clear": "Clear filters",
+      "remove": "Remove filter {filter}"
+    },
+    "sort": {
+      "title": "Sort by",
+      "label": "Name",
+      "fieldType": "Type",
+      "updatedAt": "Last updated",
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "types": {
+      "text": "Text",
+      "long-text": "Long text",
+      "number": "Number",
+      "currency": "Currency",
+      "date": "Date",
+      "dropdown": "Dropdown"
+    },
+    "type": {
+      "optionsCount": "{count, plural, one {# option} other {# options}}"
+    },
+    "origin": {
+      "SYSTEM": "System",
+      "CUSTOM": "Custom"
+    },
+    "status": {
+      "disabled": "Disabled",
+      "removed": "Removed in Saleshandy"
+    },
+    "table": {
+      "columns": {
+        "field": "Field",
+        "type": "Type",
+        "fallback": "Fallback text",
+        "tags": "Tags",
+        "origin": "Origin"
+      },
+      "errorTitle": "We couldn't load the fields",
+      "loadError": "Failed to load fields.",
+      "retry": "Retry",
+      "emptyTitle": "No fields yet",
+      "emptyHint": "Sync with Saleshandy to import your account's fields.",
+      "noMatches": "No fields match",
+      "noMatchesHint": "Try another search or clear filters."
+    },
+    "actions": {
+      "menu": "Actions",
+      "view": "View details",
+      "copyVariable": "Copy variable",
+      "copied": "Variable copied",
+      "edit": "Edit field",
+      "disable": "Disable",
+      "enable": "Enable",
+      "systemReadonly": "System field: read-only"
+    },
+    "peek": {
+      "type": "Type",
+      "origin": "Origin",
+      "fallback": "Fallback text",
+      "tags": "Tags",
+      "options": "Options",
+      "currency": "Currency",
+      "notAvailable": "Not available",
+      "metadataHint": "This field was created directly in Saleshandy; its API does not expose options or currency.",
+      "integration": "Integration",
+      "saleshandyId": "Saleshandy ID",
+      "systemMapping": "System mapping",
+      "lastSynced": "Last synced",
+      "updatedAt": "Updated",
+      "systemNotice": "System fields are defined by Saleshandy and cannot be edited or disabled.",
+      "removedNotice": "This field no longer exists in Saleshandy. It is kept here, disabled, for reference."
+    },
+    "form": {
+      "createTitle": "Add field",
+      "editTitle": "Edit field",
+      "createDescription": "The field is created in Saleshandy and becomes available as a template variable.",
+      "editDescription": "You can change the name, fallback text and tags.",
+      "label": "Field name",
+      "labelPlaceholder": "e.g. Deal stage",
+      "variablePreview": "Variable:",
+      "variableFixed": "The variable stays the same:",
+      "type": "Field type",
+      "typeLocked": "The type and its settings cannot be changed after the field is created.",
+      "options": "Options",
+      "optionsPlaceholder": "Type an option and press Enter",
+      "optionsHint": "Paste a comma- or newline-separated list to add several.",
+      "currency": "Currency",
+      "fallback": "Fallback text",
+      "fallbackPlaceholder": "e.g. there",
+      "fallbackHint": "Used when the prospect has no value for this field.",
+      "tags": "Tags",
+      "tagsPlaceholder": "Add tags to organize your fields",
+      "tagsHint": "They organize and filter fields; they are not prospect tags.",
+      "tagsReplaceWarning": "On save, this list replaces all of the field's tags in Saleshandy.",
+      "optional": "optional",
+      "cancel": "Cancel",
+      "create": "Create field",
+      "save": "Save changes",
+      "errors": {
+        "labelRequired": "Name is required.",
+        "optionsRequired": "Add at least one option.",
+        "generic": "Couldn't save the field."
+      }
+    },
+    "sync": {
+      "lastAt": "Synced {when}",
+      "failedAt": "Sync failed {when}",
+      "done": "Sync complete: {created} new, {updated} updated, {deactivated} disabled.",
+      "error": "Couldn't sync with Saleshandy. Local data was not changed."
+    },
+    "disable": {
+      "title": "Disable “{label}”?",
+      "description": "The field will still exist in Saleshandy but will no longer be offered in the app. You can enable it again anytime.",
+      "confirm": "Disable"
+    },
+    "notices": {
+      "created": "Field “{label}” created.",
+      "updated": "Field “{label}” updated.",
+      "enabled": "Field “{label}” enabled.",
+      "disabled": "Field “{label}” disabled.",
+      "statusError": "Couldn't change the field status.",
+      "dismiss": "Dismiss"
+    }
+  },
+  "Prospects": {
+    "title": "Prospects",
+    "description": "Outreach-ready contacts per talent: the ones you approve in contact discovery (people, brand emails and agencies) and the ones you import from CSV.",
+    "tabs": {
+      "all": "All",
+      "PERSON": "People",
+      "MAILBOX": "Mailboxes",
+      "archived": "Archived"
+    },
+    "toolbar": {
+      "import": "Import CSV",
+      "search": "Search prospects",
+      "searchPlaceholder": "Search by email, name, company or domain",
+      "filters": "Filters"
+    },
+    "filters": {
+      "source": "Source",
+      "allSources": "All sources",
+      "clear": "Clear filters"
+    },
+    "sort": {
+      "title": "Sort by",
+      "createdAt": "Date added",
+      "email": "Email",
+      "company": "Company",
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "source": {
+      "LEAD": "Found person",
+      "BRAND_CONTACT": "Brand email",
+      "AGENCY_CONTACT": "Agency",
+      "CSV": "CSV",
+      "MANUAL": "Manual",
+      "SALESHANDY": "Saleshandy"
+    },
+    "kind": {
+      "person": "Person",
+      "mailbox": "Mailbox",
+      "generic": "Generic"
+    },
+    "relevance": {
+      "HIGH": "High",
+      "NEUTRAL": "Medium",
+      "LOW": "Low",
+      "UNKNOWN": "Unclassified"
+    },
+    "talent": {
+      "all": "All talents",
+      "choose": "Choose a talent"
+    },
+    "table": {
+      "columns": {
+        "contact": "Contact",
+        "company": "Company",
+        "jobTitle": "Job title",
+        "talent": "Talent",
+        "source": "Source",
+        "tags": "Tags",
+        "added": "Added"
+      },
+      "errorTitle": "We couldn't load the prospects",
+      "loadError": "Failed to load prospects.",
+      "retry": "Retry",
+      "emptyTitle": "No prospects yet",
+      "emptyHint": "Approve contacts in a brand's contact discovery or import a CSV.",
+      "noMatches": "No prospects match",
+      "noMatchesHint": "Try another search or clear filters."
+    },
+    "actions": {
+      "menu": "Actions",
+      "view": "View details",
+      "edit": "Edit",
+      "archive": "Archive",
+      "restore": "Restore"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "jobTitle": "Job title",
+      "company": "Company",
+      "companyDomain": "Domain",
+      "website": "Website",
+      "linkedInUrl": "LinkedIn",
+      "country": "Country",
+      "phoneNumber": "Phone",
+      "mailboxLabel": "Mailbox label",
+      "tags": "Tags"
+    },
+    "peek": {
+      "noName": "No name",
+      "customFields": "Custom fields",
+      "origin": "Origin",
+      "brand": "Brand",
+      "agency": "Agency",
+      "relevance": "Commercial relevance",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saveError": "Couldn't save the prospect.",
+      "tagsHint": "Comma separated"
+    },
+    "notices": {
+      "archived": "{email} archived.",
+      "restored": "{email} restored.",
+      "saved": "{email} updated.",
+      "error": "Couldn't update the prospect.",
+      "dismiss": "Dismiss"
+    },
+    "pagination": {
+      "summary": "Page {page} of {totalPages} · {total} prospects",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "approve": {
+      "approve": "Approve",
+      "approved": "In prospects",
+      "remove": "Remove from prospects",
+      "error": "Couldn't update",
+      "approveAll": "{count, plural, =0 {All approved} one {Approve # contact} other {Approve # contacts}}",
+      "bulkDone": "{added} added to prospects{skipped, plural, =0 {} other {, # skipped}}",
+      "skip": {
+        "NOT_FOUND": "Contact not found",
+        "NO_VALID_EMAIL": "No valid email",
+        "INFLUENCER_REQUIRED": "Talent missing",
+        "AGENCY_NOT_LINKED": "Agency not linked to the talent"
+      }
+    },
+    "csv": {
+      "title": "Import prospects from CSV",
+      "close": "Close",
+      "steps": {
+        "upload": "Upload",
+        "map": "Map columns",
+        "review": "Review",
+        "result": "Result"
+      },
+      "talent": "Talent",
+      "talentHint": "Prospects are saved for this talent.",
+      "drop": "Drop a CSV or click to choose it",
+      "dropHint": "First row with headers · up to {max} rows",
+      "rowsFound": "{count} rows · {columns} columns",
+      "mapHint": "Choose the field for each column. The Email column is required.",
+      "csvColumn": "CSV column",
+      "sample": "Sample",
+      "field": "Field",
+      "fieldFor": "Field for {column}",
+      "noHeader": "Column {n}",
+      "skipColumn": "Do not import",
+      "systemFields": "System fields",
+      "customFields": "Custom fields",
+      "conflict": {
+        "addMissingFields": {
+          "title": "Fill blanks",
+          "hint": "If the email exists, only fill empty fields."
+        },
+        "overwrite": {
+          "title": "Overwrite",
+          "hint": "If the email exists, replace with the CSV data."
+        },
+        "noUpdate": {
+          "title": "Skip existing",
+          "hint": "If the email exists, leave it untouched."
+        }
+      },
+      "tags": "Tags for the whole batch (optional)",
+      "tagsPlaceholder": "e.g. Fair 2026, VIP list",
+      "summary": "{count} rows will be imported.",
+      "invalidEmails": "{count, plural, one {# row without a valid email} other {# rows without a valid email}} (will be reported)",
+      "import": "Import {count} rows",
+      "next": "Next",
+      "back": "Back",
+      "finish": "Done",
+      "done": "Import completed",
+      "result": {
+        "created": "New",
+        "updated": "Updated",
+        "skipped": "Skipped",
+        "failed": "Failed"
+      },
+      "errorsTitle": "Rows with notes",
+      "downloadErrors": "Download CSV",
+      "errorRow": "Row {row}",
+      "reasons": {
+        "INVALID_EMAIL": "Invalid email",
+        "DUPLICATE_IN_FILE": "Duplicate email in the file"
+      },
+      "errors": {
+        "empty": "The file has no rows.",
+        "tooMany": "Import up to {max} rows at a time.",
+        "talent": "Choose a talent.",
+        "file": "Upload a CSV file.",
+        "email": "Map a column to the Email field.",
+        "duplicate": "Each field can only be used by one column.",
+        "generic": "Couldn't import the file."
+      }
+    }
   }
 }
